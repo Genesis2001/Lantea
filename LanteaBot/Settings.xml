@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<Settings>
+	<Core>
+		<Connection Host="irc.unifiedtech.org" Port="6697" Nick="Lantea" Retry="60">
+			<Options>
+				<Secure CertificatePath="~/.lantea/lantea.pem" CertificateKeyPath="~/.lantea/lantea.key" />
+			</Options>
+			
+			<Events>
+				<OnConnect>
+					<Execute Command="OPER Foo bar" />
+					<Execute Command="PRIVMSG NickServ :ID %password%" />
+				</OnConnect>
+			</Events>
+		</Connection>
+	</Core>
+</Settings>

@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C19276F0-875B-4997-B5DB-0CF05DB7F36F}"
+	ProjectSection(SolutionItems) = preProject
+		GlobalAssemblyInfo.cs = GlobalAssemblyInfo.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5DDB5526-4C70-4822-B64F-D012D28396AE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{C12C37ED-8216-40CA-88BD-01E522A759D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanteaBot", "LanteaBot\LanteaBot.csproj", "{AE6B2EAC-6D88-4E70-87F6-415EDED3A022}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lantea.UnitTests", "Tests\Lantea.UnitTests\Lantea.UnitTests.csproj", "{6E0CE436-3E45-4ECF-AF91-E982661A4EFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lantea.Common", "Lantea.Common\Lantea.Common.csproj", "{FFDA6CBD-B19C-40F2-9204-3D2B015A8FB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lantea.Core", "Lantea.Core\Lantea.Core.csproj", "{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE6B2EAC-6D88-4E70-87F6-415EDED3A022}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE6B2EAC-6D88-4E70-87F6-415EDED3A022}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE6B2EAC-6D88-4E70-87F6-415EDED3A022}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE6B2EAC-6D88-4E70-87F6-415EDED3A022}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E0CE436-3E45-4ECF-AF91-E982661A4EFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E0CE436-3E45-4ECF-AF91-E982661A4EFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E0CE436-3E45-4ECF-AF91-E982661A4EFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E0CE436-3E45-4ECF-AF91-E982661A4EFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFDA6CBD-B19C-40F2-9204-3D2B015A8FB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFDA6CBD-B19C-40F2-9204-3D2B015A8FB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFDA6CBD-B19C-40F2-9204-3D2B015A8FB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFDA6CBD-B19C-40F2-9204-3D2B015A8FB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6E0CE436-3E45-4ECF-AF91-E982661A4EFB} = {5DDB5526-4C70-4822-B64F-D012D28396AE}
+	EndGlobalSection
+EndGlobal
