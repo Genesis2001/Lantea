@@ -50,12 +50,6 @@ namespace Lantea.UnitTests
 		}
 
 		[Test]
-		public void Version_StringContainsDecimal()
-		{
-			Assert.That(SUT.Version, Contains.Substring("."));
-		}
-
-		[Test]
 		public void Version_IsValidDecimalSeparatedStringForVersioning()
 		{
 			Assert.That(SUT.Version, Is.EqualTo("1.0.0"));

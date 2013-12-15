@@ -149,6 +149,35 @@ namespace Lantea.UnitTests
 			Assert.That(actual, Is.Not.Null);
 			Assert.AreEqual(expected, actual);
 		}
+
+		[Test]
+		public void CompareTo_ShouldReturnGreaterThanZeroWhenComparerVersionIsLessThanSUT()
+		{
+			var version = new Version(1, 3); // v0.2
+			var actual = SUT.CompareTo(version); // 1.2 > 0.2
+
+			Assert.That(actual, Is.LessThan(0));
+			Assert.That(SUT, Is.LessThan(version));
+		}
+
+		[Test]
+		public void CompareTo_ShouldReturnZeroWhenComparerIsEqualToSUT()
+		{
+			var version = new Version(major, minor); // v1.2
+			var actual = SUT.CompareTo(version);
+
+			Assert.That(actual, Is.EqualTo(0));
+		}
+
+		[Test]
+		public void CompareTo_ShouldReturnNumberGreaterThanZeroWhenGreaterThanSUT()
+		{
+			var version = new Version(1, 1); // v1.1
+			var actual = SUT.CompareTo(version);
+
+			Assert.That(actual, Is.GreaterThan(0));
+			Assert.That(SUT, Is.GreaterThan(version));
+		}
 	}
 
 	// ReSharper enable InconsistentNaming

@@ -9,12 +9,10 @@ namespace Lantea.UnitTests.Mocks
 {
 	using System;
 	using Common.Modules;
+	using Version = Common.Modules.Version;
 
 	public class MockModule : IModule
 	{
-		private bool isEnabled;
-		private bool isLoaded;
-
 		#region Implementation of IModuleMeta
 
 		public string Author
@@ -22,26 +20,18 @@ namespace Lantea.UnitTests.Mocks
 			get { return "Zack Loveless"; }
 		}
 
-		public string Version
+		public Version Version
 		{
 			get { return "1.0.0"; }
 		}
 
-		public bool IsEnabled
-		{
-			get { return isEnabled; }
-			set { isEnabled = value; }
-		}
+		public bool IsEnabled { get; set; }
 
 		#endregion
 
 		#region Implementation of IModule
 
-		public bool IsLoaded
-		{
-			get { return isLoaded; }
-			private set { isLoaded = value; }
-		}
+		public bool IsLoaded { get; private set; }
 
 		public void Load()
 		{

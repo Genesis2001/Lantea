@@ -8,13 +8,11 @@
 
 namespace Lantea.Common.Modules
 {
-	using System;
-
 	public interface IModuleMeta
 	{
 		string Author { get; }
 
-		string Version { get; }
+		Version Version { get; }
 
 		bool IsEnabled { get; set; }
 	}

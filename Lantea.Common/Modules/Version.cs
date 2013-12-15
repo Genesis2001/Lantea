@@ -14,7 +14,7 @@ namespace Lantea.Common.Modules
 
 	public class Version : IEquatable<Version>, IComparable<Version>
 	{
-		internal static readonly string[] VersionFormat = {"major", "minor", "build", "revision"};
+		internal static readonly string[] VersionKeys = {"major", "minor", "build", "revision"};
 
 		public Version(int major, int minor, int build = 0, int revision = 0)
 		{
@@ -48,6 +48,8 @@ namespace Lantea.Common.Modules
 			}
 		}
 
+		#region Public Properties
+
 		public int Major { get; private set; }
 
 		public int Minor { get; private set; }
@@ -55,6 +57,8 @@ namespace Lantea.Common.Modules
 		public int Build { get; private set; }
 
 		public int Revision { get; private set; }
+
+		#endregion
 
 		#region Implementation of IComparable<Version>
 
@@ -67,7 +71,16 @@ namespace Lantea.Common.Modules
 		/// <param name="other">An object to compare with this object.</param>
 		public int CompareTo(Version other)
 		{
-			throw new NotImplementedException();
+			if (Equals(other)) return 0; // We're equal.
+
+			int i;
+
+			if ((i = Major.CompareTo(other.Major)) != 0) return i;
+			if ((i = Minor.CompareTo(other.Minor)) != 0) return i;
+			if ((i = Build.CompareTo(other.Build)) != 0) return i;
+			if ((i = Revision.CompareTo(other.Revision)) != 0) return i;
+
+			return i;
 		}
 
 		#endregion
@@ -105,13 +118,17 @@ namespace Lantea.Common.Modules
 
 		#endregion
 
+		#region Operators
+
 		public static implicit operator Version(string value)
 		{
 			try
 			{
 				var parts = value.Split('.').Select(Int32.Parse).ToArray();
-				var dict = parts.Select((val, index) => new { key = VersionFormat[index], val }).ToDictionary(x => x.key, x => x.val);
-
+				var dict =
+					parts.Select((val, index) => new KeyValuePair<String, Int32>(VersionKeys[index], val)).
+						ToDictionary(x => x.Key, x => x.Value);
+				
 				return new Version(dict);
 			}
 			catch (Exception)
@@ -119,5 +136,29 @@ namespace Lantea.Common.Modules
 				return null;
 			}
 		}
+
+		public static bool operator <(Version left, Version right)
+		{
+			return left.CompareTo(right) < 0;
+		}
+
+		public static bool operator >(Version left, Version right)
+		{
+			return left.CompareTo(right) > 0;
+		}
+
+		public static bool operator <=(Version left, Version right)
+		{
+			if (left.Equals(right)) return true;
+			return left.CompareTo(right) < 0;
+		}
+
+		public static bool operator >=(Version left, Version right)
+		{
+			if (left.Equals(right)) return true;
+			return left.CompareTo(right) > 0;
+		}
+
+		#endregion
 	}
 }

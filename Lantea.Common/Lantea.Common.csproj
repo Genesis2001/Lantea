@@ -46,7 +46,7 @@
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Collections\IQueue.cs" />
-    <Compile Include="Collections\Concurrent\MessageQueueAdapter.cs" />
+    <Compile Include="Collections\Concurrent\ConcurrentQueueAdapter.cs" />
     <Compile Include="Modules\IModule.cs" />
     <Compile Include="Modules\IModuleMeta.cs" />
     <Compile Include="Modules\Version.cs" />
