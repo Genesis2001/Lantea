@@ -16,6 +16,8 @@ namespace Lantea.Common.Modules
 	{
 		internal static readonly string[] VersionKeys = {"major", "minor", "build", "revision"};
 
+		private static readonly Lazy<Version> EmptyInstance = new Lazy<Version>(true);
+
 		public Version(int major, int minor, int build = 0, int revision = 0)
 		{
 			Major = major;
@@ -44,7 +46,8 @@ namespace Lantea.Common.Modules
 			}
 			catch (KeyNotFoundException innerException)
 			{
-				throw new InvalidOperationException("One or more version keys were ommitted in the incoming dictionary.", innerException);
+				throw new InvalidOperationException("One or more version keys were ommitted in the incoming dictionary.",
+					innerException);
 			}
 		}
 
@@ -60,13 +63,25 @@ namespace Lantea.Common.Modules
 
 		#endregion
 
+		#region Implementation of Null-object Pattern
+
+		public static Version Empty
+		{
+			get { return EmptyInstance.Value; }
+		}
+
+		#endregion
+
 		#region Implementation of IComparable<Version>
 
 		/// <summary>
-		/// Compares the current object with another object of the same type.
+		///     Compares the current object with another object of the same type.
 		/// </summary>
 		/// <returns>
-		/// A value that indicates the relative order of the objects being compared. The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other"/> parameter.Zero This object is equal to <paramref name="other"/>. Greater than zero This object is greater than <paramref name="other"/>. 
+		///     A value that indicates the relative order of the objects being compared. The return value has the following
+		///     meanings: Value Meaning Less than zero This object is less than the <paramref name="other" /> parameter.Zero This
+		///     object is equal to <paramref name="other" />. Greater than zero This object is greater than
+		///     <paramref name="other" />.
 		/// </returns>
 		/// <param name="other">An object to compare with this object.</param>
 		public int CompareTo(Version other)
@@ -88,10 +103,10 @@ namespace Lantea.Common.Modules
 		#region Implementation of IEquatable<Version>
 
 		/// <summary>
-		/// Indicates whether the current object is equal to another object of the same type.
+		///     Indicates whether the current object is equal to another object of the same type.
 		/// </summary>
 		/// <returns>
-		/// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+		///     true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
 		/// </returns>
 		/// <param name="other">An object to compare with this object.</param>
 		public bool Equals(Version other)
@@ -104,10 +119,10 @@ namespace Lantea.Common.Modules
 		#region Overrides of Object
 
 		/// <summary>
-		/// Returns major string that represents the current object.
+		///     Returns major string that represents the current object.
 		/// </summary>
 		/// <returns>
-		/// A string that represents the current object.
+		///     A string that represents the current object.
 		/// </returns>
 		public override string ToString()
 		{
@@ -128,7 +143,7 @@ namespace Lantea.Common.Modules
 				var dict =
 					parts.Select((val, index) => new KeyValuePair<String, Int32>(VersionKeys[index], val)).
 						ToDictionary(x => x.Key, x => x.Value);
-				
+
 				return new Version(dict);
 			}
 			catch (Exception)
