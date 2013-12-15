@@ -8,7 +8,6 @@
 
 namespace Lantea.UnitTests
 {
-	using System.IO;
 	using Common;
 	using Helpers;
 	using NUnit.Framework;
@@ -42,6 +41,8 @@ namespace Lantea.UnitTests
 		[Test]
 		public void GetValue_WithValidXPathString_ReturnsStringValueCorrespondingToXPath()
 		{
+			Assert.Inconclusive("Test incomplete: postponed.");
+
 			var stream = SettingsFixtureHelper.GetMockFileStream();
 			var settings = Settings.LoadFrom(stream);
 
