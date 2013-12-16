@@ -12,6 +12,7 @@ namespace Lantea.UnitTests
 	using Common.Modules;
 	using Mocks;
 	using NUnit.Framework;
+	using Version = Common.Modules.Version;
 
 	// ReSharper disable InconsistentNaming
 	// ReSharper disable PossibleNullReferenceException
@@ -25,7 +26,6 @@ namespace Lantea.UnitTests
 		[SetUp]
 		public void Setup()
 		{
-//			MOCK = new Mock<IModule>();
 			SUT = new MockModule();
 		}
 
@@ -46,13 +46,7 @@ namespace Lantea.UnitTests
 		public void Version_IsNotNullOrEmpty()
 		{
 			Assert.That(SUT.Version, Is.Not.Null);
-			Assert.That(SUT.Version, Is.Not.Empty);
-		}
-
-		[Test]
-		public void Version_IsValidDecimalSeparatedStringForVersioning()
-		{
-			Assert.That(SUT.Version, Is.EqualTo("1.0.0"));
+			Assert.That(SUT.Version, Is.Not.EqualTo(Version.Empty));
 		}
 
 		[Test]

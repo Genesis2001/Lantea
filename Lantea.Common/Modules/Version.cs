@@ -18,6 +18,10 @@ namespace Lantea.Common.Modules
 
 		private static readonly Lazy<Version> EmptyInstance = new Lazy<Version>(true);
 
+		public Version() : this(-1, -1)
+		{
+		}
+
 		public Version(int major, int minor, int build = 0, int revision = 0)
 		{
 			Major = major;
@@ -65,6 +69,9 @@ namespace Lantea.Common.Modules
 
 		#region Implementation of Null-object Pattern
 
+		/// <summary>
+		/// Represents the empty version. This field is read-only.
+		/// </summary>
 		public static Version Empty
 		{
 			get { return EmptyInstance.Value; }
