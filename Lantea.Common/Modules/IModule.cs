@@ -10,8 +10,6 @@ namespace Lantea.Common.Modules
 {
 	public interface IModule : IModuleMeta
 	{
-		bool IsLoaded { get; }
-
 		void Load();
 
 		void Unload();

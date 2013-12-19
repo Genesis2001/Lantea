@@ -30,27 +30,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Moq">
-      <HintPath>..\..\packages\Moq.4.2.1312.1416\lib\net40\Moq.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Should">
-      <HintPath>..\..\packages\Should.1.1.20\lib\Should.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helpers\SettingsFixtureHelper.cs" />
+    <Compile Include="Fixtures\QueueFixture.cs" />
+    <Compile Include="Helpers\XmlStreamHelper.cs" />
     <Compile Include="Mocks\MockModule.cs" />
-    <Compile Include="ModuleFixture.cs" />
-    <Compile Include="ModuleLoaderFixture.cs" />
+    <Compile Include="Fixtures\ModuleFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SettingsFixture.cs" />
-    <Compile Include="VersionFixture.cs" />
+    <Compile Include="Fixtures\SettingsFixture.cs" />
+    <Compile Include="Fixtures\VersionFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -14,25 +14,30 @@ namespace Lantea.Common.Collections.Concurrent
 	/// <summary>
 	/// Represents a thread-safe first in-first out (FIFO) collection. Encapsulates a ConcurrentQueue&lt;String&gt;
 	/// </summary>
-	public class ConcurrentQueueAdapter : IQueue<string>
+	public class ConcurrentQueueAdapter<T> : IQueue<T> where T : class
 	{
-		private readonly ConcurrentQueue<string> queue;
+		private readonly ConcurrentQueue<T> queue;
 
-		public ConcurrentQueueAdapter(IEnumerable<string> items)
+		public ConcurrentQueueAdapter()
 		{
-			queue = new ConcurrentQueue<string>(items);
+			queue = new ConcurrentQueue<T>();
+		} 
+
+		public ConcurrentQueueAdapter(IEnumerable<T> items)
+		{
+			queue = new ConcurrentQueue<T>(items);
 		}
 
-		#region Implementation of IQueue<string>
+		#region Implementation of IQueue<T>
 
-		public string Pop()
+		public T Pop()
 		{
-			string result;
+			T result;
 
 			return queue.TryDequeue(out result) ? result : null;
 		}
 
-		public void Push(string item)
+		public void Push(T item)
 		{
 			queue.Enqueue(item);
 		}

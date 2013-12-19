@@ -6,8 +6,9 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.UnitTests
+namespace Lantea.IntegrationTests.Fixtures
 {
+	using Core.Modules;
 	using NUnit.Framework;
 
 	// ReSharper disable InconsistentNaming
@@ -16,7 +17,12 @@ namespace Lantea.UnitTests
 	[TestFixture]
 	public class ModuleLoaderFixture
 	{
-		// 
+		[SetUp]
+		public void Setup()
+		{
+		}
+
+		private IModuleLoader SUT;
 	}
 
 	// ReSharper enable InconsistentNaming

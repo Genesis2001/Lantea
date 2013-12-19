@@ -6,13 +6,11 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.UnitTests
+namespace Lantea.UnitTests.Fixtures
 {
-	using System;
 	using Common.Modules;
 	using Mocks;
 	using NUnit.Framework;
-	using Version = Common.Modules.Version;
 
 	// ReSharper disable InconsistentNaming
 	// ReSharper disable PossibleNullReferenceException
@@ -57,7 +55,7 @@ namespace Lantea.UnitTests
 			Assert.That(SUT.IsEnabled, Is.True);
 		}
 
-		[Test]
+		/*[Test]
 		public void Load_ShouldSetIsLoadedToTrue()
 		{
 			SUT.Load();
@@ -89,7 +87,7 @@ namespace Lantea.UnitTests
 		public void Unload_WhenNotLoaded_ShouldThrowException()
 		{
 			SUT.Unload();
-		}
+		}*/
 	}
 
 	// ReSharper enable InconsistentNaming

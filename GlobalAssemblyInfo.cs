@@ -19,7 +19,7 @@ using System.Reflection;
 #endif
 
 [assembly: AssemblyCompany("Zack Loveless")]
-[assembly: AssemblyProduct("Lantea Bot")]
+[assembly: AssemblyProduct("Lantea Program")]
 [assembly: AssemblyCopyright("Copyright © Zack Loveless. All Rights Reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

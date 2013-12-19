@@ -6,17 +6,12 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.UnitTests
+namespace Lantea.UnitTests.Fixtures
 {
-	using Common;
-	using Helpers;
-	using NUnit.Framework;
-	using Should;
-
 	// ReSharper disable InconsistentNaming
 	// ReSharper disable PossibleNullReferenceException
 
-	[TestFixture]
+	/*[TestFixture]
 	public class SettingsFixture
 	{
 		[Test]
@@ -49,7 +44,7 @@ namespace Lantea.UnitTests
 			var result = settings.GetValue("/Core/Connection/@Host");
 			Assert.That(result, Is.EqualTo("irc.unifiedtech.org"));
 		}
-	}
+	}*/
 
 	// ReSharper enable InconsistentNaming
 	// ReSharper enable PossibleNullReferenceException

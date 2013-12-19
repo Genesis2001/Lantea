@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------------
-//  <copyright file="Bot.cs" company="Zack Loveless">
+//  <copyright file="Program.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
 //      
 //      LICENSE TBA
@@ -8,7 +8,7 @@
 
 namespace LanteaBot
 {
-	public class Bot
+	public class Program
 	{
 		public static void Main(string[] args)
 		{

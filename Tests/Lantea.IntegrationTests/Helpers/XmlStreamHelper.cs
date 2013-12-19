@@ -6,12 +6,13 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.UnitTests.Helpers
+namespace Lantea.IntegrationTests.Helpers
 {
+	using System;
 	using System.IO;
 	using System.Text;
 
-	public static class SettingsFixtureHelper
+	public static class XmlStreamHelper
 	{
 		private const string XmlString = @"<Settings>
 	<Core>
@@ -25,7 +26,8 @@ namespace Lantea.UnitTests.Helpers
 
 		public static Stream GetMockFileStream()
 		{
-			return new MemoryStream(Encoding.UTF8.GetBytes(XmlString));
+			// return new MemoryStream(Encoding.UTF8.GetBytes(XmlString));
+			throw new NotImplementedException();
 		}
 	}
 }

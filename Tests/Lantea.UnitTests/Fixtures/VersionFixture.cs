@@ -6,7 +6,7 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.UnitTests
+namespace Lantea.UnitTests.Fixtures
 {
 	using System;
 	using System.Collections.Generic;
