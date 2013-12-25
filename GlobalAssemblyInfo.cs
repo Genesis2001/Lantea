@@ -1,18 +1,14 @@
-//===============================================================================
-// Microsoft patterns & practices
-// CompositeUI Application Block
-//===============================================================================
-// Copyright © Microsoft Corporation.  All rights reserved.
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY
-// OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT
-// LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-// FITNESS FOR A PARTICULAR PURPOSE.
-//===============================================================================
+// -----------------------------------------------------------------------------
+//  <copyright file="GlobalAssemblyInfo.cs" company="Zack Loveless">
+//      Copyright (c) Zack Loveless.  All rights reserved.
+//  </copyright>
+// -----------------------------------------------------------------------------
 
 using System;
 using System.Reflection;
 
 #if DEBUG
+
 [assembly: AssemblyConfiguration("Debug")]
 #else
 [assembly: AssemblyConfiguration("Release")]
@@ -24,5 +20,4 @@ using System.Reflection;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
-
 [assembly: AssemblyVersion("1.0")]

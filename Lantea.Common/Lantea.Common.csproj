@@ -48,11 +48,15 @@
     <Compile Include="Collections\QueueAdapter.cs" />
     <Compile Include="Collections\IQueue.cs" />
     <Compile Include="Collections\Concurrent\ConcurrentQueueAdapter.cs" />
+    <Compile Include="IObservableClass.cs" />
+    <Compile Include="IO\ILog.cs" />
+    <Compile Include="Linq\StringExtensions.cs" />
     <Compile Include="Modules\IModule.cs" />
     <Compile Include="Modules\IModuleMeta.cs" />
     <Compile Include="Modules\Version.cs" />
+    <Compile Include="Net\ITcpClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="IO\Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

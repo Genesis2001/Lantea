@@ -21,7 +21,7 @@ namespace Lantea.IntegrationTests.Fixtures
 		[SetUp]
 		public void IrcClient_SetUp()
 		{
-			SUT = new IrcClient();
+			SUT = new IrcClient(TODO, TODO);
 
 			IrcClient.GetHostEntry = DnsHelper.GetHostEntry;
 		}
@@ -51,17 +51,17 @@ namespace Lantea.IntegrationTests.Fixtures
 		[Category("Unit Test")]
 		public void Nick_ShouldNotBeNullOrEmpty_WhenSet()
 		{
-			SUT.Nick = "foo";
+			SUT.User.Nick = "foo";
 
-			Assert.That(SUT.Nick, Is.Not.Null);
-			Assert.That(SUT.Nick, Is.Not.Empty);
+			Assert.That(SUT.User.Nick, Is.Not.Null);
+			Assert.That(SUT.User.Nick, Is.Not.Empty);
 		}
 
 		[Test]
 		[Category("Unit Test")]
 		public void IsInitialized_ShouldReturnFalse_WhenNickNotSet()
 		{
-			SUT.Nick = null;
+			SUT.User.Nick = null;
 
 			Assert.That(SUT.IsInitialized, Is.False);
 		}

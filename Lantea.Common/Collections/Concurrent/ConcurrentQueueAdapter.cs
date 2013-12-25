@@ -1,8 +1,6 @@
 ﻿// -----------------------------------------------------------------------------
 //  <copyright file="ConcurrentQueueAdapter.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
-//      
-//      LICENSE TBA
 //  </copyright>
 // -----------------------------------------------------------------------------
 
@@ -12,7 +10,7 @@ namespace Lantea.Common.Collections.Concurrent
 	using System.Collections.Generic;
 
 	/// <summary>
-	/// Represents a thread-safe first in-first out (FIFO) collection. Encapsulates a ConcurrentQueue&lt;String&gt;
+	///     Represents a thread-safe first in-first out (FIFO) collection. Encapsulates a ConcurrentQueue&lt;String&gt;
 	/// </summary>
 	public class ConcurrentQueueAdapter<T> : IQueue<T> where T : class
 	{
@@ -21,7 +19,7 @@ namespace Lantea.Common.Collections.Concurrent
 		public ConcurrentQueueAdapter()
 		{
 			queue = new ConcurrentQueue<T>();
-		} 
+		}
 
 		public ConcurrentQueueAdapter(IEnumerable<T> items)
 		{
@@ -29,6 +27,11 @@ namespace Lantea.Common.Collections.Concurrent
 		}
 
 		#region Implementation of IQueue<T>
+
+		public int Count
+		{
+			get { return queue.Count; }
+		}
 
 		public T Pop()
 		{

@@ -1,8 +1,6 @@
 ﻿// -----------------------------------------------------------------------------
 //  <copyright file="IModuleMeta.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
-//      
-//      LICENSE TBA
 //  </copyright>
 // -----------------------------------------------------------------------------
 

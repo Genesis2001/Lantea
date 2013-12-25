@@ -1,23 +1,26 @@
 ﻿// -----------------------------------------------------------------------------
 //  <copyright file="TcpClientAdapter.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
-//      
-//      LICENSE TBA
 //  </copyright>
 // -----------------------------------------------------------------------------
 
 namespace Lantea.Core.Net
 {
+	using System;
 	using System.IO;
+	using System.Net;
 	using System.Net.Sockets;
 	using System.Text;
+	using Common.Linq;
+	using Common.Net;
 
 	public class TcpClientAdapter : ITcpClient
 	{
 		private readonly TcpClient client;
+		private readonly Encoding encoding;
 
 		private StreamReader clientReader;
-		private StreamWriter clientWriter;
+		private NetworkStream stream;
 
 		public TcpClientAdapter(TcpClient client)
 		{
@@ -27,6 +30,7 @@ namespace Lantea.Core.Net
 
 		public TcpClientAdapter(TcpClient client, Encoding encoding) : this(client)
 		{
+			this.encoding = encoding;
 			InitializeStreams(encoding);
 		}
 
@@ -34,13 +38,50 @@ namespace Lantea.Core.Net
 		{
 			if (client == null) return;
 
-			var stream = client.GetStream();
+			stream = client.GetStream();
 
 			clientReader = new StreamReader(stream, encoding ?? Encoding.Default);
-			clientWriter = new StreamWriter(stream, encoding ?? Encoding.Default);
+			// clientWriter = new StreamWriter(stream, encoding ?? Encoding.Default);
+		}
+
+		private string BuildPacket(string format, params object[] args)
+		{
+			return new StringBuilder().AppendFormat(format, args).ToString();
+		}
+
+		private string BuildPackageNewLine(string format, params object[] args)
+		{
+			return new StringBuilder().AppendLineFormat(format, args).ToString();
 		}
 
 		#region Implementation of ITcpClient
+
+		public bool Connected
+		{
+			get { return client.Connected; }
+		}
+
+		public bool DataAvailable
+		{
+			get { return stream.DataAvailable; }
+		}
+
+		public bool EndOfStream
+		{
+			get { return clientReader.EndOfStream; }
+		}
+
+		public void Connect(string host, int port)
+		{
+			var entry = Dns.GetHostEntry(host);
+			if (entry == null)
+			{
+				throw new ArgumentNullException("host", "Unable to resolve host. Check network configuration.");
+			}
+
+			var connection = new IPEndPoint(entry.AddressList[0], port);
+			client.Connect(connection);
+		}
 
 		public string ReadLine()
 		{
@@ -54,12 +95,20 @@ namespace Lantea.Core.Net
 
 		public void Write(string format, params object[] args)
 		{
-			clientWriter.Write(format, args);
+			var message = BuildPacket(format, args);
+			var buf = encoding.GetBytes(message);
+
+			stream.Write(buf, 0, buf.Length);
+			//			stream.Flush();
 		}
 
 		public void WriteLine(string format, params object[] args)
 		{
-			clientWriter.WriteLine(format, args);
+			var message = BuildPackageNewLine(format, args);
+			var buf = encoding.GetBytes(message);
+
+			stream.Write(buf, 0, buf.Length);
+			//			stream.Flush();
 		}
 
 		#endregion

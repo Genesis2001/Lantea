@@ -1,18 +1,17 @@
 ﻿// -----------------------------------------------------------------------------
-//  <copyright file="IIrcUser.cs" company="Zack Loveless">
+//  <copyright file="IObservableClass.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
-//      
-//      LICENSE TBA
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.Core.Net.Irc.Data
+namespace Lantea.Common
 {
 	using System.ComponentModel;
 
-	public interface IIrcUser : INotifyPropertyChanged
+	public interface IObservableClass : INotifyPropertyChanged, INotifyPropertyChanging
 	{
-		string Nick { get; set; }
-		string RealName { get; set; }
+		void NotifyPropertyChanged(string propertyName);
+
+		void NotifyPropertyChanging(string propertyName);
 	}
 }

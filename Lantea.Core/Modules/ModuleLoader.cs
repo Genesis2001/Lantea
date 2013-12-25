@@ -1,8 +1,6 @@
 ﻿// -----------------------------------------------------------------------------
 //  <copyright file="ModuleLoader.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
-//      
-//      LICENSE TBA
 //  </copyright>
 // -----------------------------------------------------------------------------
 
@@ -39,13 +37,15 @@ namespace Lantea.Core.Modules
 				{
 					var addedModules = args.NewItems.OfType<IModule>();
 					foreach (var item in addedModules) item.Load();
-				} break;
+				}
+					break;
 
 				case NotifyCollectionChangedAction.Remove:
 				{
 					var removedModules = args.OldItems.OfType<IModule>();
 					foreach (var item in removedModules) item.Unload();
-				} break;
+				}
+					break;
 			}
 		}
 	}

@@ -1,15 +1,17 @@
 ﻿// -----------------------------------------------------------------------------
-//  <copyright file="IModule.cs" company="Zack Loveless">
+//  <copyright file="ISettingsManager.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.Common.Modules
+namespace Lantea.Common.IO
 {
-	public interface IModule : IModuleMeta
+	public interface ISettingsManager
 	{
-		void Load();
+		string GetValue(string key);
 
-		void Unload();
+		void Load();
 	}
+
+
 }

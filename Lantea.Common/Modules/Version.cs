@@ -1,8 +1,6 @@
 ﻿// -----------------------------------------------------------------------------
 //  <copyright file="Version.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
-//      
-//      LICENSE TBA
 //  </copyright>
 // -----------------------------------------------------------------------------
 
@@ -70,7 +68,7 @@ namespace Lantea.Common.Modules
 		#region Implementation of Null-object Pattern
 
 		/// <summary>
-		/// Represents the empty version. This field is read-only.
+		///     Represents the empty version. This field is read-only.
 		/// </summary>
 		public static Version Empty
 		{
