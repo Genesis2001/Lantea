@@ -13,9 +13,9 @@ namespace LanteaBot
 	{
 		public static void Main(string[] args)
 		{
-			// TODO: bootstrap code to load the bot.
 			using (var bot = new Bot())
 			{
+				bot.LoadSettings("Settings.xml");
 				bot.Start();
 
 				Console.Write("Press <ENTER> to terminate the bot.");

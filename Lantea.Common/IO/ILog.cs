@@ -6,17 +6,10 @@
 
 namespace Lantea.Common.IO
 {
-	public enum LogType
-	{
-		None,
-		Info,
-		Warning,
-		Error,
-		Debug,
-	}
-
 	public interface ILog
 	{
+		LogType Threshold { get; set; }
+
 		bool PrefixLog { get; set; }
 
 		string Prefix { get; set; }

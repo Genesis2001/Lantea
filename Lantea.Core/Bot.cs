@@ -9,37 +9,60 @@ namespace Lantea.Core
 	using System;
 	using System.Collections.Generic;
 	using Common.IO;
+	using Common.Modules;
 	using IO;
 	using Net.Irc;
 
 	public class Bot : IDisposable
 	{
 		private IrcClient client;
-		private IEnumerable<Object> modules; // TODO
+		private IEnumerable<IModule> modules;
+		private ISettingsManager settings;
 
 		public Bot()
 		{
 			Log = new Log("lantea.log") {PrefixLog = true};
 		}
 
+		public string Nick { get; private set; }
+
+		public string RealName { get; set; }
+
 		public ILog Log { get; private set; }
 
 		private void Compose()
 		{
+		}
+
+		private void RegisterEvents()
+		{
+			client.RawMessageEvent += RawMessageEventCallback;
+			client.RfcNumericEvent += RfcNumericEventCallback;
+		}
+
+		private void RfcNumericEventCallback(object sender, RfcNumericEventArgs args)
+		{
 			// 
 		}
 
-		private void Load()
+		private void RawMessageEventCallback(object sender, RawMessageEventArgs args)
 		{
-			// TODO: load configuration.
-			// TODO: decide on a configuration structure.
+			if (Log != null) Log.Debug(args.Message);
+		}
+
+		public void LoadSettings(string configFile)
+		{
+			settings = new SettingsManager(configFile);
+			settings.Load();
 		}
 
 		public void Start()
 		{
-			// Load();
+			Nick     = settings.GetValue("");
+			RealName = settings.GetValue("");
+			client   = new IrcClient(Nick, RealName);
 
-			// client.Start();
+			RegisterEvents();
 		}
 
 		#region Implementation of IDisposable
@@ -57,7 +80,7 @@ namespace Lantea.Core
 		{
 			if (disposing)
 			{
-				// TODO: client.Disconnect("SIGTERM")
+				// TODO: client.Disconnect()
 			}
 		}
 

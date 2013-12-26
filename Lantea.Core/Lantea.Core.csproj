@@ -44,13 +44,16 @@
     </Compile>
     <Compile Include="Bot.cs" />
     <Compile Include="IO\Log.cs" />
+    <Compile Include="IO\SettingsManager.cs" />
     <Compile Include="Modules\ModuleLoader.cs" />
     <Compile Include="Net\Irc\IrcClient.cs" />
     <Compile Include="Net\Irc\Data\User.cs" />
     <Compile Include="Net\Irc\IrcClient.Callbacks.cs" />
     <Compile Include="Net\Irc\IrcEncoding.cs" />
+    <Compile Include="Net\Irc\RawMessageEventArgs.cs" />
     <Compile Include="Net\Irc\RfcNumericEventArgs.cs" />
     <Compile Include="Net\TcpClientAdapter.cs" />
+    <Compile Include="Net\TcpClientAsyncAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

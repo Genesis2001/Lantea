@@ -45,58 +45,60 @@ namespace Lantea.Core.IO
 
 		#region Implementation of ILog
 
+		public LogType Threshold { get; set; }
+
 		public bool PrefixLog { get; set; }
 
 		public string Prefix { get; set; }
 
 		public void Debug(string line)
 		{
-			Write(LogType.Debug, line);
+			if (Threshold.HasFlag(LogType.Debug)) Write(LogType.Debug, line);
 		}
 
 		public void DebugFormat(string format, params object[] args)
 		{
-			Write(LogType.Debug, format, args);
+			if (Threshold.HasFlag(LogType.Debug)) Write(LogType.Debug, format, args);
 		}
 
 		public void Error(string line)
 		{
-			Write(LogType.Error, line);
+			if (Threshold.HasFlag(LogType.Error)) Write(LogType.Error, line);
 		}
 
 		public void ErrorFormat(string format, params object[] args)
 		{
-			Write(LogType.Error, format, args);
+			if (Threshold.HasFlag(LogType.Error)) Write(LogType.Error, format, args);
 		}
 
 		public void Fatal(string line)
 		{
-			Write(LogType.Error, line);
+			if (Threshold.HasFlag(LogType.Error)) Write(LogType.Error, line);
 		}
 
 		public void FatalFormat(string format, params object[] args)
 		{
-			Write(LogType.Error, format, args);
+			if (Threshold.HasFlag(LogType.Error)) Write(LogType.Error, format, args);
 		}
 
 		public void Info(string line)
 		{
-			Write(LogType.Info, line);
+			if ((Threshold & LogType.Info) == LogType.Info) Write(LogType.Info, line);
 		}
 
 		public void InfoFormat(string format, params object[] args)
 		{
-			Write(LogType.Info, format, args);
+			if (Threshold.HasFlag(LogType.Info)) Write(LogType.Info, format, args);
 		}
 
 		public void Warn(string line)
 		{
-			Write(LogType.Warning, line);
+			if (Threshold.HasFlag(LogType.Warning)) Write(LogType.Warning, line);
 		}
 
 		public void WarnFormat(string format, params object[] args)
 		{
-			Write(LogType.Warning, format, args);
+			if (Threshold.HasFlag(LogType.Warning)) Write(LogType.Warning, format, args);
 		}
 
 		#endregion

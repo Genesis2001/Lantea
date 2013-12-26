@@ -7,7 +7,6 @@
 namespace Lantea.Core.Net.Irc
 {
 	using System;
-	using System.Threading;
 	using System.Threading.Tasks;
 	using Common.Linq;
 
@@ -21,7 +20,7 @@ namespace Lantea.Core.Net.Irc
 
 			if (toks[0].EqualsIgnoreCase("ping"))
 			{
-				Send(string.Format("PONG {0}", toks[1]));
+				Send(string.Format("PONG {0}", toks[1])); // expedite the pong reply (avoid the queue)
 			}
 
 			int num;
@@ -29,6 +28,9 @@ namespace Lantea.Core.Net.Irc
 			{
 				OnRawNumeric(num, input);
 			}
+
+			var handler = RawMessageEvent;
+			if (handler != null) handler(this, new RawMessageEventArgs(input));
 		}
 
 		protected virtual void OnRawNumeric(int numeric, string message)
@@ -39,19 +41,7 @@ namespace Lantea.Core.Net.Irc
 
 		protected void ThreadWorkerCallback()
 		{
-			/*if (o != null)
-			{
-				RfcNumericEvent += (s, e) =>
-				                   {
-					                   if (e.Numeric.Equals(001))
-					                   {
-						                   ((EventWaitHandle)o).Set();
-					                   }
-				                   };
-			}*/
-
-//			queueThread.Start();
-			// queueRunner.Start();
+			queueRunner = Task.Run(new Action(ThreadQueueCallback), cancellationTokenSource.Token);
 
 			var registration = BuildRegistrationPacket();
 			Send(registration);
@@ -72,7 +62,7 @@ namespace Lantea.Core.Net.Irc
 			}
 		}
 
-		protected async void ThreadQueueCallback(object obj)
+		protected async void ThreadQueueCallback()
 		{
 			while (client != null && client.Connected)
 			{

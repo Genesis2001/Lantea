@@ -20,8 +20,6 @@ namespace Lantea.Core.Net.Irc
 
 	public partial class IrcClient : IDisposable
 	{
-		public static Func<String, IPHostEntry> GetHostEntry;
-
 		private readonly IQueue<string> messageQueue;
 		private ITcpClient client;
 
@@ -31,13 +29,11 @@ namespace Lantea.Core.Net.Irc
 		/*private Thread queueThread;
 		private Thread workerThread;*/
 
-		private CancellationTokenSource cancellationTokenSource;
+		private readonly CancellationTokenSource cancellationTokenSource;
 
 		public IrcClient(string nickAlias, string realName)
 		{
 			cancellationTokenSource = new CancellationTokenSource();
-
-			GetHostEntry = Dns.GetHostEntry;
 			messageQueue = new ConcurrentQueueAdapter<string>();
 
 			User = new User(this, nickAlias, realName);
@@ -70,7 +66,7 @@ namespace Lantea.Core.Net.Irc
 				var val = true;
 
 				if (string.IsNullOrEmpty(User.Nick)) val = false;
-				else if (string.IsNullOrEmpty(Host) || GetHostEntry(Host) == null) val = false;
+				else if (string.IsNullOrEmpty(Host) || Dns.GetHostEntry(Host) == null) val = false;
 
 				return val;
 			}
@@ -81,6 +77,7 @@ namespace Lantea.Core.Net.Irc
 		#region Events
 
 		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;
+		public event EventHandler<RawMessageEventArgs> RawMessageEvent;
 
 		#endregion
 
@@ -133,13 +130,7 @@ namespace Lantea.Core.Net.Irc
 				// TODO: Raise disconnection event (eventually)
 			}
 
-			/*workerThread = new Thread(ThreadWorkerCallback);
-
-			var handle = new EventWaitHandle(false, EventResetMode.ManualReset);
-			workerThread.Start(handle);
-			handle.WaitOne(30000);*/
-
-			workerTask = Task.Run(new Action(ThreadWorkerCallback));
+			workerTask = Task.Run(new Action(ThreadWorkerCallback), cancellationTokenSource.Token);
 
 			throw new NotImplementedException();
 		}
