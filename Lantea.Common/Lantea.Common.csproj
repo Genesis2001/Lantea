@@ -54,6 +54,7 @@
     <Compile Include="IO\LogStream.cs" />
     <Compile Include="IO\LogThreshold.cs" />
     <Compile Include="IO\LogWriter.cs" />
+    <Compile Include="Linq\EventExtensions.cs" />
     <Compile Include="Linq\StringExtensions.cs" />
     <Compile Include="Modules\IModule.cs" />
     <Compile Include="Modules\IModuleMeta.cs" />
