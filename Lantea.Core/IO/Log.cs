@@ -11,41 +11,43 @@ namespace Lantea.Core.IO
 	using System.Text;
 	using Common.IO;
 
-	public class Log : ILog, IDisposable
+	public class Log : ILog
 	{
 		private readonly string fileName;
-		private readonly FileStream fileStream;
-		private readonly StreamWriter stream;
+		private readonly FileStream stream;
 
 		public Log(string fileName)
 		{
 			this.fileName = fileName;
 
-			fileStream = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
-			stream = new StreamWriter(fileStream, Encoding.UTF8) {AutoFlush = true};
+			stream = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
 		}
 
-		private void Write(LogType logType, string format, params object[] args)
+		private void Write(LogThreshold threshold, string format, params object[] args)
 		{
+			if (!Threshold.HasFlag(threshold)) return;
+
 			var sb = new StringBuilder();
-			sb.Append(logType.ToString().ToUpper());
 
 			if (PrefixLog)
 			{
-				sb.Append(' ');
-				sb.Append(string.IsNullOrEmpty(Prefix) ? DateTime.Now.ToString("yy-mm-dd HH:mm:ss") : Prefix);
-				sb.Append(' ');
+				if (!string.IsNullOrEmpty(Prefix)) sb.Append(Prefix);
+				else sb.AppendFormat(" {0} ", DateTime.Now.ToString("yy-mm-dd HH:mm:ss"));
 			}
 
 			sb.AppendFormat(format, args);
+			sb.AppendLine();
 
-			var line = string.Format(format, args);
-			stream.WriteLineAsync(line);
+			var buf = Encoding.GetBytes(sb.ToString());
+			stream.Write(buf, 0, buf.Length);
+			stream.Flush();
 		}
 
 		#region Implementation of ILog
 
-		public LogType Threshold { get; set; }
+		public Encoding Encoding { get; set; }
+
+		public LogThreshold Threshold { get; set; }
 
 		public bool PrefixLog { get; set; }
 
@@ -53,52 +55,52 @@ namespace Lantea.Core.IO
 
 		public void Debug(string line)
 		{
-			if (Threshold.HasFlag(LogType.Debug)) Write(LogType.Debug, line);
+			if (Threshold.HasFlag(LogThreshold.Debug)) Write(LogThreshold.Debug, line);
 		}
 
 		public void DebugFormat(string format, params object[] args)
 		{
-			if (Threshold.HasFlag(LogType.Debug)) Write(LogType.Debug, format, args);
+			if (Threshold.HasFlag(LogThreshold.Debug)) Write(LogThreshold.Debug, format, args);
 		}
 
 		public void Error(string line)
 		{
-			if (Threshold.HasFlag(LogType.Error)) Write(LogType.Error, line);
+			if (Threshold.HasFlag(LogThreshold.Error)) Write(LogThreshold.Error, line);
 		}
 
 		public void ErrorFormat(string format, params object[] args)
 		{
-			if (Threshold.HasFlag(LogType.Error)) Write(LogType.Error, format, args);
+			if (Threshold.HasFlag(LogThreshold.Error)) Write(LogThreshold.Error, format, args);
 		}
 
 		public void Fatal(string line)
 		{
-			if (Threshold.HasFlag(LogType.Error)) Write(LogType.Error, line);
+			if (Threshold.HasFlag(LogThreshold.Error)) Write(LogThreshold.Error, line);
 		}
 
 		public void FatalFormat(string format, params object[] args)
 		{
-			if (Threshold.HasFlag(LogType.Error)) Write(LogType.Error, format, args);
+			if (Threshold.HasFlag(LogThreshold.Error)) Write(LogThreshold.Error, format, args);
 		}
 
 		public void Info(string line)
 		{
-			if ((Threshold & LogType.Info) == LogType.Info) Write(LogType.Info, line);
+			if ((Threshold & LogThreshold.Info) == LogThreshold.Info) Write(LogThreshold.Info, line);
 		}
 
 		public void InfoFormat(string format, params object[] args)
 		{
-			if (Threshold.HasFlag(LogType.Info)) Write(LogType.Info, format, args);
+			if (Threshold.HasFlag(LogThreshold.Info)) Write(LogThreshold.Info, format, args);
 		}
 
 		public void Warn(string line)
 		{
-			if (Threshold.HasFlag(LogType.Warning)) Write(LogType.Warning, line);
+			if (Threshold.HasFlag(LogThreshold.Warning)) Write(LogThreshold.Warning, line);
 		}
 
 		public void WarnFormat(string format, params object[] args)
 		{
-			if (Threshold.HasFlag(LogType.Warning)) Write(LogType.Warning, format, args);
+			if (Threshold.HasFlag(LogThreshold.Warning)) Write(LogThreshold.Warning, format, args);
 		}
 
 		#endregion
@@ -118,7 +120,7 @@ namespace Lantea.Core.IO
 		{
 			if (!disposing) return;
 
-			stream.Dispose();
+			stream.Close();
 		}
 
 		#endregion

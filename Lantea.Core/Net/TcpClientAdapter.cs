@@ -83,6 +83,11 @@ namespace Lantea.Core.Net
 			client.Connect(connection);
 		}
 
+		public void Close()
+		{
+			client.Close();
+		}
+
 		public string ReadLine()
 		{
 			return clientReader.ReadLine();

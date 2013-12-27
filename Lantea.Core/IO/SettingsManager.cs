@@ -3,17 +3,20 @@
 //      Copyright (c) Zack Loveless.  All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------------
+
 namespace Lantea.Core.IO
 {
+	using System;
 	using System.IO;
-	using System.Xml.Linq;
+	using System.Xml.XPath;
 	using Common.IO;
 
 	public class SettingsManager : ISettingsManager
 	{
 		private readonly string configFile;
 		private FileStream stream;
-		private XDocument document;
+		private XPathDocument document;
+		private XPathNavigator navigator;
 
 		public SettingsManager(string configFile)
 		{
@@ -24,13 +27,22 @@ namespace Lantea.Core.IO
 
 		public string GetValue(string key)
 		{
-			throw new System.NotImplementedException();
+			var expr = navigator.Compile(key);
+			var node = navigator.SelectSingleNode(expr);
+
+			return node != null ? node.Value : string.Empty;
+		}
+
+		public string[] GetValues(string key)
+		{
+			throw new NotImplementedException();
 		}
 
 		public void Load()
 		{
-			stream   = new FileStream(configFile, FileMode.Open, FileAccess.Read, FileShare.Read);
-			document = XDocument.Load(stream);
+			stream    = new FileStream(configFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+			document  = new XPathDocument(stream);
+			navigator = document.CreateNavigator();
 		}
 
 		#endregion

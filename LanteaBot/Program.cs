@@ -13,6 +13,9 @@ namespace LanteaBot
 	{
 		public static void Main(string[] args)
 		{
+			Console.Title = "Lantea Bot";
+			Console.SetWindowSize(125, 30);
+
 			using (var bot = new Bot())
 			{
 				bot.LoadSettings("Settings.xml");

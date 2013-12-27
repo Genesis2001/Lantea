@@ -12,32 +12,40 @@ namespace Lantea.Core.Net.Irc
 	using System.Text;
 	using System.Threading;
 	using System.Threading.Tasks;
+	using System.Timers;
 	using Common.Collections;
 	using Common.Collections.Concurrent;
-	using Common.Linq;
 	using Common.Net;
 	using Data;
+	using Timer = System.Timers.Timer;
 
 	public partial class IrcClient : IDisposable
 	{
+		// ReSharper disable FieldCanBeMadeReadOnly.Local
 		private readonly IQueue<string> messageQueue;
-		private ITcpClient client;
-
-		private Task workerTask;
+		private ITcpClientAsync client;
+		
 		private Task queueRunner;
+		
+		private readonly CancellationTokenSource tokenSource;
+		private CancellationToken token;
+		// ReSharper restore FieldCanBeMadeReadOnly.Local
 
-		/*private Thread queueThread;
-		private Thread workerThread;*/
-
-		private readonly CancellationTokenSource cancellationTokenSource;
-
-		public IrcClient(string nickAlias, string realName)
+		public IrcClient(string nick, string realName)
 		{
-			cancellationTokenSource = new CancellationTokenSource();
-			messageQueue = new ConcurrentQueueAdapter<string>();
+			tokenSource             = new CancellationTokenSource();
+			token                   = tokenSource.Token;
 
-			User = new User(this, nickAlias, realName);
-			QueueInteval = 4000;
+			messageQueue            = new ConcurrentQueueAdapter<string>();
+			User                    = new User(this, nick, realName);
+			TimeOut                 = TimeSpan.FromMinutes(10d);
+			QueueInteval            = 1000;
+
+			RawMessageEvent        += RegistrationHandler;
+			RawMessageEvent        += RfcNumericHandler;
+			RawMessageEvent        += PingHandler;
+
+			token.Register(CancellationNoticeHandler);
 		}
 
 		#region Properties
@@ -72,33 +80,27 @@ namespace Lantea.Core.Net.Irc
 			}
 		}
 
+		public TimeSpan TimeOut { get; set; }
+
 		#endregion
 
 		#region Events
 
 		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageEvent;
+		public event EventHandler<RawMessageEventArgs> RawMessageTransmitEvent;
+		public event EventHandler TimeoutEvent;
 
 		#endregion
 
 		#region Methods
 
-		private string BuildRegistrationPacket()
+		private void SetDefaults()
 		{
-			var sb = new StringBuilder();
-
-			if (!string.IsNullOrEmpty(Password))
-			{
-				sb.AppendFormat("PASS :{0}\n", Password);
-			}
-
-			sb.AppendFormat("NICK {0}\n", User.Nick);
-			sb.AppendFormat("USER {0} 0 * :{1}\n", User.Ident, User.RealName);
-
-			return sb.ToString();
+			if (string.IsNullOrEmpty(User.Ident)) User.Ident = User.Nick.ToLower();
 		}
 
-		public bool Start()
+		public void Start()
 		{
 			if (!IsInitialized)
 			{
@@ -120,6 +122,8 @@ namespace Lantea.Core.Net.Irc
 					break;
 			}
 
+			SetDefaults();
+
 			client = new TcpClientAsyncAdapter(new TcpClient(), encoding);
 			try
 			{
@@ -130,20 +134,26 @@ namespace Lantea.Core.Net.Irc
 				// TODO: Raise disconnection event (eventually)
 			}
 
-			workerTask = Task.Run(new Action(ThreadWorkerCallback), cancellationTokenSource.Token);
+			client.ReadLineAsync().ContinueWith(OnAsyncRead, token);
+			queueRunner           = Task.Run(new Action(QueueHandler), token);
 
-			throw new NotImplementedException();
+			timeoutTimer          = new Timer(TimeOut.TotalMilliseconds);
+			timeoutTimer.Elapsed += TimeoutTimerElapsed;
+			timeoutTimer.Start();
 		}
 		
 		private void Send(string data)
 		{
-			client.Write(data);
+			client.WriteLine(data);
+
+			var handler = RawMessageTransmitEvent;
+			if (handler != null) handler(this, new RawMessageEventArgs(data));
 		}
 
 		public void Send(string format, params object[] args)
 		{
 			var sb = new StringBuilder();
-			sb.AppendLineFormat(format, args);
+			sb.AppendFormat(format, args);
 
 			messageQueue.Push(sb.ToString());
 		}
@@ -165,7 +175,7 @@ namespace Lantea.Core.Net.Irc
 		{
 			if (!disposing) return;
 
-			cancellationTokenSource.Cancel();
+			tokenSource.Cancel();
 		}
 
 		#endregion

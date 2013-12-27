@@ -22,5 +22,10 @@ namespace Lantea.Common.Linq
 		{
 			return source.Equals(value, StringComparison.InvariantCultureIgnoreCase);
 		}
+
+		public static bool StartsWithIgnoreCase(this string source, string value)
+		{
+			return source.StartsWith(value, StringComparison.InvariantCultureIgnoreCase);
+		}
 	}
 }

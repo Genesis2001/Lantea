@@ -51,12 +51,15 @@
     <Compile Include="IObservableClass.cs" />
     <Compile Include="IO\ILog.cs" />
     <Compile Include="IO\ISettingsManager.cs" />
-    <Compile Include="IO\LogType.cs" />
+    <Compile Include="IO\LogStream.cs" />
+    <Compile Include="IO\LogThreshold.cs" />
+    <Compile Include="IO\LogWriter.cs" />
     <Compile Include="Linq\StringExtensions.cs" />
     <Compile Include="Modules\IModule.cs" />
     <Compile Include="Modules\IModuleMeta.cs" />
     <Compile Include="Modules\Version.cs" />
     <Compile Include="Net\ITcpClient.cs" />
+    <Compile Include="Net\ITcpClientAsync.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

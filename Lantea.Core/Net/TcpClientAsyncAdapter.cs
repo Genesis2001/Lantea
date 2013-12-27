@@ -11,9 +11,10 @@ namespace Lantea.Core.Net
 	using System.Net;
 	using System.Net.Sockets;
 	using System.Text;
+	using System.Threading.Tasks;
 	using Common.Net;
 
-	public class TcpClientAsyncAdapter : ITcpClient
+	public class TcpClientAsyncAdapter : ITcpClientAsync
 	{
 		private readonly TcpClient client;
 		private Encoding encoding;
@@ -24,8 +25,6 @@ namespace Lantea.Core.Net
 		{
 			this.client   = client;
 			this.encoding = encoding;
-
-			InitializeAdapter();
 		}
 
 		private void InitializeAdapter()
@@ -64,6 +63,13 @@ namespace Lantea.Core.Net
 
 			var connection = new IPEndPoint(entry.AddressList[0], port);
 			client.Connect(connection);
+
+			InitializeAdapter();
+		}
+
+		public void Close()
+		{
+			client.Close();
 		}
 
 		public string ReadLine()
@@ -82,21 +88,61 @@ namespace Lantea.Core.Net
 
 		public void Write(string format, params object[] args)
 		{
-			var s = string.Format(format, args);
+			var s   = string.Format(format, args);
 			var buf = encoding.GetBytes(s);
 
-			stream.WriteAsync(buf, 0, buf.Length);
+			stream.Write(buf, 0, buf.Length);
+			stream.Flush();
 		}
 
 		public void WriteLine(string format, params object[] args)
+		{
+			var s = new StringBuilder();
+			if (args.Length == 0) s.Append(format);
+			else s.AppendFormat(format, args);
+			s.AppendLine();
+
+			var buf = encoding.GetBytes(s.ToString());
+
+			stream.Write(buf, 0, buf.Length);
+			stream.Flush();
+		}
+
+		#endregion
+
+		#region Implementation of ITcpClientAsync
+		
+		public Task ConnectAsync(string host, int port)
+		{
+			return client.ConnectAsync(host, port).ContinueWith(x => InitializeAdapter());
+		}
+
+		public Task<string> ReadLineAsync()
+		{
+			return reader.ReadLineAsync();
+		}
+
+		public Task<string> ReadAllAsync()
+		{
+			return reader.ReadToEndAsync();
+		}
+
+		public Task WriteAsync(string format, params object[] args)
+		{
+			var s = string.Format(format, args);
+
+			var buf = encoding.GetBytes(s);
+			return stream.WriteAsync(buf, 0, buf.Length).ContinueWith(x => stream.Flush());
+		}
+
+		public Task WriteLineAsync(string format, params object[] args)
 		{
 			var s = new StringBuilder();
 			s.AppendFormat(format, args);
 			s.AppendLine();
 
 			var buf = encoding.GetBytes(s.ToString());
-
-			stream.WriteAsync(buf, 0, buf.Length);
+			return stream.WriteAsync(buf, 0, buf.Length).ContinueWith(x => stream.Flush());
 		}
 
 		#endregion

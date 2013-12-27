@@ -6,9 +6,14 @@
 
 namespace Lantea.Common.IO
 {
-	public interface ILog
+	using System;
+	using System.Text;
+
+	public interface ILog : IDisposable
 	{
-		LogType Threshold { get; set; }
+		Encoding Encoding { get; set; }
+
+		LogThreshold Threshold { get; set; }
 
 		bool PrefixLog { get; set; }
 

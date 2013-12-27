@@ -10,6 +10,8 @@ namespace Lantea.Common.IO
 	{
 		string GetValue(string key);
 
+		string[] GetValues(string key);
+
 		void Load();
 	}
 }

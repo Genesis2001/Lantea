@@ -16,6 +16,8 @@ namespace Lantea.Common.Net
 
 		void Connect(string host, int port);
 
+		void Close();
+
 		string ReadLine();
 
 		string ReadAll();
