@@ -30,8 +30,7 @@ namespace Lantea.Core.Net.Irc
 
 		private void OnDataReceived(string input)
 		{
-			var handler = RawMessageEvent;
-			if (handler != null) handler(this, new RawMessageEventArgs(input));
+			RawMessageEvent.Raise(this, new RawMessageEventArgs(input));
 
 			lastMessage = DateTime.Now;
 		}
@@ -40,8 +39,7 @@ namespace Lantea.Core.Net.Irc
 		{
 			if ((args.SignalTime - lastMessage) < TimeOut)
 			{
-				var handler = TimeoutEvent;
-				if (handler != null) handler(this, EventArgs.Empty);
+				TimeoutEvent.Raise(this, EventArgs.Empty);
 
 				tokenSource.Cancel();
 			}
@@ -56,8 +54,7 @@ namespace Lantea.Core.Net.Irc
 			{
 				var message = string.Join(" ", toks.Skip(2));
 
-				var handler = RfcNumericEvent;
-				if (handler != null) handler(this, new RfcNumericEventArgs(num, message));
+				RfcNumericEvent.Raise(this, new RfcNumericEventArgs(num, message));
 			}
 		}
 
@@ -126,7 +123,7 @@ namespace Lantea.Core.Net.Irc
 					Send(messageQueue.Pop());
 				}
 
-				await Task.Delay(QueueInteval);
+				await Task.Delay(QueueInteval, token);
 			}
 		}
 

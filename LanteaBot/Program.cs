@@ -21,7 +21,7 @@ namespace LanteaBot
 				bot.LoadSettings("Settings.xml");
 				bot.Start();
 
-				Console.Write("Press <ENTER> to terminate the bot.");
+				Console.WriteLine("Press <ENTER> to terminate the bot.");
 				Console.ReadLine();
 			}
 		}

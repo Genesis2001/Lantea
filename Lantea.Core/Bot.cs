@@ -30,20 +30,9 @@ namespace Lantea.Core
 
 		public IrcClient Client { get; private set; }
 
-		private void Compose()
+		public void Compose()
 		{
 			var container = GetCompositionContainer();
-
-#if DEBUG
-			Log = new LogWriter<TextWriter>(Console.Out) {PrefixLog = false, Threshold = LogThreshold.Verbose};
-#else
-			Log = new LogStream<FileStream>(new FileStream("lantea.log", FileMode.Append, FileAccess.Write, FileShare.Read))
-			      {
-				      Encoding  = Encoding.UTF8,
-				      Threshold = LogThreshold.Error,
-				      PrefixLog = true,
-			      };
-#endif
 
 			// modules       = container.GetExports<IModule, IModuleMeta>();
 		}
@@ -92,6 +81,8 @@ namespace Lantea.Core
 
 			if (args.Numeric.Equals(001))
 			{
+				Log.Info("Bot started.");
+
 				// Not yet implemented, but meh.
 				/*var perform = settings.GetValues("/Settings/Connection/Events/OnConnect/Execute/@Command");
 				foreach (var item in perform)
@@ -106,10 +97,21 @@ namespace Lantea.Core
 			if (Log != null) Log.DebugFormat("OUT: {0}", args.Message);
 		}
 
-		public void LoadSettings(string configFile)
+		public void LoadSettings(string config)
 		{
-			settings = new SettingsManager(configFile);
+			settings = new SettingsManager(config);
 			settings.Load();
+
+#if DEBUG
+			Log = new LogWriter<TextWriter>(Console.Out) { PrefixLog = false, Threshold = LogThreshold.Verbose };
+#else
+			Log = new LogStream<FileStream>(new FileStream("lantea.log", FileMode.Append, FileAccess.Write, FileShare.Read))
+			      {
+				      Encoding  = Encoding.UTF8,
+				      Threshold = LogThreshold.Error,
+				      PrefixLog = true,
+			      };
+#endif
 		}
 
 		public void Start()
@@ -130,14 +132,10 @@ namespace Lantea.Core
 
 			Client.Host         = settings.GetValue("/Settings/Connection/@Host");
 			Client.Encoding     = IrcEncoding.UTF8;
-
-			Compose();
-
+			
 			RegisterClientEvents();
 
 			Client.Start();
-
-			Log.Info("Bot started.");
 		}
 
 		#region Implementation of IDisposable

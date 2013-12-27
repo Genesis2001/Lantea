@@ -15,6 +15,7 @@ namespace Lantea.Core.Net.Irc
 	using System.Timers;
 	using Common.Collections;
 	using Common.Collections.Concurrent;
+	using Common.Linq;
 	using Common.Net;
 	using Data;
 	using Timer = System.Timers.Timer;
@@ -156,8 +157,7 @@ namespace Lantea.Core.Net.Irc
 		{
 			client.WriteLine(data);
 
-			var handler = RawMessageTransmitEvent;
-			if (handler != null) handler(this, new RawMessageEventArgs(data));
+			RawMessageTransmitEvent.Raise(this, new RawMessageEventArgs(data));
 		}
 
 		public void Send(string format, params object[] args)

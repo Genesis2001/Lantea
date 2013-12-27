@@ -9,7 +9,7 @@ namespace Lantea.Common.Linq
 	using System;
 	using System.Text;
 
-	public static class StringExtensions
+	public static partial class Extensions
 	{
 		public static StringBuilder AppendLineFormat(this StringBuilder source, string format, params object[] args)
 		{
