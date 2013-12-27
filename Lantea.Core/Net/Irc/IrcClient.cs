@@ -21,6 +21,13 @@ namespace Lantea.Core.Net.Irc
 
 	public partial class IrcClient : IDisposable
 	{
+		[Flags]
+		public enum ConnectOptions
+		{
+			Default = 0,
+			Secure  = 1,
+		}
+
 		// ReSharper disable FieldCanBeMadeReadOnly.Local
 		private readonly IQueue<string> messageQueue;
 		private ITcpClientAsync client;
@@ -36,6 +43,7 @@ namespace Lantea.Core.Net.Irc
 			tokenSource             = new CancellationTokenSource();
 			token                   = tokenSource.Token;
 
+			Options                 = ConnectOptions.Default;
 			messageQueue            = new ConcurrentQueueAdapter<string>();
 			User                    = new User(this, nick, realName);
 			TimeOut                 = TimeSpan.FromMinutes(10d);
@@ -81,6 +89,8 @@ namespace Lantea.Core.Net.Irc
 		}
 
 		public TimeSpan TimeOut { get; set; }
+
+		public ConnectOptions Options { get; set; }
 
 		#endregion
 

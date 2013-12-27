@@ -70,7 +70,7 @@ namespace Lantea.Core
 			Client.RawMessageTransmitEvent += DebugMessageTransmissionEventCallback;
 			Client.RawMessageEvent         += RawMessageEventCallback;
 			Client.RfcNumericEvent         += RfcNumericEventCallback;
-			Client.TimeoutEvent += ClientTimeOutCallback;
+			Client.TimeoutEvent            += ClientTimeOutCallback;
 		}
 
 		private void ClientTimeOutCallback(object sender, EventArgs eventArgs)
@@ -110,8 +110,6 @@ namespace Lantea.Core
 		{
 			settings = new SettingsManager(configFile);
 			settings.Load();
-
-			Compose();
 		}
 
 		public void Start()
@@ -128,10 +126,12 @@ namespace Lantea.Core
 				Client.Port = port;
 			}
 
-			//var foo = settings.GetValues("/Settings/Connection/Options/Secure[@CertificatePath&@CertificateKeyPath]");
+			//var foo = settings.GetValues("/Settings/Connection/Options/Secure[@CertificatePath and @CertificateKeyPath]");
 
 			Client.Host         = settings.GetValue("/Settings/Connection/@Host");
 			Client.Encoding     = IrcEncoding.UTF8;
+
+			Compose();
 
 			RegisterClientEvents();
 
