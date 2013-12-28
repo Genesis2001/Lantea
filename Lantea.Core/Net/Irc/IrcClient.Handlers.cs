@@ -12,7 +12,6 @@ namespace Lantea.Core.Net.Irc
 	using System.Threading.Tasks;
 	using System.Timers;
 	using Common.Linq;
-	using Data;
 
 	public partial class IrcClient
 	{
@@ -39,13 +38,6 @@ namespace Lantea.Core.Net.Irc
 			client.Close();
 		}
 
-		private void OnDataReceived(string input)
-		{
-			RawMessageEvent.Raise(this, new RawMessageEventArgs(input));
-
-			lastMessage = DateTime.Now;
-		}
-
 		private void TimeoutTimerElapsed(object sender, ElapsedEventArgs args)
 		{
 			if ((args.SignalTime - lastMessage) < Timeout)
@@ -62,7 +54,7 @@ namespace Lantea.Core.Net.Irc
 			Match m;
 
 			// reg. expression credit
-			// http://teh-chris.co.uk/
+			// http://cjh.im/ - Chris J. Hogben
 
 			// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
 			if (message.TryMatch(@":?([^!]+)\!([^@]+)@(\S+)\W(JOIN|PART)\W:?(\#?[^\W]+)\W?:?(.+)?", out m))
