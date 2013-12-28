@@ -207,7 +207,7 @@ namespace Lantea.Core.Net.Irc
 			client.ReadLineAsync().ContinueWith(OnAsyncRead, token);
 			queueRunner = Task.Run(new Action(QueueHandler), token);
 
-			StartTimeoutTimer();
+			TickTimeout();
 		}
 		
 		private void Send(string data)

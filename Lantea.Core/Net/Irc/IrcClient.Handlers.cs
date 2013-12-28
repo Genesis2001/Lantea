@@ -19,9 +19,9 @@ namespace Lantea.Core.Net.Irc
 		private DateTime lastMessage;
 		private Timer timeoutTimer;
 
-		internal const string IrcRawRegex = @"^(:(?<prefix>\S+) )?(?<command>\S+)( (?!:)(?<params>.+?))?( :(?<trail>.+))?$";
+		// internal const string IrcRawRegex = @"^(:(?<prefix>\S+) )?(?<command>\S+)( (?!:)(?<params>.+?))?( :(?<trail>.+))?$";
 
-		private void StartTimeoutTimer()
+		private void TickTimeout()
 		{
 			timeoutTimer          = new Timer(Timeout.TotalMilliseconds);
 			timeoutTimer.Elapsed += TimeoutTimerElapsed;
