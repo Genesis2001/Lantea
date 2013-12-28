@@ -61,20 +61,20 @@ namespace Lantea.Core.Net.Irc
 			var message = args.Message;
 			Match m;
 
-			// expression credit
-			// web: http://calebdelnay.com/blog/2010/11/parsing-the-irc-message-format-as-a-client
+			// reg. expression credit
+			// http://teh-chris.co.uk/
 
 			// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
-			if (message.TryMatch(@":?([^!]+)!([^@]+@\S+) (JOIN|PART) (?:#?[^!]+) :(.+)", out m))
+			if (message.TryMatch(@":?([^!]+)\!([^@]+)@(\S+)\W(JOIN|PART)\W:?(\#?[^\W]+)\W?:?(.+)?", out m))
 			{
-				var user = "";
-				var channel = m.Groups["trail"].Value;
+				var user    = m.Groups[1].Value;
+				var channel = m.Groups[5].Value;
 
-				if (m.Groups["command"].Value.EqualsIgnoreCase("join"))
+				if (m.Groups[4].Value.EqualsIgnoreCase("join"))
 				{
 					ChannelJoinEvent.Raise(this, new JoinPartEventArgs(user, channel));
 				}
-				else if (m.Groups["command"].Value.EqualsIgnoreCase("part"))
+				else if (m.Groups[4].Value.EqualsIgnoreCase("part"))
 				{
 					ChannelPartEvent.Raise(this, new JoinPartEventArgs(user, channel));
 				}
@@ -110,6 +110,7 @@ namespace Lantea.Core.Net.Irc
 		{
 			if (args.Message.StartsWithIgnoreCase("ping"))
 			{
+				// Bypass the queue for sending pong responses.
 				Send(string.Format("PONG {0}", args.Message.Substring(5)));
 			}
 		}
@@ -118,8 +119,8 @@ namespace Lantea.Core.Net.Irc
 		{
 			if (task.Exception == null && task.Result != null && !task.IsCanceled)
 			{
-				OnDataReceived(task.Result);
-
+				lastMessage = DateTime.Now;
+				RawMessageEvent.Raise(this, new RawMessageEventArgs(task.Result));
 				client.ReadLineAsync().ContinueWith(OnAsyncRead, token);
 			}
 			else if (task.Result == null)
