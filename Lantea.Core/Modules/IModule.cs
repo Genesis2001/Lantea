@@ -4,10 +4,12 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.Common.Modules
+namespace Lantea.Core.Modules
 {
 	public interface IModule : IModuleMeta
 	{
+		Bot Bot { get; }
+
 		void Load();
 
 		void Unload();

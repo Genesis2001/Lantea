@@ -8,15 +8,19 @@ namespace Lantea.Core.Net.Irc
 {
 	using System;
 	using System.Linq;
+	using System.Text.RegularExpressions;
 	using System.Threading.Tasks;
 	using System.Timers;
 	using Common.Linq;
+	using Data;
 
 	public partial class IrcClient
 	{
 		private bool registered;
 		private DateTime lastMessage;
 		private Timer timeoutTimer;
+
+		internal const string IrcRawRegex = @"^(:(?<prefix>\S+) )?(?<command>\S+)( (?!:)(?<params>.+?))?( :(?<trail>.+))?$";
 
 		private void StartTimeoutTimer()
 		{
@@ -51,6 +55,31 @@ namespace Lantea.Core.Net.Irc
 				tokenSource.Cancel();
 			}
 		}
+
+		protected virtual void JoinPartHandler(object sender, RawMessageEventArgs args)
+		{
+			var message = args.Message;
+			Match m;
+
+			// expression credit
+			// web: http://calebdelnay.com/blog/2010/11/parsing-the-irc-message-format-as-a-client
+
+			// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
+			if (message.TryMatch(@"^(:(?<prefix>\S+) )?(?<command>JOIN|PART)( (?!:)(?<params>.+?))?( ?:(?<trail>.+))?$", out m))
+			{
+				var user = "";
+				var channel = m.Groups["trail"].Value;
+
+				if (m.Groups["command"].Value.EqualsIgnoreCase("join"))
+				{
+					ChannelJoinEvent.Raise(this, new JoinPartEventArgs(user, channel));
+				}
+				else if (m.Groups["command"].Value.EqualsIgnoreCase("part"))
+				{
+					ChannelPartEvent.Raise(this, new JoinPartEventArgs(user, channel));
+				}
+			}
+		}
 		
 		protected virtual void RfcNumericHandler(object sender, RawMessageEventArgs args)
 		{
@@ -70,8 +99,8 @@ namespace Lantea.Core.Net.Irc
 			if (registered) return;
 			if (!string.IsNullOrEmpty(Password)) Send("PASS :{0}", Password);
 
-			Send("NICK {0}", User.Nick);
-			Send("USER {0} 0 * :{1}", User.Ident, User.RealName);
+			Send("NICK {0}", My.Nick);
+			Send("USER {0} 0 * :{1}", My.Ident, My.RealName);
 
 			RawMessageEvent -= RegistrationHandler;
 			registered       = true;
@@ -123,14 +152,21 @@ namespace Lantea.Core.Net.Irc
 
 		protected async void QueueHandler()
 		{
-			while (client != null && client.Connected)
+			try
 			{
-				if (messageQueue.Count > 0)
+				while (client != null && client.Connected)
 				{
-					Send(messageQueue.Pop());
-				}
+					if (messageQueue.Count > 0)
+					{
+						Send(messageQueue.Pop());
+					}
 
-				await Task.Delay(QueueInteval, token);
+					await Task.Delay(QueueInteval, token);
+				}
+			}
+			catch (TaskCanceledException)
+			{
+				// nom nom.
 			}
 		}
 

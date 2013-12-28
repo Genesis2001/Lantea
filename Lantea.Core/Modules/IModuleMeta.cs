@@ -4,7 +4,7 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.Common.Modules
+namespace Lantea.Core.Modules
 {
 	public interface IModuleMeta
 	{

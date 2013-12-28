@@ -7,6 +7,8 @@
 namespace Lantea.Core.Net.Irc
 {
 	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 	using System.Net;
 	using System.Net.Sockets;
 	using System.Text;
@@ -37,22 +39,25 @@ namespace Lantea.Core.Net.Irc
 		private CancellationToken token;
 		// ReSharper restore FieldCanBeMadeReadOnly.Local
 
-		public IrcClient(string nick, string realName)
+		public IrcClient(string nick)
 		{
 			tokenSource             = new CancellationTokenSource();
 			token                   = tokenSource.Token;
 
 			Options                 = ConnectOptions.Default;
 			messageQueue            = new ConcurrentQueueAdapter<string>();
-			User                    = new User(this, nick, realName);
+			My                      = new User(nick);
 			Timeout                 = TimeSpan.FromMinutes(10d);
 			QueueInteval            = 1000;
+			Channels                = new List<Channel>();
 
 			RawMessageEvent        += RegistrationHandler;
 			RawMessageEvent        += RfcNumericHandler;
 			RawMessageEvent        += PingHandler;
+			RawMessageEvent        += JoinPartHandler;
 
 			token.Register(CancellationNoticeHandler);
+			My.SetClient(this);
 		}
 
 		#region Properties
@@ -65,6 +70,8 @@ namespace Lantea.Core.Net.Irc
 			get { return client != null && client.Connected; }
 		}
 
+		public List<Channel> Channels { get; private set; }
+
 		/// <summary>
 		/// Gets or sets a value representing what type of encoding to use for encoding messages sent to the Host.
 		/// </summary>
@@ -76,9 +83,9 @@ namespace Lantea.Core.Net.Irc
 		public string Host { get; set; }
 
 		/// <summary>
-		/// Gets an IRC User reference to the <see cref="T:IrcClient" />'s user entity.
+		/// Gets an IRC My reference to the <see cref="T:IrcClient" />'s user entity.
 		/// </summary>
-		public User User { get; private set; }
+		public User My { get; private set; }
 
 		/// <summary>
 		/// Gets or sets a <see cref="T:System.String" /> value representing the password to be used for protocol registration.
@@ -104,7 +111,7 @@ namespace Lantea.Core.Net.Irc
 			{
 				var val = true;
 
-				if (string.IsNullOrEmpty(User.Nick)) val = false;
+				if (string.IsNullOrEmpty(My.Nick)) val = false;
 				else if (string.IsNullOrEmpty(Host) || Dns.GetHostEntry(Host) == null) val = false;
 				else if (Port <= 0) val = false;
 
@@ -126,18 +133,38 @@ namespace Lantea.Core.Net.Irc
 
 		#region Events
 
-		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;
+		public event EventHandler<JoinPartEventArgs> ChannelJoinEvent;
+		public event EventHandler<JoinPartEventArgs> ChannelPartEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageTransmitEvent;
+		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;
 		public event EventHandler TimeoutEvent;
 
 		#endregion
 
 		#region Methods
 
+		public Channel GetChannel(string channelName)
+		{
+			if (string.IsNullOrEmpty(channelName))
+				throw new ArgumentNullException("channelName", "The channelName parameter cannot be null or empty.");
+
+			var c = Channels.SingleOrDefault(x => x.Name.EqualsIgnoreCase(channelName));
+
+			if (c == null)
+			{
+				c = new Channel(channelName);
+				c.SetClient(this);
+
+				Channels.Add(c);
+			}
+
+			return c;
+		}
+
 		private void SetDefaults()
 		{
-			if (string.IsNullOrEmpty(User.Ident)) User.Ident = User.Nick.ToLower();
+			if (string.IsNullOrEmpty(My.Ident)) My.Ident = My.Nick.ToLower();
 		}
 
 		/// <summary>

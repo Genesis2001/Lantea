@@ -10,7 +10,6 @@ namespace Lantea.Core.Modules
 	using System.Collections.ObjectModel;
 	using System.Collections.Specialized;
 	using System.Linq;
-	using Common.Modules;
 
 	public interface IModuleLoader
 	{

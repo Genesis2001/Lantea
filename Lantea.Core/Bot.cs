@@ -12,9 +12,10 @@ namespace Lantea.Core
 	using System.IO;
 	using System.Reflection;
 	using System.Text;
+	using System.Threading.Tasks;
 	using Common.IO;
-	using Common.Modules;
 	using IO;
+	using Modules;
 	using Net.Irc;
 
 	public class Bot : IDisposable
@@ -56,13 +57,26 @@ namespace Lantea.Core
 
 		private void RegisterClientEvents()
 		{
-			Client.RawMessageTransmitEvent += DebugMessageTransmissionEventCallback;
-			Client.RawMessageEvent         += RawMessageEventCallback;
-			Client.RfcNumericEvent         += RfcNumericEventCallback;
-			Client.TimeoutEvent            += ClientTimeOutCallback;
+//			Client.RawMessageTransmitEvent += OnMessageSend;
+//			Client.RawMessageEvent         += OnRawMessageReceived;
+
+			Client.RfcNumericEvent  += OnRfcNumericReceived;
+			Client.TimeoutEvent     += OnClientTimeout;
+			Client.ChannelJoinEvent += OnChannelJoin;
+			Client.ChannelPartEvent += OnChannelPart;
 		}
 
-		private void ClientTimeOutCallback(object sender, EventArgs eventArgs)
+		private void OnChannelJoin(object sender, JoinPartEventArgs args)
+		{
+			if (Log != null) Log.DebugFormat("[JOIN] {0} joined {1}", args.Nick, args.Channel);
+		}
+
+		private void OnChannelPart(object sender, JoinPartEventArgs args)
+		{
+			if (Log != null) Log.DebugFormat("[PART] {0} left {1}", args.Nick, args.Channel);
+		}
+
+		private void OnClientTimeout(object sender, EventArgs eventArgs)
 		{
 			// TODO: /Settings/Connection/@Retry - add reconnection attempts upon timeout.
 			if (Log != null) Log.Warn("Timeout detected. Exiting.");
@@ -70,18 +84,25 @@ namespace Lantea.Core
 			Environment.Exit(1);
 		}
 
-		private void DebugMessageTransmissionEventCallback(object sender, RawMessageEventArgs args)
+		private void OnMessageSend(object sender, RawMessageEventArgs args)
 		{
-			if (Log != null) Log.DebugFormat("IN: {0}", args.Message);
+			if (Log != null) Log.DebugFormat("SEND: {0}", args.Message);
 		}
 
-		private void RfcNumericEventCallback(object sender, RfcNumericEventArgs args)
+		private void OnRfcNumericReceived(object sender, RfcNumericEventArgs args)
 		{
-			if (Log != null) Log.DebugFormat("RECV: NUM({0}) MSG(\"{1}\")", args.Numeric, args.Message);
-
 			if (args.Numeric.Equals(001))
 			{
 				Log.Info("Bot started.");
+
+				Client.Send("JOIN #test");
+
+				Task.Factory.StartNew(async () =>
+				                            {
+					                            await Task.Delay(30);
+
+					                            Client.Send("PART #test");
+				                            });
 
 				// Not yet implemented, but meh.
 				/*var perform = settings.GetValues("/Settings/Connection/Events/OnConnect/Execute/@Command");
@@ -92,9 +113,9 @@ namespace Lantea.Core
 			}
 		}
 
-		private void RawMessageEventCallback(object sender, RawMessageEventArgs args)
+		private void OnRawMessageReceived(object sender, RawMessageEventArgs args)
 		{
-			if (Log != null) Log.DebugFormat("OUT: {0}", args.Message);
+			if (Log != null) Log.DebugFormat("RECV: {0}", args.Message);
 		}
 
 		public void LoadSettings(string config)
@@ -120,7 +141,7 @@ namespace Lantea.Core
 
 			Nick     = settings.GetValue("/Settings/Connection/@Nick");
 			RealName = settings.GetValue("/Settings/Connection/@RealName");
-			Client   = new IrcClient(Nick, RealName);
+			Client   = new IrcClient(Nick);
 
 			int port;
 			if (Int32.TryParse(settings.GetValue("/Settings/Connection/@Port"), out port))
@@ -130,8 +151,9 @@ namespace Lantea.Core
 
 			//var foo = settings.GetValues("/Settings/Connection/Options/Secure[@CertificatePath and @CertificateKeyPath]");
 
-			Client.Host         = settings.GetValue("/Settings/Connection/@Host");
-			Client.Encoding     = IrcEncoding.UTF8;
+			Client.My.RealName         = RealName;
+			Client.Host                = settings.GetValue("/Settings/Connection/@Host");
+			Client.Encoding            = IrcEncoding.UTF8;
 			
 			RegisterClientEvents();
 

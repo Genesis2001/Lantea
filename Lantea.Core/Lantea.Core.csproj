@@ -33,10 +33,6 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -46,11 +42,16 @@
     <Compile Include="Bot.cs" />
     <Compile Include="IO\Log.cs" />
     <Compile Include="IO\SettingsManager.cs" />
+    <Compile Include="Modules\IModule.cs" />
+    <Compile Include="Modules\IModuleMeta.cs" />
     <Compile Include="Modules\ModuleLoader.cs" />
+    <Compile Include="Modules\Version.cs" />
+    <Compile Include="Net\Irc\Data\Channel.cs" />
     <Compile Include="Net\Irc\IrcClient.cs" />
     <Compile Include="Net\Irc\Data\User.cs" />
     <Compile Include="Net\Irc\IrcClient.Handlers.cs" />
     <Compile Include="Net\Irc\IrcEncoding.cs" />
+    <Compile Include="Net\Irc\JoinPartEventArgs.cs" />
     <Compile Include="Net\Irc\RawMessageEventArgs.cs" />
     <Compile Include="Net\Irc\RfcNumericEventArgs.cs" />
     <Compile Include="Net\TcpClientAdapter.cs" />
