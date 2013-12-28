@@ -59,23 +59,47 @@ namespace Lantea.Core.Net.Irc
 
 		#region Properties
 
+		/// <summary>
+		/// Gets a <see cref="T:System.Boolean" /> value representing whether the <see cref="T:IrcClient" /> has connected to the Host.
+		/// </summary>
 		public bool Connected
 		{
 			get { return client != null && client.Connected; }
 		}
 
+		/// <summary>
+		/// Gets or sets a value representing what type of encoding to use for encoding messages sent to the Host.
+		/// </summary>
 		public IrcEncoding Encoding { get; set; }
 
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.String" /> value representing the name of the Host in which the <see cref="T:IrcClient" /> will be connecting.
+		/// </summary>
 		public string Host { get; set; }
 
+		/// <summary>
+		/// Gets an IRC User reference to the <see cref="T:IrcClient" />'s user entity.
+		/// </summary>
 		public User User { get; private set; }
 
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.String" /> value representing the password to be used for protocol registration.
+		/// </summary>
 		public string Password { get; set; }
 
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.Int32" /> value representing the port in which the <see cref="T:IrcClient" /> will be connecting.
+		/// </summary>
 		public int Port { get; set; }
 
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.Int32" /> value representing the 
+		/// </summary>
 		public int QueueInteval { get; set; }
 
+		/// <summary>
+		/// Gets a <see cref="T:System.Boolean" /> value representing whether the <see cref="T:IrcClient" /> has been initialized.
+		/// </summary>
 		public bool IsInitialized
 		{
 			get
@@ -89,8 +113,14 @@ namespace Lantea.Core.Net.Irc
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets a value representing the timeout interval for messages being received.
+		/// </summary>
 		public TimeSpan Timeout { get; set; }
 
+		/// <summary>
+		/// Gets or sets a bit-mask value representing the options for connecting to the Host.
+		/// </summary>
 		public ConnectOptions Options { get; set; }
 
 		#endregion
@@ -111,6 +141,9 @@ namespace Lantea.Core.Net.Irc
 			if (string.IsNullOrEmpty(User.Ident)) User.Ident = User.Nick.ToLower();
 		}
 
+		/// <summary>
+		/// Starts the <see cref="T:IrcClient" /> process of reading and writing to the Host.
+		/// </summary>
 		public void Start()
 		{
 			if (!IsInitialized)
@@ -160,6 +193,11 @@ namespace Lantea.Core.Net.Irc
 			RawMessageTransmitEvent.Raise(this, new RawMessageEventArgs(data));
 		}
 
+		/// <summary>
+		/// Enqueues the specified formatted <see cref="T:System.String" />  value to be sent to the Host.
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="args"></param>
 		public void Send(string format, params object[] args)
 		{
 			var sb = new StringBuilder();
