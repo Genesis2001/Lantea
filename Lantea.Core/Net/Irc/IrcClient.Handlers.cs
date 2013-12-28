@@ -18,6 +18,13 @@ namespace Lantea.Core.Net.Irc
 		private DateTime lastMessage;
 		private Timer timeoutTimer;
 
+		private void StartTimeoutTimer()
+		{
+			timeoutTimer          = new Timer(Timeout.TotalMilliseconds);
+			timeoutTimer.Elapsed += TimeoutTimerElapsed;
+			timeoutTimer.Start();
+		}
+
 		#region Handlers
 
 		private void CancellationNoticeHandler()

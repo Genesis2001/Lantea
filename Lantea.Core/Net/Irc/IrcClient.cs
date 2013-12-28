@@ -12,13 +12,11 @@ namespace Lantea.Core.Net.Irc
 	using System.Text;
 	using System.Threading;
 	using System.Threading.Tasks;
-	using System.Timers;
 	using Common.Collections;
 	using Common.Collections.Concurrent;
 	using Common.Linq;
 	using Common.Net;
 	using Data;
-	using Timer = System.Timers.Timer;
 
 	public partial class IrcClient : IDisposable
 	{
@@ -108,6 +106,7 @@ namespace Lantea.Core.Net.Irc
 
 				if (string.IsNullOrEmpty(User.Nick)) val = false;
 				else if (string.IsNullOrEmpty(Host) || Dns.GetHostEntry(Host) == null) val = false;
+				else if (Port <= 0) val = false;
 
 				return val;
 			}
@@ -175,15 +174,13 @@ namespace Lantea.Core.Net.Irc
 			}
 			catch (ArgumentNullException)
 			{
-				// TODO: Raise disconnection event (eventually)
+				tokenSource.Cancel();
 			}
 
 			client.ReadLineAsync().ContinueWith(OnAsyncRead, token);
-			queueRunner           = Task.Run(new Action(QueueHandler), token);
+			queueRunner = Task.Run(new Action(QueueHandler), token);
 
-			timeoutTimer          = new Timer(Timeout.TotalMilliseconds);
-			timeoutTimer.Elapsed += TimeoutTimerElapsed;
-			timeoutTimer.Start();
+			StartTimeoutTimer();
 		}
 		
 		private void Send(string data)
