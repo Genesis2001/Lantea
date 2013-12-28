@@ -37,7 +37,7 @@ namespace Lantea.Core.Net.Irc
 
 		private void TimeoutTimerElapsed(object sender, ElapsedEventArgs args)
 		{
-			if ((args.SignalTime - lastMessage) < TimeOut)
+			if ((args.SignalTime - lastMessage) < Timeout)
 			{
 				TimeoutEvent.Raise(this, EventArgs.Empty);
 

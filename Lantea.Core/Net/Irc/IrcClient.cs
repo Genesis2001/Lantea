@@ -47,7 +47,7 @@ namespace Lantea.Core.Net.Irc
 			Options                 = ConnectOptions.Default;
 			messageQueue            = new ConcurrentQueueAdapter<string>();
 			User                    = new User(this, nick, realName);
-			TimeOut                 = TimeSpan.FromMinutes(10d);
+			Timeout                 = TimeSpan.FromMinutes(10d);
 			QueueInteval            = 1000;
 
 			RawMessageEvent        += RegistrationHandler;
@@ -89,7 +89,7 @@ namespace Lantea.Core.Net.Irc
 			}
 		}
 
-		public TimeSpan TimeOut { get; set; }
+		public TimeSpan Timeout { get; set; }
 
 		public ConnectOptions Options { get; set; }
 
@@ -148,7 +148,7 @@ namespace Lantea.Core.Net.Irc
 			client.ReadLineAsync().ContinueWith(OnAsyncRead, token);
 			queueRunner           = Task.Run(new Action(QueueHandler), token);
 
-			timeoutTimer          = new Timer(TimeOut.TotalMilliseconds);
+			timeoutTimer          = new Timer(Timeout.TotalMilliseconds);
 			timeoutTimer.Elapsed += TimeoutTimerElapsed;
 			timeoutTimer.Start();
 		}
