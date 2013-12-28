@@ -65,7 +65,7 @@ namespace Lantea.Core.Net.Irc
 			// web: http://calebdelnay.com/blog/2010/11/parsing-the-irc-message-format-as-a-client
 
 			// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
-			if (message.TryMatch(@"^(:(?<prefix>\S+) )?(?<command>JOIN|PART)( (?!:)(?<params>.+?))?( ?:(?<trail>.+))?$", out m))
+			if (message.TryMatch(@":?([^!]+)!([^@]+@\S+) (JOIN|PART) (?:#?[^!]+) :(.+)", out m))
 			{
 				var user = "";
 				var channel = m.Groups["trail"].Value;
