@@ -55,6 +55,7 @@ namespace Lantea.Core.Net.Irc
 			RawMessageEvent        += RfcNumericHandler;
 			RawMessageEvent        += PingHandler;
 			RawMessageEvent        += JoinPartHandler;
+			RawMessageEvent        += MessageNoticeHandler;
 
 			token.Register(CancellationNoticeHandler);
 			My.SetClient(this);
@@ -133,8 +134,12 @@ namespace Lantea.Core.Net.Irc
 
 		#region Events
 
+		public event EventHandler ConnectionEstablishedEvent;
 		public event EventHandler<JoinPartEventArgs> ChannelJoinEvent;
 		public event EventHandler<JoinPartEventArgs> ChannelPartEvent;
+		public event EventHandler<MessageReceivedEventArgs> MessageReceivedEvent;
+		public event EventHandler<MessageReceivedEventArgs> NoticeReceivedEvent;
+		public event EventHandler PingReceiptEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageTransmitEvent;
 		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;

@@ -24,6 +24,11 @@ namespace LanteaBot
 				Console.WriteLine("Press <ENTER> to terminate the bot.");
 				Console.ReadLine();
 			}
+
+#if DEBUG
+			Console.Write("Bot running in debug mode. Press <ENTER> to exit completely.");
+			Console.ReadLine();
+#endif
 		}
 	}
 }

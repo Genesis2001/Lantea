@@ -24,7 +24,7 @@ namespace Lantea.Core.Net.Irc
 		private void TickTimeout()
 		{
 			timeoutTimer          = new Timer(Timeout.TotalMilliseconds);
-			timeoutTimer.Elapsed += TimeoutTimerElapsed;
+			timeoutTimer.Elapsed += OnTimeoutTimerElapsed;
 			timeoutTimer.Start();
 		}
 
@@ -38,7 +38,7 @@ namespace Lantea.Core.Net.Irc
 			client.Close();
 		}
 
-		private void TimeoutTimerElapsed(object sender, ElapsedEventArgs args)
+		private void OnTimeoutTimerElapsed(object sender, ElapsedEventArgs args)
 		{
 			if ((args.SignalTime - lastMessage) < Timeout)
 			{
@@ -59,16 +59,40 @@ namespace Lantea.Core.Net.Irc
 			// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
 			if (message.TryMatch(@":?([^!]+)\!([^@]+)@(\S+)\W(JOIN|PART)\W:?(\#?[^\W]+)\W?:?(.+)?", out m))
 			{
-				var user    = m.Groups[1].Value;
-				var channel = m.Groups[5].Value;
+				var nick    = m.Groups[1].Value;
+				var target  = m.Groups[5].Value;
 
 				if (m.Groups[4].Value.EqualsIgnoreCase("join"))
 				{
-					ChannelJoinEvent.Raise(this, new JoinPartEventArgs(user, channel));
+					ChannelJoinEvent.Raise(this, new JoinPartEventArgs(nick, target));
 				}
 				else if (m.Groups[4].Value.EqualsIgnoreCase("part"))
 				{
-					ChannelPartEvent.Raise(this, new JoinPartEventArgs(user, channel));
+					ChannelPartEvent.Raise(this, new JoinPartEventArgs(nick, target));
+				}
+			}
+		}
+
+		protected virtual void MessageNoticeHandler(object sender, RawMessageEventArgs args)
+		{
+			var message = args.Message;
+			Match m;
+
+			if (message.TryMatch(@":?([^!]+)\!(([^@]+)@(\S+)) (PRIVMSG|NOTICE) :?(\#?[^\W]+)\W?:?(.+)?", out m))
+			{
+				var nick   = m.Groups[1].Value;
+				var target = m.Groups[6].Value;
+				var msg    = m.Groups[7].Value;
+
+				if (m.Groups[5].Value.EqualsIgnoreCase("privmsg"))
+				{
+					if (nick.EqualsIgnoreCase(My.Nick)) MessageReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, msg));
+					else MessageReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
+				}
+				else if (m.Groups[5].Value.EqualsIgnoreCase("notice"))
+				{
+					if (nick.EqualsIgnoreCase(My.Nick)) NoticeReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, msg));
+					else NoticeReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
 				}
 			}
 		}
@@ -81,8 +105,12 @@ namespace Lantea.Core.Net.Irc
 			if (Int32.TryParse(toks[1], out num))
 			{
 				var message = string.Join(" ", toks.Skip(2));
-
 				RfcNumericEvent.Raise(this, new RfcNumericEventArgs(num, message));
+
+				if (num.Equals(001))
+				{
+					ConnectionEstablishedEvent.Raise(this, EventArgs.Empty);
+				}
 			}
 		}
 
@@ -104,6 +132,7 @@ namespace Lantea.Core.Net.Irc
 			{
 				// Bypass the queue for sending pong responses.
 				Send(string.Format("PONG {0}", args.Message.Substring(5)));
+				PingReceiptEvent.Raise(this, EventArgs.Empty);
 			}
 		}
 

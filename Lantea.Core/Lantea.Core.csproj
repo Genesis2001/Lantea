@@ -52,6 +52,7 @@
     <Compile Include="Net\Irc\IrcClient.Handlers.cs" />
     <Compile Include="Net\Irc\IrcEncoding.cs" />
     <Compile Include="Net\Irc\JoinPartEventArgs.cs" />
+    <Compile Include="Net\Irc\MessageReceivedEventArgs.cs" />
     <Compile Include="Net\Irc\RawMessageEventArgs.cs" />
     <Compile Include="Net\Irc\RfcNumericEventArgs.cs" />
     <Compile Include="Net\TcpClientAdapter.cs" />

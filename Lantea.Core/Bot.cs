@@ -12,7 +12,6 @@ namespace Lantea.Core
 	using System.IO;
 	using System.Reflection;
 	using System.Text;
-	using System.Threading.Tasks;
 	using Common.IO;
 	using IO;
 	using Modules;
@@ -57,13 +56,39 @@ namespace Lantea.Core
 
 		private void RegisterClientEvents()
 		{
-//			Client.RawMessageTransmitEvent += OnMessageSend;
-//			Client.RawMessageEvent         += OnRawMessageReceived;
+			Client.RawMessageEvent            += OnRawMessageReceived;
+			Client.TimeoutEvent               += OnClientTimeout;
+			Client.ConnectionEstablishedEvent += OnClientConnect;
 
-			Client.RfcNumericEvent  += OnRfcNumericReceived;
-			Client.TimeoutEvent     += OnClientTimeout;
-			Client.ChannelJoinEvent += OnChannelJoin;
-			Client.ChannelPartEvent += OnChannelPart;
+#if DEBUG
+			Client.RfcNumericEvent      += OnRfcNumericReceived;
+			Client.ChannelJoinEvent     += OnChannelJoin;
+			Client.ChannelPartEvent     += OnChannelPart;
+			Client.MessageReceivedEvent += OnMessageReceived;
+			Client.NoticeReceivedEvent  += OnNoticeReceived;
+			Client.PingReceiptEvent     += OnPingReceipt;
+#endif
+		}
+
+		private void OnClientConnect(object sender, EventArgs eventArgs)
+		{
+			if (Log != null) Log.Info("Connection established to server.");
+		}
+
+#if DEBUG
+		private void OnPingReceipt(object sender, EventArgs args)
+		{
+			if (Log != null) Log.Debug("Ping received. Sent pong.");
+		}
+
+		private void OnNoticeReceived(object sender, MessageReceivedEventArgs args)
+		{
+			if (Log != null) Log.DebugFormat("[MSG] Received notice from {0} (to: {1}) sent: {2}", args.Nick, args.Target, args.Message);
+		}
+
+		private void OnMessageReceived(object sender, MessageReceivedEventArgs args)
+		{
+			if (Log != null) Log.DebugFormat("[MSG] Received message from {0} (to: {1}) sent: {2}", args.Nick, args.Target, args.Message);
 		}
 
 		private void OnChannelJoin(object sender, JoinPartEventArgs args)
@@ -75,6 +100,7 @@ namespace Lantea.Core
 		{
 			if (Log != null) Log.DebugFormat("[PART] {0} left {1}", args.Nick, args.Channel);
 		}
+#endif
 
 		private void OnClientTimeout(object sender, EventArgs eventArgs)
 		{
@@ -94,15 +120,7 @@ namespace Lantea.Core
 			if (args.Numeric.Equals(001))
 			{
 				Log.Info("Bot started.");
-
 				Client.Send("JOIN #test");
-
-				Task.Factory.StartNew(async () =>
-				                            {
-					                            await Task.Delay(30);
-
-					                            Client.Send("PART #test");
-				                            });
 
 				// Not yet implemented, but meh.
 				/*var perform = settings.GetValues("/Settings/Connection/Events/OnConnect/Execute/@Command");
