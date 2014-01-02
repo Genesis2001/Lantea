@@ -18,7 +18,6 @@ namespace Lantea.Core.Net.Irc
 	using Common.Collections.Concurrent;
 	using Common.Linq;
 	using Common.Net;
-	using Data;
 
 	public partial class IrcClient : IDisposable
 	{

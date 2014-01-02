@@ -114,8 +114,18 @@ namespace Lantea.Core.Net.Irc
 					case IrcHeaders.RPL_WELCOME:
 						ConnectionEstablishedEvent.Raise(this, EventArgs.Empty);
 						break;
+
 					case IrcHeaders.ERR_NICKNAMEINUSE:
+					{
 						ChangeNick(string.Concat(My.Nick, "_"));
+
+						if (RetryNick)
+						{
+							Task.Factory.StartNew(() =>
+							                      {
+							                      }, token);
+						}
+					}
 						break;
 				}
 			}

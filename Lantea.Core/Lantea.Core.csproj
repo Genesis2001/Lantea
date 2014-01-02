@@ -46,9 +46,10 @@
     <Compile Include="Modules\IModuleMeta.cs" />
     <Compile Include="Modules\ModuleLoader.cs" />
     <Compile Include="Modules\Version.cs" />
-    <Compile Include="Net\Irc\Data\Channel.cs" />
+    <Compile Include="Net\Irc\Channel.cs" />
     <Compile Include="Net\Irc\IrcClient.cs" />
-    <Compile Include="Net\Irc\Data\User.cs" />
+    <Compile Include="Net\Irc\IrcHeaders.cs" />
+    <Compile Include="Net\Irc\User.cs" />
     <Compile Include="Net\Irc\IrcClient.Handlers.cs" />
     <Compile Include="Net\Irc\IrcEncoding.cs" />
     <Compile Include="Net\Irc\JoinPartEventArgs.cs" />

@@ -1,49 +1,87 @@
 ﻿// -----------------------------------------------------------------------------
-//  <copyright file="Target.cs" company="Zack Loveless">
+//  <copyright file="Nick.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.Core.Net.Irc.Data
+namespace Lantea.Core.Net.Irc
 {
+	using System;
 	using System.ComponentModel;
 	using System.Runtime.CompilerServices;
+	using System.Text.RegularExpressions;
 	using Common;
+	using Common.Linq;
 
-	public class Channel : IObservableClass
+	public class User : IObservableClass
 	{
-		// TODO: Add channel user list.
-		// TODO: Add channel permissions for users.
-
 		private IrcClient client;
-
-		public Channel(string channelName)
+		private string host;
+		private string ident;
+		private string nick;
+		private string realName;
+		
+		public User(string nick)
 		{
-			Name = channelName;
+			this.nick     = nick;
 		}
 
 		#region Properties
+		
+		public string Host
+		{
+			get { return host; }
+			set
+			{
+				NotifyPropertyChanging();
+				host = value;
+				NotifyPropertyChanged();
+			}
+		}
 
-		public string Name { get; private set; }
+		public string Ident
+		{
+			get { return ident; }
+			set
+			{
+				NotifyPropertyChanging();
+				ident = value;
+				NotifyPropertyChanged();
+			}
+		}
+
+		public string Nick
+		{
+			get { return nick; }
+			set
+			{
+				NotifyPropertyChanging();
+				nick = value;
+				NotifyPropertyChanged();
+			}
+		}
+
+		public string RealName
+		{
+			get { return realName; }
+			set
+			{
+				NotifyPropertyChanging();
+				realName = value;
+				NotifyPropertyChanged();
+			}
+		}
 
 		#endregion
 
 		#region Methods
-
-		public void SetClient(IrcClient pClient)
-		{
-			if (client == null)
-			{
-				client = pClient;
-			}
-		}
 
 		public void Message(string format, params object[] args)
 		{
 			if (!client.Connected) return;
 
 			var message = string.Format(format, args);
-			client.Send("PRIVMSG {0} :{1}", Name, message);
+			client.Send("PRIVMSG {0} :{1}", Nick, message);
 		}
 
 		public void Notice(string format, params object[] args)
@@ -51,7 +89,15 @@ namespace Lantea.Core.Net.Irc.Data
 			if (!client.Connected) return;
 
 			var message = string.Format(format, args);
-			client.Send("NOTICE {0} :{1}", Name, message);
+			client.Send("NOTICE {0} :{1}", Nick, message);
+		}
+
+		public void SetClient(IrcClient pClient)
+		{
+			if (client == null)
+			{
+				client = pClient;
+			}
 		}
 
 		#endregion
@@ -66,10 +112,19 @@ namespace Lantea.Core.Net.Irc.Data
 		/// </returns>
 		public override string ToString()
 		{
-			return Name;
+			return Nick;
 		}
 
 		#endregion
+
+		public static User FromRfcString(string value)
+		{
+			Match m;
+			if (!value.TryMatch(@":?([^!]+)!(([^@]+)@(\S+))", out m))
+				throw new FormatException("Unable to parse RFC1459 Nick String.");
+
+			return new User(m.Groups[1].Value) {Ident = m.Groups[3].Value, Host = m.Groups[4].Value};
+		}
 
 		#region Implementation of INotifyPropertyChanged
 
