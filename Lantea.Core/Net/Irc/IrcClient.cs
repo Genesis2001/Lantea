@@ -49,7 +49,7 @@ namespace Lantea.Core.Net.Irc
 			My                      = new User(nick);
 			Timeout                 = TimeSpan.FromMinutes(10d);
 			QueueInteval            = 1000;
-			Channels                = new List<Channel>();
+			Channels                = new HashSet<Channel>();
 
 			RawMessageEvent        += RegistrationHandler;
 			RawMessageEvent        += RfcNumericHandler;
@@ -71,7 +71,7 @@ namespace Lantea.Core.Net.Irc
 			get { return client != null && client.Connected; }
 		}
 
-		public List<Channel> Channels { get; private set; }
+		public HashSet<Channel> Channels { get; private set; }
 
 		/// <summary>
 		/// Gets or sets a value representing what type of encoding to use for encoding messages sent to the Host.
@@ -84,7 +84,24 @@ namespace Lantea.Core.Net.Irc
 		public string Host { get; set; }
 
 		/// <summary>
-		/// Gets an IRC My reference to the <see cref="T:IrcClient" />'s user entity.
+		/// Gets a <see cref="T:System.Boolean" /> value representing whether the <see cref="T:IrcClient" /> has been initialized.
+		/// </summary>
+		public bool IsInitialized
+		{
+			get
+			{
+				var val = true;
+
+				if (string.IsNullOrEmpty(My.Nick)) val = false;
+				else if (string.IsNullOrEmpty(Host) || Dns.GetHostEntry(Host) == null) val = false;
+				else if (Port <= 0) val = false;
+
+				return val;
+			}
+		}
+
+		/// <summary>
+		/// Gets an IRC User reference to the <see cref="T:IrcClient" />'s user entity.
 		/// </summary>
 		public User My { get; private set; }
 
@@ -103,22 +120,7 @@ namespace Lantea.Core.Net.Irc
 		/// </summary>
 		public int QueueInteval { get; set; }
 
-		/// <summary>
-		/// Gets a <see cref="T:System.Boolean" /> value representing whether the <see cref="T:IrcClient" /> has been initialized.
-		/// </summary>
-		public bool IsInitialized
-		{
-			get
-			{
-				var val = true;
-
-				if (string.IsNullOrEmpty(My.Nick)) val = false;
-				else if (string.IsNullOrEmpty(Host) || Dns.GetHostEntry(Host) == null) val = false;
-				else if (Port <= 0) val = false;
-
-				return val;
-			}
-		}
+		
 
 		/// <summary>
 		/// Gets or sets a value representing the timeout interval for messages being received.
@@ -148,6 +150,11 @@ namespace Lantea.Core.Net.Irc
 		#endregion
 
 		#region Methods
+
+		private void ChangeNick(string nick)
+		{
+			Send("NICK {0}", My.Nick);
+		}
 
 		public Channel GetChannel(string channelName)
 		{

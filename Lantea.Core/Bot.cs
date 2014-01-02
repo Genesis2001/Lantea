@@ -120,7 +120,7 @@ namespace Lantea.Core
 			if (args.Numeric.Equals(001))
 			{
 				Log.Info("Bot started.");
-				Client.Send("JOIN #test");
+				Client.Send("JOIN #test,#UnifiedTech");
 
 				// Not yet implemented, but meh.
 				/*var perform = settings.GetValues("/Settings/Connection/Events/OnConnect/Execute/@Command");

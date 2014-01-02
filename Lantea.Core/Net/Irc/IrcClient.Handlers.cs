@@ -8,6 +8,7 @@ namespace Lantea.Core.Net.Irc
 {
 	using System;
 	using System.Linq;
+	using System.Text;
 	using System.Text.RegularExpressions;
 	using System.Threading.Tasks;
 	using System.Timers;
@@ -107,9 +108,15 @@ namespace Lantea.Core.Net.Irc
 				var message = string.Join(" ", toks.Skip(2));
 				RfcNumericEvent.Raise(this, new RfcNumericEventArgs(num, message));
 
-				if (num.Equals(001))
+				var header = (IrcHeaders)num;
+				switch (header)
 				{
-					ConnectionEstablishedEvent.Raise(this, EventArgs.Empty);
+					case IrcHeaders.RPL_WELCOME:
+						ConnectionEstablishedEvent.Raise(this, EventArgs.Empty);
+						break;
+					case IrcHeaders.ERR_NICKNAMEINUSE:
+						ChangeNick(string.Concat(My.Nick, "_"));
+						break;
 				}
 			}
 		}
