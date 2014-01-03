@@ -32,7 +32,6 @@ namespace Lantea.Core.Net.Irc
 		private readonly IQueue<string> messageQueue;
 		private ITcpClientAsync client;
 
-		private string lastNick;
 		private Task queueRunner;
 		
 		private readonly CancellationTokenSource tokenSource;
@@ -46,7 +45,7 @@ namespace Lantea.Core.Net.Irc
 
 			Channels                = new HashSet<Channel>();
 			messageQueue            = new ConcurrentQueueAdapter<string>();
-			Nick                    = lastNick = nick;
+			Nick                    = nick;
 			Options                 = ConnectOptions.Default;
 			QueueInteval            = 1000;
 			RetryInterval           = TimeSpan.FromMinutes(5d).TotalMilliseconds;
@@ -58,6 +57,10 @@ namespace Lantea.Core.Net.Irc
 			RawMessageEvent        += JoinPartHandler;
 			RawMessageEvent        += MessageNoticeHandler;
 			RawMessageEvent        += NickHandler;
+
+			RfcNumericEvent        += ConnectionHandler;
+			RfcNumericEvent        += ProtocolHandler;
+			RfcNumericEvent        += NickInUseHandler;
 
 			token.Register(CancellationNoticeHandler);
 		}
@@ -84,6 +87,9 @@ namespace Lantea.Core.Net.Irc
 		/// </summary>
 		public string Host { get; set; }
 
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.String" /> value representing the Ident part for the <see cref="T:IrcClient" />'s user.
+		/// </summary>
 		public string Ident { get; set; }
 
 		/// <summary>
@@ -103,6 +109,9 @@ namespace Lantea.Core.Net.Irc
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.String" /> value representing the nickname for the <see cref="T:IrcClient" /> 
+		/// </summary>
 		public string Nick { get; set; }
 
 		/// <summary>
@@ -141,6 +150,11 @@ namespace Lantea.Core.Net.Irc
 		/// Gets or sets a <see cref="T:System.Int32" /> value representing the inteval for retry attempts
 		/// </summary>
 		public double RetryInterval { get; set; }
+
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.Boolean" /> value indicating whether to request RPL_NAMEREPLY from the server when someone joins/leaves a channel or changes modes on a channel.
+		/// </summary>
+		public bool StrictNames { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value representing the timeout interval for messages being received.
@@ -256,7 +270,7 @@ namespace Lantea.Core.Net.Irc
 			}
 
 			client.ReadLineAsync().ContinueWith(OnAsyncRead, token);
-			queueRunner = Task.Run(new Action(QueueHandler), token);
+			queueRunner = Task.Run(new Action(QueueProcessor), token);
 
 			TickTimeout();
 		}
