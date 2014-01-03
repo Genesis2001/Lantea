@@ -169,9 +169,9 @@ namespace Lantea.Core
 
 			//var foo = settings.GetValues("/Settings/Connection/Options/Secure[@CertificatePath and @CertificateKeyPath]");
 
-			Client.My.RealName         = RealName;
-			Client.Host                = settings.GetValue("/Settings/Connection/@Host");
-			Client.Encoding            = IrcEncoding.UTF8;
+			Client.RealName = RealName;
+			Client.Host     = settings.GetValue("/Settings/Connection/@Host");
+			Client.Encoding = IrcEncoding.UTF8;
 			
 			RegisterClientEvents();
 

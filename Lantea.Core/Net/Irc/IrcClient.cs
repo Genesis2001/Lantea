@@ -45,9 +45,9 @@ namespace Lantea.Core.Net.Irc
 
 			Options                 = ConnectOptions.Default;
 			messageQueue            = new ConcurrentQueueAdapter<string>();
-			My                      = new User(nick);
 			Timeout                 = TimeSpan.FromMinutes(10d);
 			QueueInteval            = 1000;
+			RetryInterval           = 300000;
 			Channels                = new HashSet<Channel>();
 
 			RawMessageEvent        += RegistrationHandler;
@@ -57,7 +57,6 @@ namespace Lantea.Core.Net.Irc
 			RawMessageEvent        += MessageNoticeHandler;
 
 			token.Register(CancellationNoticeHandler);
-			My.SetClient(this);
 		}
 
 		#region Properties
@@ -82,6 +81,8 @@ namespace Lantea.Core.Net.Irc
 		/// </summary>
 		public string Host { get; set; }
 
+		public string Ident { get; set; }
+
 		/// <summary>
 		/// Gets a <see cref="T:System.Boolean" /> value representing whether the <see cref="T:IrcClient" /> has been initialized.
 		/// </summary>
@@ -91,7 +92,7 @@ namespace Lantea.Core.Net.Irc
 			{
 				var val = true;
 
-				if (string.IsNullOrEmpty(My.Nick)) val = false;
+				if (string.IsNullOrEmpty(Nick)) val = false;
 				else if (string.IsNullOrEmpty(Host) || Dns.GetHostEntry(Host) == null) val = false;
 				else if (Port <= 0) val = false;
 
@@ -99,10 +100,12 @@ namespace Lantea.Core.Net.Irc
 			}
 		}
 
+		public string Nick { get; set; }
+
 		/// <summary>
-		/// Gets an IRC User reference to the <see cref="T:IrcClient" />'s user entity.
+		/// Gets or sets a bit-mask value representing the options for connecting to the Host.
 		/// </summary>
-		public User My { get; private set; }
+		public ConnectOptions Options { get; set; }
 
 		/// <summary>
 		/// Gets or sets a <see cref="T:System.String" /> value representing the password to be used for protocol registration.
@@ -115,21 +118,31 @@ namespace Lantea.Core.Net.Irc
 		public int Port { get; set; }
 
 		/// <summary>
-		/// Gets or sets a <see cref="T:System.Int32" /> value representing the 
+		/// Gets or sets a <see cref="T:System.Int32" /> value representing the interval for processing queued messages.
 		/// </summary>
 		public int QueueInteval { get; set; }
 
-		
+		public string RealName { get; set; }
+
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.Boolean" /> value indicating whether to retry connecting to the IRC server.
+		/// </summary>
+		public bool RetryConnect { get; set; }
+
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.Boolean" /> value indicating whether to retry the client's primary nickname.
+		/// </summary>
+		public bool RetryNick { get; set; }
+
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.Int32" /> value representing the inteval for retry attempts
+		/// </summary>
+		public int RetryInterval { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value representing the timeout interval for messages being received.
 		/// </summary>
 		public TimeSpan Timeout { get; set; }
-
-		/// <summary>
-		/// Gets or sets a bit-mask value representing the options for connecting to the Host.
-		/// </summary>
-		public ConnectOptions Options { get; set; }
 
 		#endregion
 
@@ -152,7 +165,7 @@ namespace Lantea.Core.Net.Irc
 
 		private void ChangeNick(string nick)
 		{
-			Send("NICK {0}", My.Nick);
+			Send("NICK {0}", nick);
 		}
 
 		public Channel GetChannel(string channelName)
@@ -173,9 +186,24 @@ namespace Lantea.Core.Net.Irc
 			return c;
 		}
 
+		public void Message(string target, string format, params object[] args)
+		{
+			var message = string.Format(format, args);
+
+			Send("PRIVMSG {0} :{1}", target, message);
+		}
+
+		public void Notice(string target, string format, params object[] args)
+		{
+			var message = string.Format(format, args);
+
+			Send("NOTICE {0} :{1}", target, message);
+		}
+
 		private void SetDefaults()
 		{
-			if (string.IsNullOrEmpty(My.Ident)) My.Ident = My.Nick.ToLower();
+			if (string.IsNullOrEmpty(Ident)) Ident = Nick.ToLower();
+			if (string.IsNullOrEmpty(RealName)) RealName = Nick;
 		}
 
 		/// <summary>

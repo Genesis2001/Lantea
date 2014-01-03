@@ -87,13 +87,11 @@ namespace Lantea.Core.Net.Irc
 
 				if (m.Groups[5].Value.EqualsIgnoreCase("privmsg"))
 				{
-					if (nick.EqualsIgnoreCase(My.Nick)) MessageReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, msg));
-					else MessageReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
+					MessageReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
 				}
 				else if (m.Groups[5].Value.EqualsIgnoreCase("notice"))
 				{
-					if (nick.EqualsIgnoreCase(My.Nick)) NoticeReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, msg));
-					else NoticeReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
+					NoticeReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
 				}
 			}
 		}
@@ -117,12 +115,15 @@ namespace Lantea.Core.Net.Irc
 
 					case IrcHeaders.ERR_NICKNAMEINUSE:
 					{
-						ChangeNick(string.Concat(My.Nick, "_"));
+						ChangeNick(string.Concat(Nick, "_"));
 
 						if (RetryNick)
 						{
-							Task.Factory.StartNew(() =>
+							Task.Factory.StartNew(async () =>
 							                      {
+								                      await Task.Delay(RetryInterval, token);
+
+								                      ChangeNick(Nick);
 							                      }, token);
 						}
 					}
@@ -136,8 +137,8 @@ namespace Lantea.Core.Net.Irc
 			if (registered) return;
 			if (!string.IsNullOrEmpty(Password)) Send("PASS :{0}", Password);
 
-			Send("NICK {0}", My.Nick);
-			Send("USER {0} 0 * :{1}", My.Ident, My.RealName);
+			Send("NICK {0}", Nick);
+			Send("USER {0} 0 * :{1}", Ident, RealName);
 
 			RawMessageEvent -= RegistrationHandler;
 			registered       = true;
