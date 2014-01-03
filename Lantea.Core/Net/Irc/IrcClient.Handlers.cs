@@ -130,6 +130,7 @@ namespace Lantea.Core.Net.Irc
 
 					case IrcHeaders.ERR_NICKNAMEINUSE:
 						{
+							// TODO: (this is currently broken - logic) Work in conjunction with the NickChangedHandler to 
 							ChangeNick(string.Concat(lastNick, "_"));
 
 							if (RetryNick)
