@@ -31,7 +31,8 @@ namespace Lantea.Core.Net.Irc
 		// ReSharper disable FieldCanBeMadeReadOnly.Local
 		private readonly IQueue<string> messageQueue;
 		private ITcpClientAsync client;
-		
+
+		private string lastNick;
 		private Task queueRunner;
 		
 		private readonly CancellationTokenSource tokenSource;
@@ -43,18 +44,20 @@ namespace Lantea.Core.Net.Irc
 			tokenSource             = new CancellationTokenSource();
 			token                   = tokenSource.Token;
 
-			Options                 = ConnectOptions.Default;
-			messageQueue            = new ConcurrentQueueAdapter<string>();
-			Timeout                 = TimeSpan.FromMinutes(10d);
-			QueueInteval            = 1000;
-			RetryInterval           = 300000;
 			Channels                = new HashSet<Channel>();
+			messageQueue            = new ConcurrentQueueAdapter<string>();
+			Nick                    = lastNick = nick;
+			Options                 = ConnectOptions.Default;
+			QueueInteval            = 1000;
+			RetryInterval           = TimeSpan.FromMinutes(5d).TotalMilliseconds;
+			Timeout                 = TimeSpan.FromMinutes(10d);
 
 			RawMessageEvent        += RegistrationHandler;
 			RawMessageEvent        += RfcNumericHandler;
 			RawMessageEvent        += PingHandler;
 			RawMessageEvent        += JoinPartHandler;
 			RawMessageEvent        += MessageNoticeHandler;
+			RawMessageEvent        += NickHandler;
 
 			token.Register(CancellationNoticeHandler);
 		}
@@ -137,7 +140,7 @@ namespace Lantea.Core.Net.Irc
 		/// <summary>
 		/// Gets or sets a <see cref="T:System.Int32" /> value representing the inteval for retry attempts
 		/// </summary>
-		public int RetryInterval { get; set; }
+		public double RetryInterval { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value representing the timeout interval for messages being received.
@@ -152,6 +155,7 @@ namespace Lantea.Core.Net.Irc
 		public event EventHandler<JoinPartEventArgs> ChannelJoinEvent;
 		public event EventHandler<JoinPartEventArgs> ChannelPartEvent;
 		public event EventHandler<MessageReceivedEventArgs> MessageReceivedEvent;
+		public event EventHandler<NickChangeEventArgs> NickChangedEvent;
 		public event EventHandler<MessageReceivedEventArgs> NoticeReceivedEvent;
 		public event EventHandler PingReceiptEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageEvent;
@@ -236,7 +240,15 @@ namespace Lantea.Core.Net.Irc
 			client = new TcpClientAsyncAdapter(new TcpClient(), encoding);
 			try
 			{
-				client.Connect(Host, Port);
+				if (Options.HasFlag(ConnectOptions.Secure))
+				{
+					// TODO: Call client.ConnectSecurely(string host, int port, [something] certificatePfx);
+					client.Connect(Host, Port);
+				}
+				else
+				{
+					client.Connect(Host, Port);
+				}
 			}
 			catch (ArgumentNullException)
 			{

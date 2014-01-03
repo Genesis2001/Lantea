@@ -95,6 +95,21 @@ namespace Lantea.Core.Net.Irc
 				}
 			}
 		}
+
+		protected virtual void NickHandler(object sender, RawMessageEventArgs args)
+		{
+			var message = args.Message;
+			Match m;
+
+			// :Genesis2001!zack@unifiedtech.org NICK Genesis2002
+			if (message.TryMatch(@":?([^!]+)\!(([^@]+)@(\S+)) NICK :?(\#?[^\W]+)\W?:?(.+)?", out m))
+			{
+				var nick   = m.Groups[1].Value;
+				var target = m.Groups[5].Value;
+
+				NickChangedEvent.Raise(this, new NickChangeEventArgs(nick, target));
+			}
+		}
 		
 		protected virtual void RfcNumericHandler(object sender, RawMessageEventArgs args)
 		{
@@ -114,20 +129,19 @@ namespace Lantea.Core.Net.Irc
 						break;
 
 					case IrcHeaders.ERR_NICKNAMEINUSE:
-					{
-						ChangeNick(string.Concat(Nick, "_"));
-
-						if (RetryNick)
 						{
-							Task.Factory.StartNew(async () =>
-							                      {
-								                      await Task.Delay(RetryInterval, token);
+							ChangeNick(string.Concat(lastNick, "_"));
 
-								                      ChangeNick(Nick);
-							                      }, token);
-						}
-					}
-						break;
+							if (RetryNick)
+							{
+								Task.Factory.StartNew(async () =>
+													  {
+														  await Task.Delay(Convert.ToInt32(RetryInterval), token);
+
+														  ChangeNick(Nick);
+													  }, token);
+							}
+						} break;
 				}
 			}
 		}

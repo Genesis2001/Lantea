@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-//  <copyright file="RawMessageEventArgs.cs" company="Zack Loveless">
+//  <copyright file="NickChangeEventArgs.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
 //      
 //      LICENSE TBA
@@ -10,13 +10,16 @@ namespace Lantea.Core.Net.Irc
 {
 	using System;
 
-	public class RawMessageEventArgs : EventArgs
+	public class NickChangeEventArgs : EventArgs
 	{
-		public RawMessageEventArgs(string message)
+		public NickChangeEventArgs(string oldNick, string newNick)
 		{
-			Message = message;
+			OldNick = oldNick;
+			NewNick = newNick;
 		}
 
-		public string Message { get; set; }
+		public string OldNick { get; set; }
+
+		public string NewNick { get; set; }
 	}
 }

@@ -26,6 +26,8 @@ namespace Lantea.Core.Net.Irc
 
 		public string Name { get; private set; }
 
+
+
 		#endregion
 
 		#region Methods

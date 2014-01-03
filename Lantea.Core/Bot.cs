@@ -56,26 +56,32 @@ namespace Lantea.Core
 
 		private void RegisterClientEvents()
 		{
-			Client.RawMessageEvent            += OnRawMessageReceived;
 			Client.TimeoutEvent               += OnClientTimeout;
 			Client.ConnectionEstablishedEvent += OnClientConnect;
 
 #if DEBUG
+			Client.RawMessageEvent      += OnRawMessageReceived;
 			Client.RfcNumericEvent      += OnRfcNumericReceived;
 			Client.ChannelJoinEvent     += OnChannelJoin;
 			Client.ChannelPartEvent     += OnChannelPart;
 			Client.MessageReceivedEvent += OnMessageReceived;
+			Client.NickChangedEvent     += OnNickChanged;
 			Client.NoticeReceivedEvent  += OnNoticeReceived;
 			Client.PingReceiptEvent     += OnPingReceipt;
 #endif
 		}
 
-		private void OnClientConnect(object sender, EventArgs eventArgs)
+		private void OnClientConnect(object sender, EventArgs args)
 		{
 			if (Log != null) Log.Info("Connection established to server.");
 		}
 
 #if DEBUG
+		private void OnNickChanged(object sender, NickChangeEventArgs args)
+		{
+			if (Log != null) Log.DebugFormat("{0} changed nicks to {1}", args.OldNick, args.NewNick);
+		}
+
 		private void OnPingReceipt(object sender, EventArgs args)
 		{
 			if (Log != null) Log.Debug("Ping received. Sent pong.");
