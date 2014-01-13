@@ -287,7 +287,7 @@ namespace Lantea.Core.Net.Irc
 						Send(messageQueue.Pop());
 					}
 
-					await Task.Delay(QueueInteval, token);
+					await Task.Delay(QueueInteval, queueToken);
 				}
 			}
 			catch (TaskCanceledException)

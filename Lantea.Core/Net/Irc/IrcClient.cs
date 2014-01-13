@@ -33,9 +33,12 @@ namespace Lantea.Core.Net.Irc
 		private ITcpClientAsync client;
 
 		private Task queueRunner;
-		
+
+		private CancellationTokenSource queueTokenSource;
 		private readonly CancellationTokenSource tokenSource;
 		private CancellationToken token;
+		private CancellationToken queueToken;
+		private bool enableFakeLag;
 		// ReSharper restore FieldCanBeMadeReadOnly.Local
 
 		public IrcClient(string nick)
@@ -48,6 +51,7 @@ namespace Lantea.Core.Net.Irc
 			Nick                    = nick;
 			Options                 = ConnectOptions.Default;
 			QueueInteval            = 1000;
+			EnableFakeLag           = true;
 			RetryInterval           = TimeSpan.FromMinutes(5d).TotalMilliseconds;
 			Timeout                 = TimeSpan.FromMinutes(10d);
 			Modes                   = new List<char>();
@@ -78,6 +82,21 @@ namespace Lantea.Core.Net.Irc
 		}
 
 		public HashSet<Channel> Channels { get; private set; }
+
+		public bool EnableFakeLag
+		{
+			get { return enableFakeLag; }
+			set
+			{
+				enableFakeLag = value;
+
+				if (value)
+				{
+					queueTokenSource.Cancel();
+				}
+				else StartQueue();
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets a value representing what type of encoding to use for encoding messages sent to the Host.
@@ -183,7 +202,7 @@ namespace Lantea.Core.Net.Irc
 		public event EventHandler<MessageReceivedEventArgs> NoticeReceivedEvent;
 		public event EventHandler PingReceiptEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageEvent;
-		public event EventHandler<RawMessageEventArgs> RawMessageTransmitEvent;
+		public event EventHandler<RawMessageEventArgs> ClientSocketWriteEvent;
 		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;
 		public event EventHandler TimeoutEvent;
 
@@ -278,16 +297,21 @@ namespace Lantea.Core.Net.Irc
 			}
 
 			client.ReadLineAsync().ContinueWith(OnAsyncRead, token);
-			queueRunner = Task.Run(new Action(QueueProcessor), token);
 
+			StartQueue();
 			TickTimeout();
+		}
+
+		private void StartQueue()
+		{
+			queueRunner = Task.Run(new Action(QueueProcessor), queueToken);
 		}
 		
 		private void Send(string data)
 		{
 			client.WriteLine(data);
 
-			RawMessageTransmitEvent.Raise(this, new RawMessageEventArgs(data));
+			ClientSocketWriteEvent.Raise(this, new RawMessageEventArgs(data));
 		}
 
 		/// <summary>
@@ -300,7 +324,11 @@ namespace Lantea.Core.Net.Irc
 			var sb = new StringBuilder();
 			sb.AppendFormat(format, args);
 
-			messageQueue.Push(sb.ToString());
+			if (EnableFakeLag)
+			{
+				messageQueue.Push(sb.ToString());
+			}
+			else Send(sb.ToString());
 		}
 
 		#endregion
