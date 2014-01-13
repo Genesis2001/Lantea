@@ -349,7 +349,7 @@ namespace Lantea.Core.Net.Irc
 			if (!disposing) return;
 
 			if (!queueTokenSource.IsCancellationRequested) queueTokenSource.Cancel();
-			tokenSource.Cancel();
+			if (!tokenSource.IsCancellationRequested) tokenSource.Cancel();
 		}
 
 		#endregion
