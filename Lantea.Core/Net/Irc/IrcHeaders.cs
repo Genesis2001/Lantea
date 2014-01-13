@@ -13,6 +13,9 @@ namespace Lantea.Core.Net.Irc
 		RPL_WELCOME       = 001,
 		RPL_PROTOCTL      = 005,
 		RPL_NAMREPLY      = 353,
+		RPL_INVITELIST    = 346,
+		RPL_EXCEPTLIST    = 348,
+		RPL_BANLIST       = 367,
 		ERR_NICKNAMEINUSE = 433,
 	}
 }

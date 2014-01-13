@@ -7,6 +7,7 @@
 namespace Lantea.Core.Net.Irc
 {
 	using System;
+	using System.Diagnostics;
 	using System.Linq;
 	using System.Text.RegularExpressions;
 	using System.Threading.Tasks;
@@ -17,7 +18,8 @@ namespace Lantea.Core.Net.Irc
 	{
 		#region Fields
 
-		private string accessPrefixes;
+		internal string accessPrefixes;
+		internal string channelModes;
 
 		private bool registered;
 		private DateTime lastMessage;
@@ -62,25 +64,54 @@ namespace Lantea.Core.Net.Irc
 				}
 				else if (message.TryMatch(@"CHANMODES=(\S+)", out m))
 				{
-					// 
+					channelModes = m.Groups[1].Value;
 				}
 			}
 		}
 
-		protected virtual void NamesHandler(object sender, RfcNumericEventArgs args)
+		protected virtual void ChannelAccessHandler(object sender, RfcNumericEventArgs args)
 		{
 			var header  = (IrcHeaders)args.Numeric;
 			var message = args.Message;
 
 			if (header == IrcHeaders.RPL_NAMREPLY)
 			{
-				var accessString = string.Format(@"[{0}](\S+)", accessPrefixes);
-				MatchCollection m;
+				var toks   = message.Split(' ');
+				var c      = GetChannel(toks[2]);
+				var names  = message.Substring(message.IndexOf(':') + 1);
 
-				if (message.TryMatches(accessString, out m))
+				MatchCollection collection;
+				var accessRegex = string.Format(@"(?<prefix>[{0}]?)(?<user>\S+)", accessPrefixes);
+				if (names.TryMatches(accessRegex, out collection))
 				{
-					// 
+					foreach (Match item in collection)
+					{
+						var prefix = item.Groups["prefix"].Value.Length > 0 ? item.Groups["prefix"].Value[0] : (char)0;
+						var user   = item.Groups["user"].Value;
+
+						if (c.Users.ContainsKey(user))
+						{
+							c.Users[user].AddPrefix(prefix);
+						}
+						else
+						{
+							var p = new PrefixList(this);
+							p.AddPrefix(prefix);
+							c.Users.Add(user, p);
+						}
+					}
 				}
+			}
+		}
+
+		protected virtual void ListModeHandler(object sender, RfcNumericEventArgs args)
+		{
+			var header  = (IrcHeaders)args.Numeric;
+			var message = args.Message;
+
+			if (header == IrcHeaders.RPL_BANLIST || header == IrcHeaders.RPL_EXCEPTLIST || header == IrcHeaders.RPL_INVITELIST)
+			{
+				// 
 			}
 		}
 
@@ -121,23 +152,26 @@ namespace Lantea.Core.Net.Irc
 			// http://cjh.im/ - Chris J. Hogben
 
 			// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
-			if (message.TryMatch(@":?([^!]+)\!([^@]+)@(\S+)\W(JOIN|PART)\W:?(\#?[^\W]+)\W?:?(.+)?", out m))
+			if (message.TryMatch(@"^:?(?<nick>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>PRIVMSG|NOTICE|JOIN|PART|QUIT|MODE|NICK) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$", out m))
 			{
-				var nick   = m.Groups[1].Value;
-				var target = m.Groups[5].Value;
+				if (m.Groups["command"].Value.Matches(@"join|part"))
+				{
+					var nick   = m.Groups[1].Value;
+					var target = m.Groups[5].Value;
 
-				if (m.Groups[4].Value.EqualsIgnoreCase("join"))
-				{
-					ChannelJoinEvent.Raise(this, new JoinPartEventArgs(nick, target));
-				}
-				else if (m.Groups[4].Value.EqualsIgnoreCase("part"))
-				{
-					ChannelPartEvent.Raise(this, new JoinPartEventArgs(nick, target));
-				}
+					if (m.Groups[4].Value.EqualsIgnoreCase("join"))
+					{
+						ChannelJoinEvent.Raise(this, new JoinPartEventArgs(nick, target));
+					}
+					else if (m.Groups[4].Value.EqualsIgnoreCase("part"))
+					{
+						ChannelPartEvent.Raise(this, new JoinPartEventArgs(nick, target));
+					}
 
-				if (StrictNames)
-				{
-					Send("NAMES {0}", target);
+					if (StrictNames)
+					{
+						Send("NAMES {0}", target);
+					}
 				}
 			}
 		}
@@ -161,6 +195,17 @@ namespace Lantea.Core.Net.Irc
 				{
 					NoticeReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
 				}
+			}
+		}
+
+		protected virtual void ModeHandler(object sender, RawMessageEventArgs args)
+		{
+			var message = args.Message;
+			Match m;
+
+			if (message.TryMatch(@":?([^!]+)\!(([^@]+)@(\S+)) MODE :?(\#?[^\W]+)\W?:?(.+)?", out m))
+			{
+				// 
 			}
 		}
 

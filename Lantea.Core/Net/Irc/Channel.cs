@@ -6,59 +6,55 @@
 
 namespace Lantea.Core.Net.Irc
 {
-	using System.ComponentModel;
-	using System.Runtime.CompilerServices;
-	using Common;
+	using System;
+	using System.Collections.Generic;
+	using Common.Linq;
 
-	public class Channel : IObservableClass
+	public class Channel : IEquatable<String>
 	{
 		// TODO: Add channel user list.
 		// TODO: Add channel permissions for users.
 
-		private IrcClient client;
+		private readonly IrcClient client;
 
-		public Channel(string channelName)
+		private Channel()
 		{
-			Name = channelName;
+			ListModes = new List<ListMode>();
+			Modes     = new Dictionary<char, string>();
+			Users     = new Dictionary<string, PrefixList>();
+		}
+
+		internal Channel(IrcClient client, string channelName) : this()
+		{
+			this.client = client;
+			Name        = channelName;
 		}
 
 		#region Properties
 
 		public string Name { get; private set; }
 
+		public List<ListMode> ListModes { get; private set; }
 
+		public Dictionary<char, string> Modes { get; private set; }
 
-		#endregion
-
-		#region Methods
-
-		public void SetClient(IrcClient pClient)
-		{
-			if (client == null)
-			{
-				client = pClient;
-			}
-		}
-
-		public void Message(string format, params object[] args)
-		{
-			if (!client.Connected) return;
-
-			var message = string.Format(format, args);
-			client.Send("PRIVMSG {0} :{1}", Name, message);
-		}
-
-		public void Notice(string format, params object[] args)
-		{
-			if (!client.Connected) return;
-
-			var message = string.Format(format, args);
-			client.Send("NOTICE {0} :{1}", Name, message);
-		}
+		public Dictionary<string, PrefixList> Users { get; private set; }
 
 		#endregion
 
 		#region Overrides of Object
+
+		/// <summary>
+		/// Indicates whether the current object is equal to another object of the same type.
+		/// </summary>
+		/// <returns>
+		/// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+		/// </returns>
+		/// <param name="other">An object to compare with this object.</param>
+		public bool Equals(string other)
+		{
+			return Name.EqualsIgnoreCase(other);
+		}
 
 		/// <summary>
 		/// Returns a string that represents the current object.
@@ -69,34 +65,6 @@ namespace Lantea.Core.Net.Irc
 		public override string ToString()
 		{
 			return Name;
-		}
-
-		#endregion
-
-		#region Implementation of INotifyPropertyChanged
-
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		#endregion
-
-		#region Implementation of INotifyPropertyChanging
-
-		public event PropertyChangingEventHandler PropertyChanging;
-
-		#endregion
-
-		#region Implementation of IObservableClass
-
-		public void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
-		{
-			var handler = PropertyChanged;
-			if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
-		}
-
-		public void NotifyPropertyChanging([CallerMemberName] string propertyName = null)
-		{
-			var handler = PropertyChanging;
-			if (handler != null) handler(this, new PropertyChangingEventArgs(propertyName));
 		}
 
 		#endregion

@@ -61,7 +61,6 @@ namespace Lantea.Core
 
 #if DEBUG
 			Client.RawMessageEvent      += OnRawMessageReceived;
-			Client.RfcNumericEvent      += OnRfcNumericReceived;
 			Client.ChannelJoinEvent     += OnChannelJoin;
 			Client.ChannelPartEvent     += OnChannelPart;
 			Client.MessageReceivedEvent += OnMessageReceived;
@@ -73,7 +72,14 @@ namespace Lantea.Core
 
 		private void OnClientConnect(object sender, EventArgs args)
 		{
-			if (Log != null) Log.Info("Connection established to server.");
+			if (Log != null)
+			{
+				Log.Info("Connection established to server.");
+
+				Log.Info("Bot started.");
+			}
+
+			Client.Send("JOIN #test,#UnifiedTech");
 		}
 
 #if DEBUG
@@ -114,27 +120,6 @@ namespace Lantea.Core
 			if (Log != null) Log.Warn("Timeout detected. Exiting.");
 
 			Environment.Exit(1);
-		}
-
-		private void OnMessageSend(object sender, RawMessageEventArgs args)
-		{
-			if (Log != null) Log.DebugFormat("SEND: {0}", args.Message);
-		}
-
-		private void OnRfcNumericReceived(object sender, RfcNumericEventArgs args)
-		{
-			if (args.Numeric.Equals(001))
-			{
-				Log.Info("Bot started.");
-				Client.Send("JOIN #test,#UnifiedTech");
-
-				// Not yet implemented, but meh.
-				/*var perform = settings.GetValues("/Settings/Connection/Events/OnConnect/Execute/@Command");
-				foreach (var item in perform)
-				{
-					client.Send(item);
-				}*/
-			}
 		}
 
 		private void OnRawMessageReceived(object sender, RawMessageEventArgs args)

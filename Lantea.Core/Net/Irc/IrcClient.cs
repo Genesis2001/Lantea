@@ -50,6 +50,7 @@ namespace Lantea.Core.Net.Irc
 			QueueInteval            = 1000;
 			RetryInterval           = TimeSpan.FromMinutes(5d).TotalMilliseconds;
 			Timeout                 = TimeSpan.FromMinutes(10d);
+			Modes                   = new List<char>();
 
 			RawMessageEvent        += RegistrationHandler;
 			RawMessageEvent        += RfcNumericHandler;
@@ -60,6 +61,7 @@ namespace Lantea.Core.Net.Irc
 
 			RfcNumericEvent        += ConnectionHandler;
 			RfcNumericEvent        += ProtocolHandler;
+			RfcNumericEvent        += ChannelAccessHandler;
 			RfcNumericEvent        += NickInUseHandler;
 
 			token.Register(CancellationNoticeHandler);
@@ -110,6 +112,11 @@ namespace Lantea.Core.Net.Irc
 		}
 
 		/// <summary>
+		/// Gets a list of modes that are currently set on the client.
+		/// </summary>
+		public List<char> Modes { get; private set; }
+
+		/// <summary>
 		/// Gets or sets a <see cref="T:System.String" /> value representing the nickname for the <see cref="T:IrcClient" /> 
 		/// </summary>
 		public string Nick { get; set; }
@@ -134,6 +141,9 @@ namespace Lantea.Core.Net.Irc
 		/// </summary>
 		public int QueueInteval { get; set; }
 
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.String" /> value representing the <see cref="T:IrcClient" />'s real name.
+		/// </summary>
 		public string RealName { get; set; }
 
 		/// <summary>
@@ -195,9 +205,7 @@ namespace Lantea.Core.Net.Irc
 
 			if (c == null)
 			{
-				c = new Channel(channelName);
-				c.SetClient(this);
-
+				c = new Channel(this, channelName);
 				Channels.Add(c);
 			}
 
