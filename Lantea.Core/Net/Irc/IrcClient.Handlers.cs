@@ -7,6 +7,7 @@
 namespace Lantea.Core.Net.Irc
 {
 	using System;
+	using System.Diagnostics;
 	using System.Linq;
 	using System.Text.RegularExpressions;
 	using System.Threading.Tasks;
@@ -15,38 +16,132 @@ namespace Lantea.Core.Net.Irc
 
 	public partial class IrcClient
 	{
+		#region Fields
+
+		internal string accessPrefixes;
+		internal string channelModes;
+
 		private bool registered;
 		private DateTime lastMessage;
 		private Timer timeoutTimer;
+
+		#endregion
 
 		// internal const string IrcRawRegex = @"^(:(?<prefix>\S+) )?(?<command>\S+)( (?!:)(?<params>.+?))?( :(?<trail>.+))?$";
 
 		private void TickTimeout()
 		{
 			timeoutTimer          = new Timer(Timeout.TotalMilliseconds);
-			timeoutTimer.Elapsed += TimeoutTimerElapsed;
+			timeoutTimer.Elapsed += OnTimeoutTimerElapsed;
 			timeoutTimer.Start();
 		}
 
 		#region Handlers
 
-		private void CancellationNoticeHandler()
-		{
-			if (!tokenSource.IsCancellationRequested) return;
+		#region IRC Numeric Handlers
 
-			Send("QUIT :Exiting.");
-			client.Close();
-		}
-
-		private void TimeoutTimerElapsed(object sender, ElapsedEventArgs args)
+		protected virtual void ConnectionHandler(object sender, RfcNumericEventArgs args)
 		{
-			if ((args.SignalTime - lastMessage) < Timeout)
+			var header = (IrcHeaders)args.Numeric;
+
+			if (header == IrcHeaders.RPL_WELCOME)
 			{
-				TimeoutEvent.Raise(this, EventArgs.Empty);
-
-				tokenSource.Cancel();
+				ConnectionEstablishedEvent.Raise(this, EventArgs.Empty);
 			}
 		}
+
+		protected virtual void ProtocolHandler(object sender, RfcNumericEventArgs args)
+		{
+			var header  = (IrcHeaders)args.Numeric;
+			var message = args.Message;
+
+			if (header == IrcHeaders.RPL_PROTOCTL)
+			{
+				Match m;
+				if (message.TryMatch(@"PREFIX=\((\S+)\)(\S+)", out m))
+				{
+					accessPrefixes = m.Groups[2].Value;
+				}
+				else if (message.TryMatch(@"CHANMODES=(\S+)", out m))
+				{
+					channelModes = m.Groups[1].Value;
+				}
+			}
+		}
+
+		protected virtual void ChannelAccessHandler(object sender, RfcNumericEventArgs args)
+		{
+			var header  = (IrcHeaders)args.Numeric;
+			var message = args.Message;
+
+			if (header == IrcHeaders.RPL_NAMREPLY)
+			{
+				var toks   = message.Split(' ');
+				var c      = GetChannel(toks[2]);
+				var names  = message.Substring(message.IndexOf(':') + 1);
+
+				MatchCollection collection;
+				var accessRegex = string.Format(@"(?<prefix>[{0}]?)(?<user>\S+)", accessPrefixes);
+				if (names.TryMatches(accessRegex, out collection))
+				{
+					foreach (Match item in collection)
+					{
+						var prefix = item.Groups["prefix"].Value.Length > 0 ? item.Groups["prefix"].Value[0] : (char)0;
+						var user   = item.Groups["user"].Value;
+
+						if (c.Users.ContainsKey(user))
+						{
+							c.Users[user].AddPrefix(prefix);
+						}
+						else
+						{
+							var p = new PrefixList(this);
+							p.AddPrefix(prefix);
+							c.Users.Add(user, p);
+						}
+					}
+				}
+			}
+		}
+
+		protected virtual void ListModeHandler(object sender, RfcNumericEventArgs args)
+		{
+			var header  = (IrcHeaders)args.Numeric;
+			var message = args.Message;
+
+			if (header == IrcHeaders.RPL_BANLIST || header == IrcHeaders.RPL_EXCEPTLIST || header == IrcHeaders.RPL_INVITELIST)
+			{
+				// 
+			}
+		}
+
+		protected virtual void NickInUseHandler(object sender, RfcNumericEventArgs args)
+		{
+			var header  = (IrcHeaders)args.Numeric;
+			var message = args.Message;
+
+			if (header == IrcHeaders.ERR_NICKNAMEINUSE)
+			{
+				var toks    = message.Split(' ');
+				var newNick = string.Concat(toks[1], "_");
+
+				ChangeNick(newNick);
+
+				if (RetryNick)
+				{
+					Task.Factory.StartNew(async () =>
+					                            {
+						                            await Task.Delay(Convert.ToInt32(RetryInterval), token);
+
+						                            ChangeNick(Nick);
+					                            }, token);
+				}
+			}
+		}
+
+		#endregion
+
+		#region IRC Raw Message Handlers
 
 		protected virtual void JoinPartHandler(object sender, RawMessageEventArgs args)
 		{
@@ -57,22 +152,78 @@ namespace Lantea.Core.Net.Irc
 			// http://cjh.im/ - Chris J. Hogben
 
 			// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
-			if (message.TryMatch(@":?([^!]+)\!([^@]+)@(\S+)\W(JOIN|PART)\W:?(\#?[^\W]+)\W?:?(.+)?", out m))
+			if (message.TryMatch(@"^:?(?<nick>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>PRIVMSG|NOTICE|JOIN|PART|QUIT|MODE|NICK) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$", out m))
 			{
-				var user    = m.Groups[1].Value;
-				var channel = m.Groups[5].Value;
+				if (m.Groups["command"].Value.Matches(@"join|part"))
+				{
+					var nick   = m.Groups[1].Value;
+					var target = m.Groups[5].Value;
 
-				if (m.Groups[4].Value.EqualsIgnoreCase("join"))
-				{
-					ChannelJoinEvent.Raise(this, new JoinPartEventArgs(user, channel));
-				}
-				else if (m.Groups[4].Value.EqualsIgnoreCase("part"))
-				{
-					ChannelPartEvent.Raise(this, new JoinPartEventArgs(user, channel));
+					if (m.Groups[4].Value.EqualsIgnoreCase("join"))
+					{
+						ChannelJoinEvent.Raise(this, new JoinPartEventArgs(nick, target));
+					}
+					else if (m.Groups[4].Value.EqualsIgnoreCase("part"))
+					{
+						ChannelPartEvent.Raise(this, new JoinPartEventArgs(nick, target));
+					}
+
+					if (StrictNames)
+					{
+						Send("NAMES {0}", target);
+					}
 				}
 			}
 		}
-		
+
+		protected virtual void MessageNoticeHandler(object sender, RawMessageEventArgs args)
+		{
+			var message = args.Message;
+			Match m;
+
+			if (message.TryMatch(@":?([^!]+)\!(([^@]+)@(\S+)) (PRIVMSG|NOTICE) :?(\#?[^\W]+)\W?:?(.+)?", out m))
+			{
+				var nick   = m.Groups[1].Value;
+				var target = m.Groups[6].Value;
+				var msg    = m.Groups[7].Value;
+
+				if (m.Groups[5].Value.EqualsIgnoreCase("privmsg"))
+				{
+					MessageReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
+				}
+				else if (m.Groups[5].Value.EqualsIgnoreCase("notice"))
+				{
+					NoticeReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
+				}
+			}
+		}
+
+		protected virtual void ModeHandler(object sender, RawMessageEventArgs args)
+		{
+			var message = args.Message;
+			Match m;
+
+			if (message.TryMatch(@":?([^!]+)\!(([^@]+)@(\S+)) MODE :?(\#?[^\W]+)\W?:?(.+)?", out m))
+			{
+				// 
+			}
+		}
+
+		protected virtual void NickHandler(object sender, RawMessageEventArgs args)
+		{
+			var message = args.Message;
+			Match m;
+
+			// :Genesis2001!zack@unifiedtech.org NICK Genesis2002
+			if (message.TryMatch(@":?([^!]+)\!(([^@]+)@(\S+)) NICK :?(\#?[^\W]+)\W?:?(.+)?", out m))
+			{
+				var nick = m.Groups[1].Value;
+				var target = m.Groups[5].Value;
+
+				NickChangedEvent.Raise(this, new NickChangeEventArgs(nick, target));
+			}
+		}
+
 		protected virtual void RfcNumericHandler(object sender, RawMessageEventArgs args)
 		{
 			var toks = args.Message.Split(' ');
@@ -81,7 +232,6 @@ namespace Lantea.Core.Net.Irc
 			if (Int32.TryParse(toks[1], out num))
 			{
 				var message = string.Join(" ", toks.Skip(2));
-
 				RfcNumericEvent.Raise(this, new RfcNumericEventArgs(num, message));
 			}
 		}
@@ -91,11 +241,11 @@ namespace Lantea.Core.Net.Irc
 			if (registered) return;
 			if (!string.IsNullOrEmpty(Password)) Send("PASS :{0}", Password);
 
-			Send("NICK {0}", My.Nick);
-			Send("USER {0} 0 * :{1}", My.Ident, My.RealName);
+			Send("NICK {0}", Nick);
+			Send("USER {0} 0 * :{1}", Ident, RealName);
 
 			RawMessageEvent -= RegistrationHandler;
-			registered       = true;
+			registered = true;
 		}
 
 		protected virtual void PingHandler(object sender, RawMessageEventArgs args)
@@ -104,8 +254,13 @@ namespace Lantea.Core.Net.Irc
 			{
 				// Bypass the queue for sending pong responses.
 				Send(string.Format("PONG {0}", args.Message.Substring(5)));
+				PingReceiptEvent.Raise(this, EventArgs.Empty);
 			}
 		}
+
+		#endregion
+
+		#region Callbacks
 
 		private void OnAsyncRead(Task<String> task)
 		{
@@ -121,29 +276,7 @@ namespace Lantea.Core.Net.Irc
 			}
 		}
 		
-		/*protected void ThreadWorkerCallback()
-		{
-			SetDefaults();
-			
-			// queueRunner = Task.Run(new Action(QueueHandler), tokenSource.Token);
-			
-			while (client != null && client.Connected)
-			{
-				if (!client.DataAvailable) continue;
-				
-				while (!client.EndOfStream)
-				{
-					var line = client.ReadLine().Trim();
-					
-					if (!string.IsNullOrEmpty(line))
-					{
-						OnDataReceived(line);
-					}
-				}
-			}
-		}*/
-
-		protected async void QueueHandler()
+		protected async void QueueProcessor()
 		{
 			try
 			{
@@ -162,6 +295,26 @@ namespace Lantea.Core.Net.Irc
 				// nom nom.
 			}
 		}
+
+		private void CancellationNoticeHandler()
+		{
+			if (!tokenSource.IsCancellationRequested) return;
+
+			Send("QUIT :Exiting.");
+			client.Close();
+		}
+
+		private void OnTimeoutTimerElapsed(object sender, ElapsedEventArgs args)
+		{
+			if ((args.SignalTime - lastMessage) < Timeout)
+			{
+				TimeoutEvent.Raise(this, EventArgs.Empty);
+
+				tokenSource.Cancel();
+			}
+		}
+
+		#endregion
 
 		#endregion
 	}

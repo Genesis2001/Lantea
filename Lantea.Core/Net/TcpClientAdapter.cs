@@ -51,7 +51,7 @@ namespace Lantea.Core.Net
 
 		private string BuildPackageNewLine(string format, params object[] args)
 		{
-			return new StringBuilder().AppendLineFormat(format, args).ToString();
+			return new StringBuilder().AppendFormatLine(format, args).ToString();
 		}
 
 		#region Implementation of ITcpClient

@@ -12,7 +12,6 @@ namespace Lantea.Core
 	using System.IO;
 	using System.Reflection;
 	using System.Text;
-	using System.Threading.Tasks;
 	using Common.IO;
 	using IO;
 	using Modules;
@@ -57,13 +56,51 @@ namespace Lantea.Core
 
 		private void RegisterClientEvents()
 		{
-//			Client.RawMessageTransmitEvent += OnMessageSend;
-//			Client.RawMessageEvent         += OnRawMessageReceived;
+			Client.TimeoutEvent               += OnClientTimeout;
+			Client.ConnectionEstablishedEvent += OnClientConnect;
 
-			Client.RfcNumericEvent  += OnRfcNumericReceived;
-			Client.TimeoutEvent     += OnClientTimeout;
-			Client.ChannelJoinEvent += OnChannelJoin;
-			Client.ChannelPartEvent += OnChannelPart;
+#if DEBUG
+			Client.RawMessageEvent      += OnRawMessageReceived;
+			Client.ChannelJoinEvent     += OnChannelJoin;
+			Client.ChannelPartEvent     += OnChannelPart;
+			Client.MessageReceivedEvent += OnMessageReceived;
+			Client.NickChangedEvent     += OnNickChanged;
+			Client.NoticeReceivedEvent  += OnNoticeReceived;
+			Client.PingReceiptEvent     += OnPingReceipt;
+#endif
+		}
+
+		private void OnClientConnect(object sender, EventArgs args)
+		{
+			if (Log != null)
+			{
+				Log.Info("Connection established to server.");
+
+				Log.Info("Bot started.");
+			}
+
+			Client.Send("JOIN #test,#UnifiedTech");
+		}
+
+#if DEBUG
+		private void OnNickChanged(object sender, NickChangeEventArgs args)
+		{
+			if (Log != null) Log.DebugFormat("{0} changed nicks to {1}", args.OldNick, args.NewNick);
+		}
+
+		private void OnPingReceipt(object sender, EventArgs args)
+		{
+			if (Log != null) Log.Debug("Ping received. Sent pong.");
+		}
+
+		private void OnNoticeReceived(object sender, MessageReceivedEventArgs args)
+		{
+			if (Log != null) Log.DebugFormat("[MSG] Received notice from {0} (to: {1}) sent: {2}", args.Nick, args.Target, args.Message);
+		}
+
+		private void OnMessageReceived(object sender, MessageReceivedEventArgs args)
+		{
+			if (Log != null) Log.DebugFormat("[MSG] Received message from {0} (to: {1}) sent: {2}", args.Nick, args.Target, args.Message);
 		}
 
 		private void OnChannelJoin(object sender, JoinPartEventArgs args)
@@ -75,6 +112,7 @@ namespace Lantea.Core
 		{
 			if (Log != null) Log.DebugFormat("[PART] {0} left {1}", args.Nick, args.Channel);
 		}
+#endif
 
 		private void OnClientTimeout(object sender, EventArgs eventArgs)
 		{
@@ -82,35 +120,6 @@ namespace Lantea.Core
 			if (Log != null) Log.Warn("Timeout detected. Exiting.");
 
 			Environment.Exit(1);
-		}
-
-		private void OnMessageSend(object sender, RawMessageEventArgs args)
-		{
-			if (Log != null) Log.DebugFormat("SEND: {0}", args.Message);
-		}
-
-		private void OnRfcNumericReceived(object sender, RfcNumericEventArgs args)
-		{
-			if (args.Numeric.Equals(001))
-			{
-				Log.Info("Bot started.");
-
-				Client.Send("JOIN #test");
-
-				Task.Factory.StartNew(async () =>
-				                            {
-					                            await Task.Delay(30);
-
-					                            Client.Send("PART #test");
-				                            });
-
-				// Not yet implemented, but meh.
-				/*var perform = settings.GetValues("/Settings/Connection/Events/OnConnect/Execute/@Command");
-				foreach (var item in perform)
-				{
-					client.Send(item);
-				}*/
-			}
 		}
 
 		private void OnRawMessageReceived(object sender, RawMessageEventArgs args)
@@ -151,9 +160,9 @@ namespace Lantea.Core
 
 			//var foo = settings.GetValues("/Settings/Connection/Options/Secure[@CertificatePath and @CertificateKeyPath]");
 
-			Client.My.RealName         = RealName;
-			Client.Host                = settings.GetValue("/Settings/Connection/@Host");
-			Client.Encoding            = IrcEncoding.UTF8;
+			Client.RealName = RealName;
+			Client.Host     = settings.GetValue("/Settings/Connection/@Host");
+			Client.Encoding = IrcEncoding.UTF8;
 			
 			RegisterClientEvents();
 

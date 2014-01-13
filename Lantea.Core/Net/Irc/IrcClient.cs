@@ -18,7 +18,6 @@ namespace Lantea.Core.Net.Irc
 	using Common.Collections.Concurrent;
 	using Common.Linq;
 	using Common.Net;
-	using Data;
 
 	public partial class IrcClient : IDisposable
 	{
@@ -32,7 +31,7 @@ namespace Lantea.Core.Net.Irc
 		// ReSharper disable FieldCanBeMadeReadOnly.Local
 		private readonly IQueue<string> messageQueue;
 		private ITcpClientAsync client;
-		
+
 		private Task queueRunner;
 		
 		private readonly CancellationTokenSource tokenSource;
@@ -44,20 +43,28 @@ namespace Lantea.Core.Net.Irc
 			tokenSource             = new CancellationTokenSource();
 			token                   = tokenSource.Token;
 
-			Options                 = ConnectOptions.Default;
+			Channels                = new HashSet<Channel>();
 			messageQueue            = new ConcurrentQueueAdapter<string>();
-			My                      = new User(nick);
-			Timeout                 = TimeSpan.FromMinutes(10d);
+			Nick                    = nick;
+			Options                 = ConnectOptions.Default;
 			QueueInteval            = 1000;
-			Channels                = new List<Channel>();
+			RetryInterval           = TimeSpan.FromMinutes(5d).TotalMilliseconds;
+			Timeout                 = TimeSpan.FromMinutes(10d);
+			Modes                   = new List<char>();
 
 			RawMessageEvent        += RegistrationHandler;
 			RawMessageEvent        += RfcNumericHandler;
 			RawMessageEvent        += PingHandler;
 			RawMessageEvent        += JoinPartHandler;
+			RawMessageEvent        += MessageNoticeHandler;
+			RawMessageEvent        += NickHandler;
+
+			RfcNumericEvent        += ConnectionHandler;
+			RfcNumericEvent        += ProtocolHandler;
+			RfcNumericEvent        += ChannelAccessHandler;
+			RfcNumericEvent        += NickInUseHandler;
 
 			token.Register(CancellationNoticeHandler);
-			My.SetClient(this);
 		}
 
 		#region Properties
@@ -70,7 +77,7 @@ namespace Lantea.Core.Net.Irc
 			get { return client != null && client.Connected; }
 		}
 
-		public List<Channel> Channels { get; private set; }
+		public HashSet<Channel> Channels { get; private set; }
 
 		/// <summary>
 		/// Gets or sets a value representing what type of encoding to use for encoding messages sent to the Host.
@@ -83,9 +90,41 @@ namespace Lantea.Core.Net.Irc
 		public string Host { get; set; }
 
 		/// <summary>
-		/// Gets an IRC My reference to the <see cref="T:IrcClient" />'s user entity.
+		/// Gets or sets a <see cref="T:System.String" /> value representing the Ident part for the <see cref="T:IrcClient" />'s user.
 		/// </summary>
-		public User My { get; private set; }
+		public string Ident { get; set; }
+
+		/// <summary>
+		/// Gets a <see cref="T:System.Boolean" /> value representing whether the <see cref="T:IrcClient" /> has been initialized.
+		/// </summary>
+		public bool IsInitialized
+		{
+			get
+			{
+				var val = true;
+
+				if (string.IsNullOrEmpty(Nick)) val = false;
+				else if (string.IsNullOrEmpty(Host) || Dns.GetHostEntry(Host) == null) val = false;
+				else if (Port <= 0) val = false;
+
+				return val;
+			}
+		}
+
+		/// <summary>
+		/// Gets a list of modes that are currently set on the client.
+		/// </summary>
+		public List<char> Modes { get; private set; }
+
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.String" /> value representing the nickname for the <see cref="T:IrcClient" /> 
+		/// </summary>
+		public string Nick { get; set; }
+
+		/// <summary>
+		/// Gets or sets a bit-mask value representing the options for connecting to the Host.
+		/// </summary>
+		public ConnectOptions Options { get; set; }
 
 		/// <summary>
 		/// Gets or sets a <see cref="T:System.String" /> value representing the password to be used for protocol registration.
@@ -98,43 +137,51 @@ namespace Lantea.Core.Net.Irc
 		public int Port { get; set; }
 
 		/// <summary>
-		/// Gets or sets a <see cref="T:System.Int32" /> value representing the 
+		/// Gets or sets a <see cref="T:System.Int32" /> value representing the interval for processing queued messages.
 		/// </summary>
 		public int QueueInteval { get; set; }
 
 		/// <summary>
-		/// Gets a <see cref="T:System.Boolean" /> value representing whether the <see cref="T:IrcClient" /> has been initialized.
+		/// Gets or sets a <see cref="T:System.String" /> value representing the <see cref="T:IrcClient" />'s real name.
 		/// </summary>
-		public bool IsInitialized
-		{
-			get
-			{
-				var val = true;
+		public string RealName { get; set; }
 
-				if (string.IsNullOrEmpty(My.Nick)) val = false;
-				else if (string.IsNullOrEmpty(Host) || Dns.GetHostEntry(Host) == null) val = false;
-				else if (Port <= 0) val = false;
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.Boolean" /> value indicating whether to retry connecting to the IRC server.
+		/// </summary>
+		public bool RetryConnect { get; set; }
 
-				return val;
-			}
-		}
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.Boolean" /> value indicating whether to retry the client's primary nickname.
+		/// </summary>
+		public bool RetryNick { get; set; }
+
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.Int32" /> value representing the inteval for retry attempts
+		/// </summary>
+		public double RetryInterval { get; set; }
+
+		/// <summary>
+		/// Gets or sets a <see cref="T:System.Boolean" /> value indicating whether to request RPL_NAMEREPLY from the server when someone joins/leaves a channel or changes modes on a channel.
+		/// </summary>
+		public bool StrictNames { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value representing the timeout interval for messages being received.
 		/// </summary>
 		public TimeSpan Timeout { get; set; }
 
-		/// <summary>
-		/// Gets or sets a bit-mask value representing the options for connecting to the Host.
-		/// </summary>
-		public ConnectOptions Options { get; set; }
-
 		#endregion
 
 		#region Events
 
+		public event EventHandler ConnectionEstablishedEvent;
 		public event EventHandler<JoinPartEventArgs> ChannelJoinEvent;
 		public event EventHandler<JoinPartEventArgs> ChannelPartEvent;
+		public event EventHandler<MessageReceivedEventArgs> MessageReceivedEvent;
+		public event EventHandler<NickChangeEventArgs> NickChangedEvent;
+		public event EventHandler<MessageReceivedEventArgs> NoticeReceivedEvent;
+		public event EventHandler PingReceiptEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageTransmitEvent;
 		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;
@@ -143,6 +190,11 @@ namespace Lantea.Core.Net.Irc
 		#endregion
 
 		#region Methods
+
+		private void ChangeNick(string nick)
+		{
+			Send("NICK {0}", nick);
+		}
 
 		public Channel GetChannel(string channelName)
 		{
@@ -153,18 +205,31 @@ namespace Lantea.Core.Net.Irc
 
 			if (c == null)
 			{
-				c = new Channel(channelName);
-				c.SetClient(this);
-
+				c = new Channel(this, channelName);
 				Channels.Add(c);
 			}
 
 			return c;
 		}
 
+		public void Message(string target, string format, params object[] args)
+		{
+			var message = string.Format(format, args);
+
+			Send("PRIVMSG {0} :{1}", target, message);
+		}
+
+		public void Notice(string target, string format, params object[] args)
+		{
+			var message = string.Format(format, args);
+
+			Send("NOTICE {0} :{1}", target, message);
+		}
+
 		private void SetDefaults()
 		{
-			if (string.IsNullOrEmpty(My.Ident)) My.Ident = My.Nick.ToLower();
+			if (string.IsNullOrEmpty(Ident)) Ident = Nick.ToLower();
+			if (string.IsNullOrEmpty(RealName)) RealName = Nick;
 		}
 
 		/// <summary>
@@ -197,7 +262,15 @@ namespace Lantea.Core.Net.Irc
 			client = new TcpClientAsyncAdapter(new TcpClient(), encoding);
 			try
 			{
-				client.Connect(Host, Port);
+				if (Options.HasFlag(ConnectOptions.Secure))
+				{
+					// TODO: Call client.ConnectSecurely(string host, int port, [something] certificatePfx);
+					client.Connect(Host, Port);
+				}
+				else
+				{
+					client.Connect(Host, Port);
+				}
 			}
 			catch (ArgumentNullException)
 			{
@@ -205,7 +278,7 @@ namespace Lantea.Core.Net.Irc
 			}
 
 			client.ReadLineAsync().ContinueWith(OnAsyncRead, token);
-			queueRunner = Task.Run(new Action(QueueHandler), token);
+			queueRunner = Task.Run(new Action(QueueProcessor), token);
 
 			TickTimeout();
 		}
