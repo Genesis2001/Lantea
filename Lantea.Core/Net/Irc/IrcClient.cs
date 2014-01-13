@@ -348,6 +348,7 @@ namespace Lantea.Core.Net.Irc
 		{
 			if (!disposing) return;
 
+			if (!queueTokenSource.IsCancellationRequested) queueTokenSource.Cancel();
 			tokenSource.Cancel();
 		}
 

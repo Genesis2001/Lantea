@@ -311,6 +311,7 @@ namespace Lantea.Core.Net.Irc
 				TimeoutEvent.Raise(this, EventArgs.Empty);
 
 				tokenSource.Cancel();
+				queueTokenSource.Cancel();
 			}
 		}
 
