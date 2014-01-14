@@ -210,7 +210,7 @@ namespace Lantea.Core.Net.Irc
 
 			if (message.TryMatch(@":?([^!]+)\!(([^@]+)@(\S+)) MODE :?(\#?[^\W]+)\W?:?(.+)?", out m))
 			{
-				// 
+
 			}
 		}
 
