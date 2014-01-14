@@ -159,11 +159,11 @@ namespace Lantea.Core.Net.Irc
 					var nick   = m.Groups[1].Value;
 					var target = m.Groups[5].Value;
 
-					if (m.Groups[4].Value.EqualsIgnoreCase("join"))
+					if (m.Groups["command"].Value.EqualsIgnoreCase("join"))
 					{
 						ChannelJoinEvent.Raise(this, new JoinPartEventArgs(nick, target));
 					}
-					else if (m.Groups[4].Value.EqualsIgnoreCase("part"))
+					else if (m.Groups["command"].Value.EqualsIgnoreCase("part"))
 					{
 						ChannelPartEvent.Raise(this, new JoinPartEventArgs(nick, target));
 					}
@@ -196,6 +196,11 @@ namespace Lantea.Core.Net.Irc
 					NoticeReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
 				}
 			}
+		}
+
+		private enum ChannelModeType
+		{
+			
 		}
 
 		protected virtual void ModeHandler(object sender, RawMessageEventArgs args)
