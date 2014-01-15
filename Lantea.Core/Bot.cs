@@ -60,7 +60,7 @@ namespace Lantea.Core
 			Client.ConnectionEstablishedEvent += OnClientConnect;
 
 #if DEBUG
-			Client.RawMessageEvent      += OnRawMessageReceived;
+//			Client.RawMessageEvent      += OnRawMessageReceived;
 			Client.ChannelJoinEvent     += OnChannelJoin;
 			Client.ChannelPartEvent     += OnChannelPart;
 			Client.MessageReceivedEvent += OnMessageReceived;
@@ -79,7 +79,7 @@ namespace Lantea.Core
 				Log.Info("Bot started.");
 			}
 
-			Client.Send("JOIN #test,#UnifiedTech");
+			Client.Send("JOIN #UnifiedTech");
 		}
 
 #if DEBUG

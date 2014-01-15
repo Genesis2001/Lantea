@@ -59,10 +59,13 @@ namespace Lantea.Core.Net.Irc
 			RawMessageEvent        += RegistrationHandler;
 			RawMessageEvent        += RfcNumericHandler;
 			RawMessageEvent        += PingHandler;
-			RawMessageEvent        += JoinPartHandler;
-			RawMessageEvent        += MessageNoticeHandler;
-			RawMessageEvent        += NickHandler;
+			RawMessageEvent        += ProtocalMessageHandler;
 
+			ProtocolMessageReceivedEvent += JoinPartHandler;
+			ProtocolMessageReceivedEvent += MessageNoticeHandler;
+			ProtocolMessageReceivedEvent += ModeHandler;
+			ProtocolMessageReceivedEvent += NickHandler;
+			
 			RfcNumericEvent        += ConnectionHandler;
 			RfcNumericEvent        += ProtocolHandler;
 			RfcNumericEvent        += ChannelAccessHandler;
@@ -201,8 +204,8 @@ namespace Lantea.Core.Net.Irc
 		public event EventHandler<NickChangeEventArgs> NickChangedEvent;
 		public event EventHandler<MessageReceivedEventArgs> NoticeReceivedEvent;
 		public event EventHandler PingReceiptEvent;
+		public event EventHandler<ProtocolMessageEventArgs> ProtocolMessageReceivedEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageEvent;
-		public event EventHandler<RawMessageEventArgs> ClientSocketWriteEvent;
 		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;
 		public event EventHandler TimeoutEvent;
 
@@ -310,8 +313,6 @@ namespace Lantea.Core.Net.Irc
 		private void Send(string data)
 		{
 			client.WriteLine(data);
-
-			ClientSocketWriteEvent.Raise(this, new RawMessageEventArgs(data));
 		}
 
 		/// <summary>

@@ -81,23 +81,23 @@ namespace Lantea.Core.Net.Irc
 				var names  = message.Substring(message.IndexOf(':') + 1);
 
 				MatchCollection collection;
-				var accessRegex = string.Format(@"(?<prefix>[{0}]?)(?<user>\S+)", accessPrefixes);
+				var accessRegex = string.Format(@"(?<prefix>[{0}]?)(?<nick>\S+)", accessPrefixes);
 				if (names.TryMatches(accessRegex, out collection))
 				{
 					foreach (Match item in collection)
 					{
 						var prefix = item.Groups["prefix"].Value.Length > 0 ? item.Groups["prefix"].Value[0] : (char)0;
-						var user   = item.Groups["user"].Value;
+						var nick   = item.Groups["nick"].Value;
 
-						if (c.Users.ContainsKey(user))
+						if (c.Users.ContainsKey(nick))
 						{
-							c.Users[user].AddPrefix(prefix);
+							c.Users[nick].AddPrefix(prefix);
 						}
 						else
 						{
 							var p = new PrefixList(this);
 							p.AddPrefix(prefix);
-							c.Users.Add(user, p);
+							c.Users.Add(nick, p);
 						}
 					}
 				}
@@ -143,86 +143,98 @@ namespace Lantea.Core.Net.Irc
 
 		#region IRC Raw Message Handlers
 
-		protected virtual void JoinPartHandler(object sender, RawMessageEventArgs args)
+		protected virtual void ProtocalMessageHandler(object sender, RawMessageEventArgs args)
 		{
 			var message = args.Message;
 			Match m;
 
-			// reg. expression credit
-			// http://cjh.im/ - Chris J. Hogben
+			// Regular Expression Credits
+			// created by Chris J. Hogben (http://cjh.im/)
+			// modified by Zack Loveless (http://zloveless.com)
 
-			// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
 			if (message.TryMatch(@"^:?(?<nick>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>PRIVMSG|NOTICE|JOIN|PART|QUIT|MODE|NICK) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$", out m))
 			{
-				if (m.Groups["command"].Value.Matches(@"join|part"))
+				ProtocolMessageReceivedEvent.Raise(this, new ProtocolMessageEventArgs(m, message));
+			}
+		}
+
+		protected virtual void JoinPartHandler(object sender, ProtocolMessageEventArgs args)
+		{
+			var match   = args.Match;
+
+			// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
+			if (match.Groups["command"].Value.Matches(@"JOIN|PART"))
+			{
+				var nick   = match.Groups["nick"].Value;
+				var target = match.Groups["target"].Value;
+
+				if (match.Groups["command"].Value.EqualsIgnoreCase("join"))
 				{
-					var nick   = m.Groups[1].Value;
-					var target = m.Groups[5].Value;
+					ChannelJoinEvent.Raise(this, new JoinPartEventArgs(nick, target));
+				}
+				else if (match.Groups["command"].Value.EqualsIgnoreCase("part"))
+				{
+					ChannelPartEvent.Raise(this, new JoinPartEventArgs(nick, target));
+				}
 
-					if (m.Groups["command"].Value.EqualsIgnoreCase("join"))
-					{
-						ChannelJoinEvent.Raise(this, new JoinPartEventArgs(nick, target));
-					}
-					else if (m.Groups["command"].Value.EqualsIgnoreCase("part"))
-					{
-						ChannelPartEvent.Raise(this, new JoinPartEventArgs(nick, target));
-					}
-
-					if (StrictNames)
-					{
-						Send("NAMES {0}", target);
-					}
+				if (StrictNames)
+				{
+					Send("NAMES {0}", target);
 				}
 			}
 		}
 
-		protected virtual void MessageNoticeHandler(object sender, RawMessageEventArgs args)
+		protected virtual void MessageNoticeHandler(object sender, ProtocolMessageEventArgs args)
 		{
-			var message = args.Message;
-			Match m;
+			var m = args.Match;
 
-			if (message.TryMatch(@":?([^!]+)\!(([^@]+)@(\S+)) (PRIVMSG|NOTICE) :?(\#?[^\W]+)\W?:?(.+)?", out m))
+			if (m.Groups["command"].Value.Matches(@"PRIVMSG|NOTICE"))
 			{
-				var nick   = m.Groups[1].Value;
-				var target = m.Groups[6].Value;
-				var msg    = m.Groups[7].Value;
+				var nick   = m.Groups["nick"].Value;
+				var target = m.Groups["target"].Value;
+				var msg    = m.Groups["params"].Value;
 
-				if (m.Groups[5].Value.EqualsIgnoreCase("privmsg"))
+				if (m.Groups["command"].Value.EqualsIgnoreCase("privmsg"))
 				{
 					MessageReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
 				}
-				else if (m.Groups[5].Value.EqualsIgnoreCase("notice"))
+				else if (m.Groups["command"].Value.EqualsIgnoreCase("notice"))
 				{
 					NoticeReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
 				}
+
+				// TODO: Add support for (S)NOTICE messages.
+				// TODO: Add support for NOTICE AUTH messages.
 			}
 		}
 
 		private enum ChannelModeType
 		{
-			
+			LIST,
+			SETUNSET,
+			SET,
+			NOPARAM,
+			ACCESS,
 		}
 
-		protected virtual void ModeHandler(object sender, RawMessageEventArgs args)
+		protected virtual void ModeHandler(object sender, ProtocolMessageEventArgs args)
 		{
-			var message = args.Message;
-			Match m;
+			var m = args.Match;
 
-			if (message.TryMatch(@":?([^!]+)\!(([^@]+)@(\S+)) MODE :?(\#?[^\W]+)\W?:?(.+)?", out m))
+			if (m.Groups["command"].Value.Equals("MODE"))
 			{
-
+				// !
 			}
 		}
 
-		protected virtual void NickHandler(object sender, RawMessageEventArgs args)
+		protected virtual void NickHandler(object sender, ProtocolMessageEventArgs args)
 		{
-			var message = args.Message;
-			Match m;
+			var m = args.Match;
 
 			// :Genesis2001!zack@unifiedtech.org NICK Genesis2002
-			if (message.TryMatch(@":?([^!]+)\!(([^@]+)@(\S+)) NICK :?(\#?[^\W]+)\W?:?(.+)?", out m))
+			if (m.Groups["command"].Value.EqualsIgnoreCase("nick"))
 			{
-				var nick = m.Groups[1].Value;
+				var nick   = m.Groups[1].Value;
 				var target = m.Groups[5].Value;
 
 				NickChangedEvent.Raise(this, new NickChangeEventArgs(nick, target));
@@ -245,6 +257,9 @@ namespace Lantea.Core.Net.Irc
 		{
 			if (registered) return;
 			if (!string.IsNullOrEmpty(Password)) Send("PASS :{0}", Password);
+
+			// TODO: Check for NOTICE AUTH ...
+			// Accident waiting to happen I think.
 
 			Send("NICK {0}", Nick);
 			Send("USER {0} 0 * :{1}", Ident, RealName);

@@ -19,7 +19,9 @@ namespace Lantea.Common.Linq
 
 		public static Match Match(this string source, string expression)
 		{
-			Regex r;
+			return Regex.Match(source, expression);
+
+			/*Regex r;
 			if (regexes.TryGetValue(expression, out r))
 			{
 				return r.Match(expression);
@@ -36,7 +38,7 @@ namespace Lantea.Common.Linq
 
 			Regex.CacheSize += 1;
 
-			return r.Match(expression);
+			return r.Match(expression);*/
 		}
 
 		public static bool Matches(this string source, string expression)

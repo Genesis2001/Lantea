@@ -56,6 +56,7 @@
     <Compile Include="Net\Irc\MessageReceivedEventArgs.cs" />
     <Compile Include="Net\Irc\NickChangeEventArgs.cs" />
     <Compile Include="Net\Irc\PrefixList.cs" />
+    <Compile Include="Net\Irc\ProtocolMessageEventArgs.cs" />
     <Compile Include="Net\Irc\RawMessageEventArgs.cs" />
     <Compile Include="Net\Irc\RfcNumericEventArgs.cs" />
     <Compile Include="Net\TcpClientAdapter.cs" />
