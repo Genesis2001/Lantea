@@ -90,9 +90,9 @@ namespace Lantea.Core.Net.Irc
 			{
 				enableFakeLag = value;
 
-				if (value)
+				if (!value)
 				{
-					queueTokenSource.Cancel();
+					if (queueTokenSource != null) queueTokenSource.Cancel();
 				}
 				else StartQueue();
 			}
@@ -348,8 +348,8 @@ namespace Lantea.Core.Net.Irc
 		{
 			if (!disposing) return;
 
-			if (!queueTokenSource.IsCancellationRequested) queueTokenSource.Cancel();
-			if (!tokenSource.IsCancellationRequested) tokenSource.Cancel();
+			if (queueTokenSource != null && !queueTokenSource.IsCancellationRequested) queueTokenSource.Cancel();
+			if (tokenSource != null && !tokenSource.IsCancellationRequested) tokenSource.Cancel();
 		}
 
 		#endregion
