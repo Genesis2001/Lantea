@@ -152,7 +152,7 @@ namespace Lantea.Core.Net.Irc
 			// created by Chris J. Hogben (http://cjh.im/)
 			// modified by Zack Loveless (http://zloveless.com)
 
-			if (message.TryMatch(@"^:?(?<nick>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>PRIVMSG|NOTICE|JOIN|PART|QUIT|MODE|NICK) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$", out m))
+			if (message.TryMatch(@"^:?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>PRIVMSG|NOTICE|JOIN|PART|QUIT|MODE|NICK) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$", out m))
 			{
 				ProtocolMessageReceivedEvent.Raise(this, new ProtocolMessageEventArgs(m, message));
 			}
@@ -165,7 +165,7 @@ namespace Lantea.Core.Net.Irc
 			// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
 			if (match.Groups["command"].Value.Matches(@"JOIN|PART"))
 			{
-				var nick   = match.Groups["nick"].Value;
+				var nick   = match.Groups["source"].Value;
 				var target = match.Groups["target"].Value;
 
 				if (match.Groups["command"].Value.EqualsIgnoreCase("join"))
@@ -190,7 +190,7 @@ namespace Lantea.Core.Net.Irc
 
 			if (m.Groups["command"].Value.Matches(@"PRIVMSG|NOTICE"))
 			{
-				var nick   = m.Groups["nick"].Value;
+				var nick   = m.Groups["source"].Value;
 				var target = m.Groups["target"].Value;
 				var msg    = m.Groups["params"].Value;
 
@@ -223,7 +223,7 @@ namespace Lantea.Core.Net.Irc
 
 			if (m.Groups["command"].Value.Equals("MODE"))
 			{
-				// !
+				// TODO: todo....
 			}
 		}
 
@@ -234,8 +234,8 @@ namespace Lantea.Core.Net.Irc
 			// :Genesis2001!zack@unifiedtech.org NICK Genesis2002
 			if (m.Groups["command"].Value.EqualsIgnoreCase("nick"))
 			{
-				var nick   = m.Groups[1].Value;
-				var target = m.Groups[5].Value;
+				var nick   = m.Groups["source"].Value;
+				var target = m.Groups["target"].Value;
 
 				NickChangedEvent.Raise(this, new NickChangeEventArgs(nick, target));
 			}
