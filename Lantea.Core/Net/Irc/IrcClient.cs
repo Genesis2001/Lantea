@@ -52,8 +52,8 @@ namespace Lantea.Core.Net.Irc
 			Options                 = ConnectOptions.Default;
 			QueueInteval            = 1000;
 			EnableFakeLag           = true;
-			RetryInterval           = TimeSpan.FromMinutes(5d).TotalMilliseconds;
-			Timeout                 = TimeSpan.FromMinutes(10d);
+			RetryInterval           = TimeSpan.FromMinutes(05.0).TotalMilliseconds;
+			Timeout                 = TimeSpan.FromMinutes(10.0);
 			Modes                   = new List<char>();
 
 			RawMessageEvent        += RegistrationHandler;
