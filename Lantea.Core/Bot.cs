@@ -60,7 +60,7 @@ namespace Lantea.Core
 			Client.ConnectionEstablishedEvent += OnClientConnect;
 
 #if DEBUG
-//			Client.RawMessageEvent      += OnRawMessageReceived;
+			Client.RawMessageEvent      += OnRawMessageReceived;
 			Client.ChannelJoinEvent     += OnChannelJoin;
 			Client.ChannelPartEvent     += OnChannelPart;
 			Client.MessageReceivedEvent += OnMessageReceived;

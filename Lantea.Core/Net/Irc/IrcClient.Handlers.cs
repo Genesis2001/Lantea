@@ -19,6 +19,7 @@ namespace Lantea.Core.Net.Irc
 		#region Fields
 
 		internal string accessPrefixes;
+		internal string accessRegex;
 		internal string channelModes;
 
 		private bool registered;
@@ -27,7 +28,7 @@ namespace Lantea.Core.Net.Irc
 
 		#endregion
 
-		// internal const string IrcRawRegex = @"^(:(?<prefix>\S+) )?(?<command>\S+)( (?!:)(?<params>.+?))?( :(?<trail>.+))?$";
+		// DEBUG RECV: ERROR :Closing link: (lantea@1.2.3.4) [Killed (Genesis2001 (foo))]
 
 		private void TickTimeout()
 		{
@@ -81,7 +82,8 @@ namespace Lantea.Core.Net.Irc
 				var names  = message.Substring(message.IndexOf(':') + 1);
 
 				MatchCollection collection;
-				var accessRegex = string.Format(@"(?<prefix>[{0}]?)(?<nick>\S+)", accessPrefixes);
+				if (string.IsNullOrEmpty(accessRegex)) accessRegex = string.Format(@"(?<prefix>[{0}]?)(?<nick>\S+)", accessPrefixes);
+
 				if (names.TryMatches(accessRegex, out collection))
 				{
 					foreach (Match item in collection)
