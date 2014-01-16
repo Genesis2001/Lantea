@@ -21,13 +21,6 @@ namespace Lantea.Core.Net.Irc
 
 	public partial class IrcClient : IDisposable
 	{
-		[Flags]
-		public enum ConnectOptions
-		{
-			Default = 0,
-			Secure  = 1,
-		}
-
 		// ReSharper disable FieldCanBeMadeReadOnly.Local
 		private readonly IQueue<string> messageQueue;
 		private ITcpClientAsync client;

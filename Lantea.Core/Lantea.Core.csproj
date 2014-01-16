@@ -47,6 +47,7 @@
     <Compile Include="Modules\ModuleLoader.cs" />
     <Compile Include="Modules\Version.cs" />
     <Compile Include="Net\Irc\Channel.cs" />
+    <Compile Include="Net\Irc\ConnectOptions.cs" />
     <Compile Include="Net\Irc\IrcClient.cs" />
     <Compile Include="Net\Irc\IrcHeaders.cs" />
     <Compile Include="Net\Irc\IrcClient.Handlers.cs" />

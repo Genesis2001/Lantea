@@ -12,9 +12,6 @@ namespace Lantea.Core.Net.Irc
 
 	public class Channel : IEquatable<String>
 	{
-		// TODO: Add channel user list.
-		// TODO: Add channel permissions for users.
-
 		private readonly IrcClient client;
 
 		private Channel()
