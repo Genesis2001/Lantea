@@ -17,8 +17,14 @@ namespace Lantea.Core.Net.Irc
 			Match   = match;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public Match Match { get; private set; }
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public string Message { get; private set; }
 	}
 }

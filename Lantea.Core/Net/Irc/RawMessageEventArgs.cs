@@ -17,6 +17,9 @@ namespace Lantea.Core.Net.Irc
 			Message = message;
 		}
 
+		/// <summary>
+		/// Gets a <see cref="T:System.String" /> value representing the message received from the IRC server.
+		/// </summary>
 		public string Message { get; set; }
 	}
 }

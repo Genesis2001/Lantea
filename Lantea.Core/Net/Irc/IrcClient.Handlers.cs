@@ -28,6 +28,7 @@ namespace Lantea.Core.Net.Irc
 
 		#endregion
 
+		// TODO: Handle disconnection events.
 		// DEBUG RECV: ERROR :Closing link: (lantea@1.2.3.4) [Killed (Genesis2001 (foo))]
 
 		private void TickTimeout()
@@ -225,7 +226,6 @@ namespace Lantea.Core.Net.Irc
 
 			if (m.Groups["command"].Value.Equals("MODE"))
 			{
-				// TODO: todo....
 			}
 		}
 
@@ -234,7 +234,7 @@ namespace Lantea.Core.Net.Irc
 			var m = args.Match;
 
 			// :Genesis2001!zack@unifiedtech.org NICK Genesis2002
-			if (m.Groups["command"].Value.EqualsIgnoreCase("nick"))
+			if (m.Groups["command"].Value.Equals("NICK"))
 			{
 				var nick   = m.Groups["source"].Value;
 				var target = m.Groups["target"].Value;

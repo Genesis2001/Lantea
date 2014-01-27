@@ -29,31 +29,7 @@ namespace Lantea.Core
 		public ILog Log { get; private set; }
 
 		public IrcClient Client { get; private set; }
-
-		public void Compose()
-		{
-			var container = GetCompositionContainer();
-
-			// modules       = container.GetExports<IModule, IModuleMeta>();
-		}
-
-		private static CompositionContainer GetCompositionContainer()
-		{
-			var asm                = Assembly.GetEntryAssembly();
-			var loc                = Path.GetDirectoryName(asm.Location);
-			var extensionDirectory = Path.Combine(loc, "Extensions");
-
-			if (!Directory.Exists(extensionDirectory))
-			{
-				Directory.CreateDirectory(extensionDirectory);
-			}
-
-			var catalog = new AggregateCatalog();
-			catalog.Catalogs.Add(new DirectoryCatalog(extensionDirectory));
-
-			return new CompositionContainer(catalog);
-		}
-
+		
 		private void RegisterClientEvents()
 		{
 			Client.TimeoutEvent               += OnClientTimeout;
@@ -75,7 +51,6 @@ namespace Lantea.Core
 			if (Log != null)
 			{
 				Log.Info("Connection established to server.");
-
 				Log.Info("Bot started.");
 			}
 
@@ -101,6 +76,14 @@ namespace Lantea.Core
 		private void OnMessageReceived(object sender, MessageReceivedEventArgs args)
 		{
 			if (Log != null) Log.DebugFormat("[MSG] Received message from {0} (to: {1}) sent: {2}", args.Nick, args.Target, args.Message);
+
+			if (args.Message.StartsWith("!perm"))
+			{
+				var c = Client.GetChannel(args.Target);
+				var u = c.Users[args.Nick];
+
+				Client.Message(c.Name, "{0}, you currently have {1} as your highest prefix.", args.Nick, u.HighestPrefix);
+			}
 		}
 
 		private void OnChannelJoin(object sender, JoinPartEventArgs args)

@@ -13,21 +13,28 @@ namespace Lantea.Core.Net.Irc
 	public class MessageReceivedEventArgs : EventArgs
 	{
 		/// <summary>
-		///     Initializes a new instance of the <see cref="T:System.EventArgs" /> class.
+		/// Initializes a new instance of the <see cref="T:System.EventArgs" /> class.
 		/// </summary>
-		public MessageReceivedEventArgs(string nick, string message)
+		public MessageReceivedEventArgs(string nick, string target, string message)
 		{
-			Nick = nick;
+			Nick    = nick;
 			Message = message;
+			Target  = target;
 		}
 
-		public MessageReceivedEventArgs(string nick, string target, string message) : this(nick, message)
-		{
-			Target = target;
-		}
-
+		/// <summary>
+		/// 
+		/// </summary>
 		public string Nick { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public string Target { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public string Message { get; private set; }
 	}
 }
