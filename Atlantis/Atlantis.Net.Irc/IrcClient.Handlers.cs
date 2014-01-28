@@ -28,7 +28,7 @@ namespace Atlantis.Net.Irc
 		#endregion
 
 		// TODO: Handle disconnection events.
-		// DEBUG RECV: ERROR :Closing link: (lantea@1.2.3.4) [Killed (Genesis2001 (foo))]
+		// TODO: DEBUG RECV: ERROR :Closing link: (lantea@1.2.3.4) [Killed (Genesis2001 (foo))]
 
 		private void TickTimeout()
 		{
