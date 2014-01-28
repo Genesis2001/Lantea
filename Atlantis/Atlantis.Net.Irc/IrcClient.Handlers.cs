@@ -50,8 +50,8 @@ namespace Atlantis.Net.Irc
 				ConnectionEstablishedEvent.Raise(this, EventArgs.Empty);
 			}
 		}
-
-		protected virtual void ProtocolHandler(object sender, RfcNumericEventArgs args)
+		
+		protected virtual void Protocol005Handler(object sender, RfcNumericEventArgs args)
 		{
 			var header  = (IrcHeaders)args.Numeric;
 			var message = args.Message;
@@ -82,7 +82,10 @@ namespace Atlantis.Net.Irc
 				var names  = message.Substring(message.IndexOf(':') + 1);
 
 				MatchCollection collection;
-				if (string.IsNullOrEmpty(accessRegex)) accessRegex = string.Format(@"(?<prefix>[{0}]?)(?<nick>\S+)", accessPrefixes);
+				if (string.IsNullOrEmpty(accessRegex))
+				{
+					accessRegex = string.Format(@"(?<prefix>[{0}]?)(?<nick>\S+)", accessPrefixes);
+				}
 
 				if (names.TryMatches(accessRegex, out collection))
 				{
