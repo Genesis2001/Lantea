@@ -45,9 +45,12 @@ namespace Lantea.Core.Net.Irc
 			Options                 = ConnectOptions.Default;
 			QueueInteval            = 1000;
 			EnableFakeLag           = true;
-			RetryInterval           = TimeSpan.FromMinutes(05.0).TotalMilliseconds;
+			RetryInterval           = TimeSpan.FromMinutes(10.0).TotalMilliseconds;
 			Timeout                 = TimeSpan.FromMinutes(10.0);
 			Modes                   = new List<char>();
+
+			FillListsOnJoin         = false;
+			FillListsDelay          = TimeSpan.FromSeconds(30.0).TotalMilliseconds;
 
 			RawMessageEvent        += RegistrationHandler;
 			RawMessageEvent        += RfcNumericHandler;
@@ -185,6 +188,10 @@ namespace Lantea.Core.Net.Irc
 		/// Gets or sets a value representing the timeout interval for messages being received.
 		/// </summary>
 		public TimeSpan Timeout { get; set; }
+
+		public bool FillListsOnJoin { get; set; }
+
+		public double FillListsDelay { get; set; }
 
 		#endregion
 

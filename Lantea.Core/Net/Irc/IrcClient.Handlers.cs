@@ -7,7 +7,6 @@
 namespace Lantea.Core.Net.Irc
 {
 	using System;
-	using System.Diagnostics;
 	using System.Linq;
 	using System.Text.RegularExpressions;
 	using System.Threading.Tasks;
@@ -114,7 +113,6 @@ namespace Lantea.Core.Net.Irc
 
 			if (header == IrcHeaders.RPL_BANLIST || header == IrcHeaders.RPL_EXCEPTLIST || header == IrcHeaders.RPL_INVITELIST)
 			{
-				// 
 			}
 		}
 
@@ -174,6 +172,18 @@ namespace Lantea.Core.Net.Irc
 				if (match.Groups["command"].Value.EqualsIgnoreCase("join"))
 				{
 					ChannelJoinEvent.Raise(this, new JoinPartEventArgs(nick, target));
+
+					if (FillListsOnJoin && nick.EqualsIgnoreCase(Nick))
+					{
+						if (FillListsDelay > 0)
+						{
+							Task.Factory.StartNew(() => FillChannelList(target), token);
+						}
+						else
+						{
+							FillChannelList(target);
+						}
+					}
 				}
 				else if (match.Groups["command"].Value.EqualsIgnoreCase("part"))
 				{
@@ -184,6 +194,28 @@ namespace Lantea.Core.Net.Irc
 				{
 					Send("NAMES {0}", target);
 				}
+			}
+		}
+
+		private async void FillChannelList(string channelName)
+		{
+			try
+			{
+				if (string.IsNullOrEmpty(channelName)) throw new ArgumentNullException("channelName");
+				if (FillListsOnJoin && FillListsDelay > 0)
+				{
+					await Task.Delay((int)FillListsDelay, token);
+				}
+
+				var listModes = channelModes.Split(',')[0];
+				foreach (var mode in listModes)
+				{
+					Send("MODE {0} +{1}", channelName, mode);
+				}
+			}
+			catch (TaskCanceledException)
+			{
+				// nomnom.
 			}
 		}
 
@@ -224,8 +256,27 @@ namespace Lantea.Core.Net.Irc
 		{
 			var m = args.Match;
 
+			/*
+if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelRegex.Match(toks[2])).Success)
+{
+    //Console.WriteLine("debug: {0}", input.Substring(input.IndexOf(toks[3])));
+    if (toks.Length > 4)
+    {
+        // chan-user mode
+        string s1 = input.Substring(input.IndexOf(toks[3])).Substring(toks[3].Length + 1);
+        OnRawChannelMode(n.Groups[1].Value, m.Groups[1].Value, toks[3], s1.Split(' '));
+    }
+    else
+    {
+        // generic channel mode
+        OnRawChannelMode(n.Groups[1].Value, m.Groups[1].Value, toks[3]);
+    }
+}
+			 */
+
 			if (m.Groups["command"].Value.Equals("MODE"))
 			{
+				// 
 			}
 		}
 

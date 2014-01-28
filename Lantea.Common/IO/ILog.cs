@@ -11,8 +11,6 @@ namespace Lantea.Common.IO
 
 	public interface ILog : IDisposable
 	{
-		Encoding Encoding { get; set; }
-
 		LogThreshold Threshold { get; set; }
 
 		bool PrefixLog { get; set; }

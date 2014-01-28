@@ -36,6 +36,9 @@ namespace Lantea.Core
 			Client.ConnectionEstablishedEvent += OnClientConnect;
 
 #if DEBUG
+			Client.FillListsOnJoin       = true;
+			Client.FillListsDelay        = 5000;
+			
 			Client.RawMessageEvent      += OnRawMessageReceived;
 			Client.ChannelJoinEvent     += OnChannelJoin;
 			Client.ChannelPartEvent     += OnChannelPart;
@@ -80,9 +83,9 @@ namespace Lantea.Core
 			if (args.Message.StartsWith("!perm"))
 			{
 				var c = Client.GetChannel(args.Target);
-				var u = c.Users[args.Nick];
+				var n = c.Users[args.Nick];
 
-				Client.Message(c.Name, "{0}, you currently have {1} as your highest prefix.", args.Nick, u.HighestPrefix);
+				Client.Message(c.Name, "{0}, you currently have {1} as your highest prefix.", args.Nick, n.HighestPrefix);
 			}
 		}
 
