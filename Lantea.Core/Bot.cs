@@ -8,14 +8,10 @@ namespace Lantea.Core
 {
 	using System;
 	using System.Collections.Generic;
-	using System.ComponentModel.Composition.Hosting;
 	using System.IO;
-	using System.Reflection;
-	using System.Text;
-	using Common.IO;
+	using Atlantis.Net.Irc;
 	using IO;
 	using Modules;
-	using Net.Irc;
 
 	public class Bot : IDisposable
 	{

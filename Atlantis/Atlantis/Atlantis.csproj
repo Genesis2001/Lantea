@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</ProjectGuid>
+    <ProjectGuid>{3464FCF7-A68E-40CC-A354-32B80E698890}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lantea.Core</RootNamespace>
-    <AssemblyName>Lantea.Core</AssemblyName>
+    <RootNamespace>Atlantis</RootNamespace>
+    <AssemblyName>Atlantis</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,35 +31,18 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Bot.cs" />
-    <Compile Include="IObservableClass.cs" />
-    <Compile Include="IO\DualLog.cs" />
-    <Compile Include="IO\ILog.cs" />
-    <Compile Include="IO\ISettingsManager.cs" />
-    <Compile Include="IO\Log.cs" />
-    <Compile Include="IO\LogStream.cs" />
-    <Compile Include="IO\LogThreshold.cs" />
-    <Compile Include="IO\LogWriter.cs" />
-    <Compile Include="IO\SettingsManager.cs" />
-    <Compile Include="Modules\IModule.cs" />
-    <Compile Include="Modules\IModuleMeta.cs" />
-    <Compile Include="Modules\ModuleLoader.cs" />
-    <Compile Include="Modules\Version.cs" />
+    <Compile Include="Collections\Concurrent\ConcurrentQueueAdapter.cs" />
+    <Compile Include="Collections\IQueue.cs" />
+    <Compile Include="Collections\QueueAdapter.cs" />
+    <Compile Include="Linq\EventExtensions.cs" />
+    <Compile Include="Linq\StringExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Atlantis\Atlantis.Net.Irc\Atlantis.Net.Irc.csproj">
-      <Project>{07410E3A-D2CF-4A81-BA52-864C8D206664}</Project>
-      <Name>Atlantis.Net.Irc</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

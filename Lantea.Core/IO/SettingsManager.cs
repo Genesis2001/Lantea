@@ -9,7 +9,6 @@ namespace Lantea.Core.IO
 	using System;
 	using System.IO;
 	using System.Xml.XPath;
-	using Common.IO;
 
 	public class SettingsManager : ISettingsManager
 	{

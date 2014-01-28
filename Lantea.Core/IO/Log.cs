@@ -9,7 +9,6 @@ namespace Lantea.Core.IO
 	using System;
 	using System.IO;
 	using System.Text;
-	using Common.IO;
 
 	public class Log : ILog
 	{

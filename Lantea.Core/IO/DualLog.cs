@@ -7,7 +7,6 @@
 namespace Lantea.Core.IO
 {
 	using System;
-	using Common.IO;
 
 	public class DualLog : ILog
 	{
