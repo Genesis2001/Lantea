@@ -122,10 +122,10 @@ namespace Atlantis.Net.Irc
 		protected virtual void NickInUseHandler(object sender, RfcNumericEventArgs args)
 		{
 			var header  = (IrcHeaders)args.Numeric;
-			var message = args.Message;
-
+			
 			if (header == IrcHeaders.ERR_NICKNAMEINUSE)
 			{
+				var message = args.Message;
 				var toks    = message.Split(' ');
 				var newNick = string.Concat(toks[1], "_");
 
@@ -135,7 +135,10 @@ namespace Atlantis.Net.Irc
 				{
 					Task.Factory.StartNew(async () =>
 					                            {
-						                            await Task.Delay(Convert.ToInt32(RetryInterval), token);
+						                            if (!registered)
+						                            {
+							                            await Task.Delay(Convert.ToInt32(RetryInterval), token);
+						                            }
 
 						                            ChangeNick(Nick);
 					                            }, token);
