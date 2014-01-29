@@ -52,18 +52,19 @@ namespace Atlantis.Net.Irc
 			FillListsDelay          = TimeSpan.FromSeconds(30.0).TotalMilliseconds;
 
 			RawMessageEvent        += RegistrationHandler;
-			RawMessageEvent        += RfcNumericHandler;
 			RawMessageEvent        += PingHandler;
+			RawMessageEvent        += RfcNumericHandler;
 			RawMessageEvent        += ProtocalMessageHandler;
 
 			ProtocolMessageReceivedEvent += JoinPartHandler;
 			ProtocolMessageReceivedEvent += MessageNoticeHandler;
 			ProtocolMessageReceivedEvent += ModeHandler;
 			ProtocolMessageReceivedEvent += NickHandler;
+			ProtocolMessageReceivedEvent += QuitHandler;
 			
 			RfcNumericEvent        += ConnectionHandler;
-			RfcNumericEvent        += ProtocolHandler;
-			RfcNumericEvent        += ChannelAccessHandler;
+			RfcNumericEvent        += RfcProtocolHandler;
+			RfcNumericEvent        += RfcNamesHandler;
 			RfcNumericEvent        += NickInUseHandler;
 
 			token.Register(CancellationNoticeHandler);
@@ -204,6 +205,7 @@ namespace Atlantis.Net.Irc
 		public event EventHandler<MessageReceivedEventArgs> NoticeReceivedEvent;
 		public event EventHandler PingReceiptEvent;
 		public event EventHandler<ProtocolMessageEventArgs> ProtocolMessageReceivedEvent;
+		public event EventHandler<QuitEventArgs> QuitEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageEvent;
 		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;
 		public event EventHandler TimeoutEvent;
@@ -220,10 +222,11 @@ namespace Atlantis.Net.Irc
 		public Channel GetChannel(string channelName)
 		{
 			if (string.IsNullOrEmpty(channelName))
+			{
 				throw new ArgumentNullException("channelName", "The channelName parameter cannot be null or empty.");
+			}
 
 			var c = Channels.SingleOrDefault(x => x.Name.EqualsIgnoreCase(channelName));
-
 			if (c == null)
 			{
 				c = new Channel(this, channelName);
@@ -285,7 +288,7 @@ namespace Atlantis.Net.Irc
 			{
 				if (Options.HasFlag(ConnectOptions.Secure))
 				{
-					// TODO: Call client.ConnectSecurely(string host, int port, [something] certificatePfx);
+					// TODO: Call client.ConnectSecurely(string host, int port, [something] certificate);
 					client.Connect(Host, Port);
 				}
 				else

@@ -24,6 +24,7 @@ namespace Atlantis.Net.Irc
 		private bool registered;
 		private DateTime lastMessage;
 		private Timer timeoutTimer;
+		private string rfcStringCase;
 
 		#endregion
 
@@ -51,7 +52,7 @@ namespace Atlantis.Net.Irc
 			}
 		}
 		
-		protected virtual void Protocol005Handler(object sender, RfcNumericEventArgs args)
+		protected virtual void RfcProtocolHandler(object sender, RfcNumericEventArgs args)
 		{
 			var header  = (IrcHeaders)args.Numeric;
 			var message = args.Message;
@@ -67,10 +68,14 @@ namespace Atlantis.Net.Irc
 				{
 					channelModes = m.Groups[1].Value;
 				}
+				else if (message.TryMatch(@"CASEMAPPING=([a-z\-])", out m))
+				{
+					rfcStringCase = m.Groups[1].Value;
+				}
 			}
 		}
 
-		protected virtual void ChannelAccessHandler(object sender, RfcNumericEventArgs args)
+		protected virtual void RfcNamesHandler(object sender, RfcNumericEventArgs args)
 		{
 			var header  = (IrcHeaders)args.Numeric;
 			var message = args.Message;
@@ -112,10 +117,36 @@ namespace Atlantis.Net.Irc
 		protected virtual void ListModeHandler(object sender, RfcNumericEventArgs args)
 		{
 			var header  = (IrcHeaders)args.Numeric;
-			var message = args.Message;
-
+			
 			if (header == IrcHeaders.RPL_BANLIST || header == IrcHeaders.RPL_EXCEPTLIST || header == IrcHeaders.RPL_INVITELIST)
 			{
+				var message = args.Message;
+
+				var c    = GetChannel("");
+				var type = '\0';
+
+				switch (header)
+				{
+					case IrcHeaders.RPL_BANLIST:
+						type = 'b';
+						break;
+					
+					case IrcHeaders.RPL_EXCEPTLIST:
+						type = 'e';
+						break;
+
+					case IrcHeaders.RPL_INVITELIST:
+						type = 'I';
+						break;
+				}
+
+				if (c.ListModes.Find(x => x.Mask.Equals("")) != null)
+				{
+					return;
+				}
+
+				var l = new ListMode(type, DateTime.Now, "", "");
+				c.ListModes.Add(l);
 			}
 		}
 
@@ -134,14 +165,14 @@ namespace Atlantis.Net.Irc
 				if (RetryNick)
 				{
 					Task.Factory.StartNew(async () =>
-					                            {
-						                            if (!registered)
-						                            {
-							                            await Task.Delay(Convert.ToInt32(RetryInterval), token);
-						                            }
+					                        {
+						                        if (!registered)
+						                        {
+							                        await Task.Delay(Convert.ToInt32(RetryInterval), token);
+						                        }
 
-						                            ChangeNick(Nick);
-					                            }, token);
+						                        ChangeNick(Nick);
+					                        }, token);
 				}
 			}
 		}
@@ -165,6 +196,24 @@ namespace Atlantis.Net.Irc
 			}
 		}
 
+		protected virtual void QuitHandler(object sender, ProtocolMessageEventArgs args)
+		{
+			var m = args.Match;
+
+			if (m.Groups["command"].Value.Equals("QUIT"))
+			{
+				var source = m.Groups["source"].Value;
+				var message = m.Groups["params"].Value;
+
+				foreach (var item in Channels)
+				{
+					item.Users.Remove(source);
+				}
+
+				QuitEvent.Raise(this, new QuitEventArgs(source, message));
+			}
+		}
+
 		protected virtual void JoinPartHandler(object sender, ProtocolMessageEventArgs args)
 		{
 			var match   = args.Match;
@@ -183,7 +232,13 @@ namespace Atlantis.Net.Irc
 					{
 						if (FillListsDelay > 0)
 						{
-							Task.Factory.StartNew(() => FillChannelList(target), token);
+							Task.Factory.StartNew(async () =>
+													{
+														// ReSharper disable once MethodSupportsCancellation
+														await Task.Delay((int)FillListsDelay);
+
+														FillChannelList(target);
+													}, token);
 						}
 						else
 						{
@@ -203,25 +258,14 @@ namespace Atlantis.Net.Irc
 			}
 		}
 
-		private async void FillChannelList(string channelName)
+		private void FillChannelList(string channelName)
 		{
-			try
-			{
-				if (string.IsNullOrEmpty(channelName)) throw new ArgumentNullException("channelName");
-				if (FillListsOnJoin && FillListsDelay > 0)
-				{
-					await Task.Delay((int)FillListsDelay, token);
-				}
+			if (string.IsNullOrEmpty(channelName)) throw new ArgumentNullException("channelName");
 
-				var listModes = channelModes.Split(',')[0];
-				foreach (var mode in listModes)
-				{
-					Send("MODE {0} +{1}", channelName, mode);
-				}
-			}
-			catch (TaskCanceledException)
+			var listModes = channelModes.Split(',')[0];
+			foreach (var mode in listModes)
 			{
-				// nomnom.
+				Send("MODE {0} +{1}", channelName, mode);
 			}
 		}
 
@@ -282,7 +326,7 @@ if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelReg
 
 			if (m.Groups["command"].Value.Equals("MODE"))
 			{
-				// 
+
 			}
 		}
 

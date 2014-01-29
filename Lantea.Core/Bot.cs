@@ -42,7 +42,13 @@ namespace Lantea.Core
 			Client.NickChangedEvent     += OnNickChanged;
 			Client.NoticeReceivedEvent  += OnNoticeReceived;
 			Client.PingReceiptEvent     += OnPingReceipt;
+			Client.QuitEvent += OnQuit;
 #endif
+		}
+
+		private void OnQuit(object sender, QuitEventArgs e)
+		{
+			if (Log != null) Log.InfoFormat("[QUIT] {0} has left the IRC server: {1}", e.Nick, e.Message);
 		}
 
 		private void OnClientConnect(object sender, EventArgs args)
