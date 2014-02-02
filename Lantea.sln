@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		GlobalAssemblyInfo.cs = GlobalAssemblyInfo.cs
 		LanteaMap.dgml = LanteaMap.dgml
 		LICENSE. = LICENSE.
+		README = README
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5DDB5526-4C70-4822-B64F-D012D28396AE}"
