@@ -202,7 +202,7 @@ namespace Atlantis.Net.Irc
 
 			if (m.Groups["command"].Value.Equals("QUIT"))
 			{
-				var source = m.Groups["source"].Value;
+				var source  = m.Groups["source"].Value;
 				var message = m.Groups["params"].Value;
 
 				foreach (var item in Channels)
