@@ -26,13 +26,13 @@ namespace Atlantis.Net
 			this.encoding = encoding;
 		}
 
-		private void InitializeAdapter()
+		private void InitializeAdapter(Task task)
 		{
 			if (client == null) return;
 
-			stream   = client.GetStream();
+			stream = client.GetStream();
 			encoding = encoding ?? new UTF8Encoding(false);
-			reader   = new StreamReader(client.GetStream(), encoding);
+			reader = new StreamReader(client.GetStream(), encoding);
 		}
 
 		#region Implementation of ITcpClient
@@ -63,7 +63,7 @@ namespace Atlantis.Net
 			var connection = new IPEndPoint(entry.AddressList[0], port);
 			client.Connect(connection);
 
-			InitializeAdapter();
+			InitializeAdapter(null);
 		}
 
 		public void Close()
@@ -113,7 +113,7 @@ namespace Atlantis.Net
 		
 		public Task ConnectAsync(string host, int port)
 		{
-			return client.ConnectAsync(host, port).ContinueWith(x => InitializeAdapter());
+			return client.ConnectAsync(host, port).ContinueWith(InitializeAdapter);
 		}
 
 		public Task<string> ReadLineAsync()

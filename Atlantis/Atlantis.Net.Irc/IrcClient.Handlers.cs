@@ -9,9 +9,11 @@ namespace Atlantis.Net.Irc
 	using System;
 	using System.Linq;
 	using System.Text.RegularExpressions;
+	using System.Threading;
 	using System.Threading.Tasks;
 	using System.Timers;
 	using Linq;
+	using Timer = System.Timers.Timer;
 
 	public partial class IrcClient
 	{
@@ -164,15 +166,15 @@ namespace Atlantis.Net.Irc
 
 				if (RetryNick)
 				{
-					Task.Factory.StartNew(async () =>
-					                        {
-						                        if (!registered)
-						                        {
-							                        await Task.Delay(Convert.ToInt32(RetryInterval), token);
-						                        }
+					Task.Factory.StartNew(() =>
+					                      {
+						                      if (!registered)
+						                      {
+							                      Task.Delay((int)RetryInterval, token).Wait(token);
+						                      }
 
-						                        ChangeNick(Nick);
-					                        }, token);
+						                      ChangeNick(Nick);
+					                      }, token);
 				}
 			}
 		}
@@ -399,7 +401,7 @@ if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelReg
 			}
 		}
 		
-		protected async void QueueProcessor()
+		protected void QueueProcessor()
 		{
 			try
 			{
@@ -410,7 +412,7 @@ if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelReg
 						Send(messageQueue.Pop());
 					}
 
-					await Task.Delay(QueueInteval, queueToken);
+					Task.Delay(QueueInteval, queueToken).Wait(queueToken);
 				}
 			}
 			catch (TaskCanceledException)
@@ -427,14 +429,30 @@ if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelReg
 			client.Close();
 		}
 
-		private void OnTimeoutTimerElapsed(object sender, ElapsedEventArgs args)
+		private void OnTimeoutTimerElapsed(object sender, ElapsedEventArgs e)
 		{
-			if ((args.SignalTime - lastMessage) < Timeout)
+			if ((e.SignalTime - lastMessage) < Timeout)
 			{
-				TimeoutEvent.Raise(this, EventArgs.Empty);
-
 				tokenSource.Cancel();
 				queueTokenSource.Cancel();
+
+				var args = new TimeoutEventArgs();
+				TimeoutEvent.Raise(this, args);
+
+				if (!args.Handled)
+				{
+					tokenSource = new CancellationTokenSource();
+					queueTokenSource = new CancellationTokenSource();
+
+					if (RetryInterval > 0)
+					{
+						// ReSharper disable MethodSupportsCancellation
+						Task.Delay((int)RetryInterval).Wait();
+						// ReSharper restore MethodSupportsCancellation
+					}
+
+					Connect();
+				}
 			}
 		}
 

@@ -27,7 +27,7 @@ namespace Atlantis.Net.Irc
 		private Task queueRunner;
 
 		private CancellationTokenSource queueTokenSource;
-		private readonly CancellationTokenSource tokenSource;
+		private CancellationTokenSource tokenSource;
 		private CancellationToken token;
 		private CancellationToken queueToken;
 		private bool enableFakeLag;
@@ -208,7 +208,7 @@ namespace Atlantis.Net.Irc
 		public event EventHandler<QuitEventArgs> QuitEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageEvent;
 		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;
-		public event EventHandler TimeoutEvent;
+		public event EventHandler<TimeoutEventArgs> TimeoutEvent;
 
 		#endregion
 
@@ -284,6 +284,12 @@ namespace Atlantis.Net.Irc
 			SetDefaults();
 
 			client = new TcpClientAsyncAdapter(new TcpClient(), encoding);
+
+			Connect();
+		}
+
+		private void Connect()
+		{
 			try
 			{
 				if (Options.HasFlag(ConnectOptions.Secure))
