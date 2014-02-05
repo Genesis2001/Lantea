@@ -26,9 +26,4 @@ namespace Atlantis.Net.Irc
 		/// </summary>
 		public string Message { get; private set; }
 	}
-
-	public class TimeoutEventArgs : EventArgs
-	{
-		public bool Handled { get; set; }
-	}
 }

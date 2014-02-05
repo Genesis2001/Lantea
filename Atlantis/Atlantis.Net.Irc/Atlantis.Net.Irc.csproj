@@ -53,6 +53,7 @@
     <Compile Include="QuitEventArgs.cs" />
     <Compile Include="RawMessageEventArgs.cs" />
     <Compile Include="RfcNumericEventArgs.cs" />
+    <Compile Include="TimeoutEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Atlantis.Net\Atlantis.Net.csproj">

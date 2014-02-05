@@ -2,7 +2,5 @@
 	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">-----------------------------------------------------------------------------&#xD;
  &lt;copyright file="$FILENAME$" company="Zack Loveless"&gt;&#xD;
      Copyright (c) Zack Loveless.  All rights reserved.&#xD;
-     &#xD;
-     LICENSE TBA&#xD;
  &lt;/copyright&gt;&#xD;
 -----------------------------------------------------------------------------</s:String></wpf:ResourceDictionary>
