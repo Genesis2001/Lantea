@@ -7,6 +7,7 @@
 namespace Atlantis.Net.Irc
 {
 	using System;
+	using System.Diagnostics;
 	using System.Linq;
 	using System.Text.RegularExpressions;
 	using System.Threading;
@@ -48,9 +49,12 @@ namespace Atlantis.Net.Irc
 		{
 			var header = (IrcHeaders)args.Numeric;
 
+			// if (registered) { /* LOLWUT? */ }
+
 			if (header == IrcHeaders.RPL_WELCOME)
 			{
 				ConnectionEstablishedEvent.Raise(this, EventArgs.Empty);
+				registered = true;
 			}
 		}
 		
@@ -192,7 +196,8 @@ namespace Atlantis.Net.Irc
 			// created by Chris J. Hogben (http://cjh.im/)
 			// modified by Zack Loveless (http://zloveless.com)
 
-			if (message.TryMatch(@"^:?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>PRIVMSG|NOTICE|JOIN|PART|QUIT|MODE|NICK) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$", out m))
+			// if (message.TryMatch(@"^:?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>PRIVMSG|NOTICE|JOIN|PART|QUIT|MODE|NICK) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$", out m))
+			if (message.TryMatch(@"^:?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>[A-Z]) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$", out m))
 			{
 				ProtocolMessageReceivedEvent.Raise(this, new ProtocolMessageEventArgs(m, message));
 			}
@@ -223,24 +228,30 @@ namespace Atlantis.Net.Irc
 			// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
 			if (match.Groups["command"].Value.Matches(@"JOIN|PART"))
 			{
-				var nick   = match.Groups["source"].Value;
-				var target = match.Groups["target"].Value;
+				var source        = match.Groups["source"].Value;
+				var target        = match.Groups["target"].Value;
+				var targetChannel = GetChannel(target);
 
 				if (match.Groups["command"].Value.EqualsIgnoreCase("join"))
 				{
-					ChannelJoinEvent.Raise(this, new JoinPartEventArgs(nick, target));
+					if (!targetChannel.Users.ContainsKey(source))
+					{
+						targetChannel.Users.Add(source, new PrefixList(this));
+					}
 
-					if (FillListsOnJoin && nick.EqualsIgnoreCase(Nick))
+					ChannelJoinEvent.Raise(this, new JoinPartEventArgs(source, target));
+
+					if (FillListsOnJoin && source.EqualsIgnoreCase(Nick))
 					{
 						if (FillListsDelay > 0)
 						{
-							Task.Factory.StartNew(async () =>
-													{
-														// ReSharper disable once MethodSupportsCancellation
-														await Task.Delay((int)FillListsDelay);
+							Task.Factory.StartNew(() =>
+							                      {
+								                      // ReSharper disable once MethodSupportsCancellation
+								                      Task.Delay((int)FillListsDelay).Wait(token);
 
-														FillChannelList(target);
-													}, token);
+								                      FillChannelList(target);
+							                      }, token);
 						}
 						else
 						{
@@ -250,7 +261,12 @@ namespace Atlantis.Net.Irc
 				}
 				else if (match.Groups["command"].Value.EqualsIgnoreCase("part"))
 				{
-					ChannelPartEvent.Raise(this, new JoinPartEventArgs(nick, target));
+					if (targetChannel.Users.ContainsKey(source))
+					{
+						targetChannel.Users.Remove(source);
+					}
+
+					ChannelPartEvent.Raise(this, new JoinPartEventArgs(source, target));
 				}
 
 				if (StrictNames)
@@ -328,7 +344,8 @@ if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelReg
 
 			if (m.Groups["command"].Value.Equals("MODE"))
 			{
-
+				var target = m.Groups["target"].Value;
+				var source = m.Groups["source"].Value;
 			}
 		}
 
@@ -365,6 +382,8 @@ if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelReg
 
 			// TODO: Check for NOTICE AUTH ...
 			// Accident waiting to happen I think.
+
+			// TODO: Handle RFC numeric 464 too for this.
 
 			Send("NICK {0}", Nick);
 			Send("USER {0} 0 * :{1}", Ident, RealName);
