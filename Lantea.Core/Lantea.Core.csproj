@@ -52,7 +52,6 @@
     <Compile Include="Modules\IModule.cs" />
     <Compile Include="Modules\IModuleMeta.cs" />
     <Compile Include="Modules\ModuleLoader.cs" />
-    <Compile Include="Modules\Version.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
