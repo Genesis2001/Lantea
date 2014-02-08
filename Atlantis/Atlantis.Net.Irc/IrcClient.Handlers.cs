@@ -28,6 +28,10 @@ namespace Atlantis.Net.Irc
 		private Timer timeoutTimer;
 		private string rfcStringCase;
 
+		// PRIVMSG|NOTICE|JOIN|PART|QUIT|MODE|NICK|INVITE|KICK
+		private const string IRC_PROTOSTR = @"^:?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>[A-Z]) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$";
+		private const string IRC_USERSTR = @":?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+))";
+
 		#endregion
 
 		// TODO: Handle disconnection events.
@@ -184,7 +188,7 @@ namespace Atlantis.Net.Irc
 
 		#region IRC Raw Message Handlers
 
-		protected virtual void ProtocalMessageHandler(object sender, RawMessageEventArgs args)
+		protected virtual void ProtocalMessageReceivedHandler(object sender, RawMessageEventArgs args)
 		{
 			var message = args.Message;
 			Match m;
@@ -218,57 +222,62 @@ namespace Atlantis.Net.Irc
 			}
 		}
 
-		protected virtual void JoinPartHandler(object sender, ProtocolMessageEventArgs args)
+		protected virtual void JoinPartHandler(object sender, RawMessageEventArgs args)
 		{
-			var match   = args.Match;
-
-			// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
-			if (match.Groups["command"].Value.Matches(@"JOIN|PART"))
+			var message = args.Message;
+			var toks = args.Tokens;
+			
+			if (toks[1].Equals("JOIN") || toks[1].Equals("PART"))
 			{
-				var source        = match.Groups["source"].Value;
-				var target        = match.Groups["target"].Value;
-				var targetChannel = GetChannel(target);
+				// :Lantea!lantea@unified-nac.jhi.145.98.IP JOIN :#UnifiedTech
 
-				if (match.Groups["command"].Value.EqualsIgnoreCase("join"))
+				Match m;
+				if (toks[0].TryMatch(IRC_USERSTR, out m))
 				{
-					if (!targetChannel.Users.ContainsKey(source))
-					{
-						targetChannel.Users.Add(source, new PrefixList(this));
-					}
+					var source = m.Groups["source"].Value;
+					var target = toks[2];
+					var channel = GetChannel(target);
 
-					ChannelJoinEvent.Raise(this, new JoinPartEventArgs(source, target));
-
-					if (FillListsOnJoin && source.EqualsIgnoreCase(Nick))
+					if (toks[1].Equals("JOIN"))
 					{
-						if (FillListsDelay > 0)
+						if (!channel.Users.ContainsKey(source))
 						{
-							Task.Factory.StartNew(() =>
-							                      {
-								                      // ReSharper disable once MethodSupportsCancellation
-								                      Task.Delay((int)FillListsDelay).Wait(token);
-
-								                      FillChannelList(target);
-							                      }, token);
+							channel.Users.Add(source, new PrefixList(this));
 						}
-						else
+
+						ChannelJoinEvent.Raise(this, new JoinPartEventArgs(source, target));
+
+						if (FillListsOnJoin && source.EqualsIgnoreCase(Nick))
 						{
-							FillChannelList(target);
+							if (FillListsDelay > 0)
+							{
+								Task.Factory.StartNew(() =>
+								                      {
+									                      Task.Delay((int)FillListsDelay, token).Wait(token);
+
+									                      FillChannelList(target);
+								                      }, token);
+							}
+							else
+							{
+								FillChannelList(target);
+							}
 						}
 					}
-				}
-				else if (match.Groups["command"].Value.EqualsIgnoreCase("part"))
-				{
-					if (targetChannel.Users.ContainsKey(source))
+					else if (toks[1].Equals("PART"))
 					{
-						targetChannel.Users.Remove(source);
+						if (channel.Users.ContainsKey(source))
+						{
+							channel.Users.Remove(source);
+						}
+
+						ChannelPartEvent.Raise(this, new JoinPartEventArgs(source, target));
 					}
 
-					ChannelPartEvent.Raise(this, new JoinPartEventArgs(source, target));
-				}
-
-				if (StrictNames)
-				{
-					Send("NAMES {0}", target);
+					if (StrictNames)
+					{
+						Send("NAMES {0}", target);
+					}
 				}
 			}
 		}
@@ -362,7 +371,7 @@ if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelReg
 
 		protected virtual void RfcNumericHandler(object sender, RawMessageEventArgs args)
 		{
-			var toks = args.Message.Split(' ');
+			var toks = args.Tokens;
 
 			int num;
 			if (Int32.TryParse(toks[1], out num))
@@ -385,13 +394,13 @@ if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelReg
 			Send("NICK {0}", Nick);
 			Send("USER {0} 0 * :{1}", Ident, RealName);
 
-			RawMessageEvent -= RegistrationHandler;
+			RawMessageReceivedEvent -= RegistrationHandler;
 			registered = true;
 		}
 
 		protected virtual void PingHandler(object sender, RawMessageEventArgs args)
 		{
-			if (args.Message.StartsWithIgnoreCase("ping"))
+			if (args.Message.StartsWith("PING"))
 			{
 				// Bypass the queue for sending pong responses.
 				Send(string.Format("PONG {0}", args.Message.Substring(5)));
@@ -408,7 +417,7 @@ if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelReg
 			if (task.Exception == null && task.Result != null && !task.IsCanceled)
 			{
 				lastMessage = DateTime.Now;
-				RawMessageEvent.Raise(this, new RawMessageEventArgs(task.Result));
+				RawMessageReceivedEvent.Raise(this, new RawMessageEventArgs(task.Result));
 				client.ReadLineAsync().ContinueWith(OnAsyncRead, token);
 			}
 			else if (task.Result == null)

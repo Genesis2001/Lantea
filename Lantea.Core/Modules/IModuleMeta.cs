@@ -10,8 +10,6 @@ namespace Lantea.Core.Modules
 	{
 		string Author { get; }
 
-		Version Version { get; }
-
 		bool IsEnabled { get; set; }
 	}
 }

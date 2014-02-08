@@ -51,12 +51,12 @@ namespace Atlantis.Net.Irc
 			FillListsOnJoin         = false;
 			FillListsDelay          = TimeSpan.FromSeconds(30.0).TotalMilliseconds;
 
-			RawMessageEvent        += RegistrationHandler;
-			RawMessageEvent        += PingHandler;
-			RawMessageEvent        += RfcNumericHandler;
-			RawMessageEvent        += ProtocalMessageHandler;
+			RawMessageReceivedEvent        += RegistrationHandler;
+			RawMessageReceivedEvent        += PingHandler;
+			RawMessageReceivedEvent        += RfcNumericHandler;
+			// RawMessageReceivedEvent        += ProtocalMessageReceivedHandler;
+			RawMessageReceivedEvent += JoinPartHandler;
 
-			ProtocolMessageReceivedEvent += JoinPartHandler;
 			ProtocolMessageReceivedEvent += MessageNoticeHandler;
 			ProtocolMessageReceivedEvent += ModeHandler;
 			ProtocolMessageReceivedEvent += NickHandler;
@@ -206,7 +206,7 @@ namespace Atlantis.Net.Irc
 		public event EventHandler PingReceiptEvent;
 		public event EventHandler<ProtocolMessageEventArgs> ProtocolMessageReceivedEvent;
 		public event EventHandler<QuitEventArgs> QuitEvent;
-		public event EventHandler<RawMessageEventArgs> RawMessageEvent;
+		public event EventHandler<RawMessageEventArgs> RawMessageReceivedEvent;
 		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;
 		public event EventHandler<TimeoutEventArgs> TimeoutEvent;
 

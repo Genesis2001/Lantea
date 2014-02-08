@@ -34,8 +34,8 @@ namespace Lantea.Core
 #if DEBUG
 			Client.FillListsOnJoin       = true;
 			Client.FillListsDelay        = 5000;
-			
-			Client.RawMessageEvent      += OnRawMessageReceived;
+
+			Client.RawMessageReceivedEvent += OnRawMessageReceivedReceived;
 			Client.ChannelJoinEvent     += OnChannelJoin;
 			Client.ChannelPartEvent     += OnChannelPart;
 			Client.MessageReceivedEvent += OnMessageReceived;
@@ -110,7 +110,7 @@ namespace Lantea.Core
 			Environment.Exit(1);
 		}
 
-		private void OnRawMessageReceived(object sender, RawMessageEventArgs args)
+		private void OnRawMessageReceivedReceived(object sender, RawMessageEventArgs args)
 		{
 			if (Log != null) Log.DebugFormat("RECV: {0}", args.Message);
 		}
