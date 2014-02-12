@@ -225,7 +225,7 @@ namespace Atlantis.Net.Irc
 		protected virtual void JoinPartHandler(object sender, RawMessageEventArgs args)
 		{
 			var message = args.Message;
-			var toks = args.Tokens;
+			var toks    = args.Tokens;
 			
 			if (toks[1].Equals("JOIN") || toks[1].Equals("PART"))
 			{
