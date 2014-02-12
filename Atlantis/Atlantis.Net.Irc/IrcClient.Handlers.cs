@@ -7,7 +7,6 @@
 namespace Atlantis.Net.Irc
 {
 	using System;
-	using System.Diagnostics;
 	using System.Linq;
 	using System.Text.RegularExpressions;
 	using System.Threading;
@@ -48,8 +47,6 @@ namespace Atlantis.Net.Irc
 		protected virtual void ConnectionHandler(object sender, RfcNumericEventArgs args)
 		{
 			var header = (IrcHeaders)args.Numeric;
-
-			// if (registered) { /* LOLWUT? */ }
 
 			if (header == IrcHeaders.RPL_WELCOME)
 			{
