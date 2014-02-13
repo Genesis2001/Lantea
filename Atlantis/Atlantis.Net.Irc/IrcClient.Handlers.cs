@@ -127,13 +127,13 @@ namespace Atlantis.Net.Irc
 			
 			if (header == IrcHeaders.RPL_BANLIST || header == IrcHeaders.RPL_EXCEPTLIST || header == IrcHeaders.RPL_INVITELIST)
 			{
-				string[] toks = args.Message.Split(' ');
+				string[] toks      = args.Message.Split(' ');
 				string channelName = toks[0];
-				string mask = toks[2];
-				string whomSet = toks[3];
-				DateTime set = toks[4].ToDouble().ToDateTime();
+				string mask        = toks[2];
+				string whomSet     = toks[3];
+				DateTime set       = toks[4].ToDouble().ToDateTime();
 
-				var c = GetChannel(channelName);
+				var c    = GetChannel(channelName);
 				var type = '\0';
 
 				switch (header)
@@ -255,12 +255,20 @@ namespace Atlantis.Net.Irc
 						{
 							if (FillListsDelay > 0)
 							{
-								Task.Factory.StartNew(() =>
-								                      {
-									                      Task.Delay((int)FillListsDelay, token).Wait(token);
+								try
+								{
+									Task.Factory.StartNew(() =>
+									                      {
+										                      Task.Delay((int)FillListsDelay, token).Wait(token);
 
-									                      FillChannelList(target);
-								                      }, token);
+										                      FillChannelList(target);
+									                      },
+										token);
+								}
+								catch (TaskCanceledException)
+								{
+									// Omnomnomnom
+								}
 							}
 							else
 							{
