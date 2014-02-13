@@ -66,6 +66,7 @@ namespace Atlantis.Net.Irc
 			RfcNumericEvent        += RfcProtocolHandler;
 			RfcNumericEvent        += RfcNamesHandler;
 			RfcNumericEvent        += NickInUseHandler;
+			RfcNumericEvent += ListModeHandler;
 
 			token.Register(CancellationNoticeHandler);
 		}

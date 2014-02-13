@@ -41,6 +41,7 @@
     <Compile Include="Collections\IQueue.cs" />
     <Compile Include="Collections\QueueAdapter.cs" />
     <Compile Include="Linq\EventExtensions.cs" />
+    <Compile Include="Linq\NumericExtensions.cs" />
     <Compile Include="Linq\StringExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
