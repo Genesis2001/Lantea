@@ -124,11 +124,13 @@ namespace Atlantis.Net.Irc
 		protected virtual void ListModeHandler(object sender, RfcNumericEventArgs args)
 		{
 			var header  = (IrcHeaders)args.Numeric;
+
+			// CHANMODES=Ibeg,k,FHJLdfjl,ABCDGKMNOPQRSTcimnprstuz 
 			
 			if (header == IrcHeaders.RPL_BANLIST || header == IrcHeaders.RPL_EXCEPTLIST || header == IrcHeaders.RPL_INVITELIST)
 			{
 				string[] toks      = args.Message.Split(' ');
-				string channelName = toks[0];
+				string channelName = toks[1];
 				string mask        = toks[2];
 				string whomSet     = toks[3];
 				DateTime set       = toks[4].ToDouble().ToDateTime();
@@ -238,57 +240,67 @@ namespace Atlantis.Net.Irc
 				Match m;
 				if (toks[0].TryMatch(IRC_USERSTR, out m))
 				{
-					var source = m.Groups["source"].Value;
-					var target = toks[2];
-					var channel = GetChannel(target);
+					string source = m.Groups["source"].Value;
+					string target = null;
 
-					if (toks[1].Equals("JOIN"))
+					Match n;
+					if (toks[2].TryMatch(@":?(?<target>\#?[^\W]+)", out n))
 					{
-						if (!channel.Users.ContainsKey(source))
-						{
-							channel.Users.Add(source, new PrefixList(this));
-						}
-
-						ChannelJoinEvent.Raise(this, new JoinPartEventArgs(source, target));
-
-						if (FillListsOnJoin && source.EqualsIgnoreCase(Nick))
-						{
-							if (FillListsDelay > 0)
-							{
-								try
-								{
-									Task.Factory.StartNew(() =>
-									                      {
-										                      Task.Delay((int)FillListsDelay, token).Wait(token);
-
-										                      FillChannelList(target);
-									                      },
-										token);
-								}
-								catch (TaskCanceledException)
-								{
-									// Omnomnomnom
-								}
-							}
-							else
-							{
-								FillChannelList(target);
-							}
-						}
-					}
-					else if (toks[1].Equals("PART"))
-					{
-						if (channel.Users.ContainsKey(source))
-						{
-							channel.Users.Remove(source);
-						}
-
-						ChannelPartEvent.Raise(this, new JoinPartEventArgs(source, target));
+						target = n.Groups["target"].Value;
 					}
 
-					if (StrictNames)
+					if (target != null)
 					{
-						Send("NAMES {0}", target);
+						Channel channel = GetChannel(target);
+
+						if (toks[1].Equals("JOIN"))
+						{
+							if (!channel.Users.ContainsKey(source))
+							{
+								channel.Users.Add(source, new PrefixList(this));
+							}
+
+							ChannelJoinEvent.Raise(this, new JoinPartEventArgs(source, target));
+
+							if (FillListsOnJoin && source.EqualsIgnoreCase(Nick))
+							{
+								if (FillListsDelay > 0)
+								{
+									try
+									{
+										Task.Factory.StartNew(() =>
+										                      {
+											                      Task.Delay((int)FillListsDelay, token).Wait(token);
+
+											                      FillChannelList(target);
+										                      },
+											token);
+									}
+									catch (TaskCanceledException)
+									{
+										// Omnomnomnom
+									}
+								}
+								else
+								{
+									FillChannelList(target);
+								}
+							}
+						}
+						else if (toks[1].Equals("PART"))
+						{
+							if (channel.Users.ContainsKey(source))
+							{
+								channel.Users.Remove(source);
+							}
+
+							ChannelPartEvent.Raise(this, new JoinPartEventArgs(source, target));
+						}
+
+						if (StrictNames)
+						{
+							Send("NAMES {0}", target);
+						}
 					}
 				}
 			}

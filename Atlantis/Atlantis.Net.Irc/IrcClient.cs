@@ -51,21 +51,20 @@ namespace Atlantis.Net.Irc
 			FillListsOnJoin         = false;
 			FillListsDelay          = TimeSpan.FromSeconds(30.0).TotalMilliseconds;
 
-			RawMessageReceivedEvent        += RegistrationHandler;
-			RawMessageReceivedEvent        += PingHandler;
-			RawMessageReceivedEvent        += RfcNumericHandler;
-			// RawMessageReceivedEvent        += ProtocalMessageReceivedHandler;
+			RawMessageReceivedEvent += RegistrationHandler;
+			RawMessageReceivedEvent += PingHandler;
+			RawMessageReceivedEvent += RfcNumericHandler;
 			RawMessageReceivedEvent += JoinPartHandler;
 
 			ProtocolMessageReceivedEvent += MessageNoticeHandler;
 			ProtocolMessageReceivedEvent += ModeHandler;
 			ProtocolMessageReceivedEvent += NickHandler;
 			ProtocolMessageReceivedEvent += QuitHandler;
-			
-			RfcNumericEvent        += ConnectionHandler;
-			RfcNumericEvent        += RfcProtocolHandler;
-			RfcNumericEvent        += RfcNamesHandler;
-			RfcNumericEvent        += NickInUseHandler;
+
+			RfcNumericEvent += ConnectionHandler;
+			RfcNumericEvent += RfcProtocolHandler;
+			RfcNumericEvent += RfcNamesHandler;
+			RfcNumericEvent += NickInUseHandler;
 			RfcNumericEvent += ListModeHandler;
 
 			token.Register(CancellationNoticeHandler);

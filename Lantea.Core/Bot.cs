@@ -33,7 +33,7 @@ namespace Lantea.Core
 
 #if DEBUG
 			Client.FillListsOnJoin       = true;
-			Client.FillListsDelay        = 5000;
+			Client.FillListsDelay        = 10;
 
 			Client.RawMessageReceivedEvent += OnRawMessageReceivedReceived;
 			Client.ChannelJoinEvent     += OnChannelJoin;
