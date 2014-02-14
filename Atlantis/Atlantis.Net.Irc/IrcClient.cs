@@ -56,10 +56,9 @@ namespace Atlantis.Net.Irc
 			RawMessageReceivedEvent += RfcNumericHandler;
 			RawMessageReceivedEvent += JoinPartHandler;
 			RawMessageReceivedEvent += MessageNoticeHandler;
-
-			ProtocolMessageReceivedEvent += ModeHandler;
-			ProtocolMessageReceivedEvent += NickHandler;
-			ProtocolMessageReceivedEvent += QuitHandler;
+			// RawMessageReceivedEvent += ModeHandler;
+			RawMessageReceivedEvent += NickHandler;
+			// RawMessageReceivedEvent += QuitHandler;
 
 			RfcNumericEvent += ConnectionHandler;
 			RfcNumericEvent += RfcProtocolHandler;
@@ -208,6 +207,7 @@ namespace Atlantis.Net.Irc
 		public event EventHandler<QuitEventArgs> QuitEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageReceivedEvent;
 		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;
+		public event EventHandler<MessageReceivedEventArgs> ServerNoticeReceivedEvent;
 		public event EventHandler<TimeoutEventArgs> TimeoutEvent;
 
 		#endregion

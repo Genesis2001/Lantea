@@ -339,8 +339,7 @@ namespace Atlantis.Net.Irc
 
 					if (target != null)
 					{
-						string message = string.Join(" ", toks.Skip(3));
-						message = message.TrimStart(':');
+						string message = string.Join(" ", toks.Skip(3)).TrimStart(':');
 
 						if (toks[1].Equals("PRIVMSG"))
 						{
@@ -356,7 +355,10 @@ namespace Atlantis.Net.Irc
 				}
 				else
 				{
-					// TODO: Add support for (S)NOTICE messages
+					string source  = toks[0].TrimStart(':');
+					string message = string.Join(" ", toks.Skip(3)).TrimStart(':');
+
+					ServerNoticeReceivedEvent.Raise(this, new MessageReceivedEventArgs(source, null, message));
 				}
 			}
 		}
@@ -370,11 +372,9 @@ namespace Atlantis.Net.Irc
 			ACCESS,
 		}
 
-		protected virtual void ModeHandler(object sender, ProtocolMessageEventArgs args)
+		protected virtual void ModeHandler(object sender, RawMessageEventArgs args)
 		{
-			var m = args.Match;
-
-			/*
+/*
 if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelRegex.Match(toks[2])).Success)
 {
     //Console.WriteLine("debug: {0}", input.Substring(input.IndexOf(toks[3])));
@@ -389,27 +389,34 @@ if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelReg
         // generic channel mode
         OnRawChannelMode(n.Groups[1].Value, m.Groups[1].Value, toks[3]);
     }
-}
-			 */
-
-			if (m.Groups["command"].Value.Equals("MODE"))
-			{
-				var target = m.Groups["target"].Value;
-				var source = m.Groups["source"].Value;
-			}
+} */
 		}
 
-		protected virtual void NickHandler(object sender, ProtocolMessageEventArgs args)
+		protected virtual void NickHandler(object sender, RawMessageEventArgs args)
 		{
-			var m = args.Match;
+			string[] toks = args.Tokens;
 
-			// :Genesis2001!zack@unifiedtech.org NICK Genesis2002
-			if (m.Groups["command"].Value.Equals("NICK"))
+			if (toks[1].Equals("NICK"))
 			{
-				var nick   = m.Groups["source"].Value;
-				var target = m.Groups["target"].Value;
+				Match m;
+				if (toks[0].TryMatch(IRC_USERSTR, out m))
+				{
+					string source = m.Groups["source"].Value;
+					string target = toks[2].TrimStart(':');
 
-				NickChangedEvent.Raise(this, new NickChangeEventArgs(nick, target));
+					foreach (Channel c in Channels)
+					{
+						if (c.Users.ContainsKey(source))
+						{
+							var p = c.Users[source];
+
+							c.Users.Remove(source);
+							c.Users.Add(target, p);
+						}
+					}
+
+					NickChangedEvent.Raise(this, new NickChangeEventArgs(source, target));
+				}
 			}
 		}
 

@@ -15,9 +15,9 @@ namespace Atlantis.Net.Irc
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:System.EventArgs" /> class.
 		/// </summary>
-		public MessageReceivedEventArgs(string nick, string target, string message)
+		public MessageReceivedEventArgs(string source, string target, string message)
 		{
-			Nick    = nick;
+			Source    = source;
 			Message = message;
 			Target  = target;
 		}
@@ -25,7 +25,7 @@ namespace Atlantis.Net.Irc
 		/// <summary>
 		/// 
 		/// </summary>
-		public string Nick { get; private set; }
+		public string Source { get; private set; }
 
 		/// <summary>
 		/// 
