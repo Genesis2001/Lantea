@@ -75,19 +75,19 @@ namespace Lantea.Core
 
 		private void OnNoticeReceived(object sender, MessageReceivedEventArgs args)
 		{
-			if (Log != null) Log.DebugFormat("[MSG] Received notice from {0} (to: {1}) sent: {2}", args.Nick, args.Target, args.Message);
+			if (Log != null) Log.DebugFormat("[MSG] Received notice from {0} (to: {1}) sent: {2}", args.Source, args.Target, args.Message);
 		}
 
 		private void OnMessageReceived(object sender, MessageReceivedEventArgs args)
 		{
-			if (Log != null) Log.DebugFormat("[MSG] Received message from {0} (to: {1}) sent: {2}", args.Nick, args.Target, args.Message);
+			if (Log != null) Log.DebugFormat("[MSG] Received message from {0} (to: {1}) sent: {2}", args.Source, args.Target, args.Message);
 
 			if (args.Message.StartsWith("!perm"))
 			{
 				var c = Client.GetChannel(args.Target);
-				var n = c.Users[args.Nick];
+				var n = c.Users[args.Source];
 
-				Client.Message(c.Name, "{0}, you currently have {1} as your highest prefix.", args.Nick, n.HighestPrefix);
+				Client.Message(c.Name, "{0}, you currently have {1} as your highest prefix.", args.Source, n.HighestPrefix);
 			}
 		}
 

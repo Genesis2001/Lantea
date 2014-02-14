@@ -211,21 +211,28 @@ namespace Atlantis.Net.Irc
 			}
 		}
 
-		protected virtual void QuitHandler(object sender, ProtocolMessageEventArgs args)
+		protected virtual void QuitHandler(object sender, RawMessageEventArgs args)
 		{
-			var m = args.Match;
+			string[] toks = args.Tokens;
 
-			if (m.Groups["command"].Value.Equals("QUIT"))
+			if (toks[1].Equals("QUIT"))
 			{
-				var source  = m.Groups["source"].Value;
-				var message = m.Groups["params"].Value;
-
-				foreach (var item in Channels)
+				Match m;
+				if (toks[0].TryMatch(IRC_USERSTR, out m))
 				{
-					item.Users.Remove(source);
-				}
+					string source  = m.Groups["source"].Value;
+					string message = string.Join(" ", toks.Skip(2)).TrimStart(':');
 
-				QuitEvent.Raise(this, new QuitEventArgs(source, message));
+					foreach (Channel c in Channels)
+					{
+						if (c.Users.ContainsKey(source))
+						{
+							c.Users.Remove(source);
+						}
+					}
+
+					QuitEvent.Raise(this, new QuitEventArgs(source, message));
+				}
 			}
 		}
 
