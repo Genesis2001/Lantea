@@ -36,13 +36,13 @@ namespace Lantea.Core
 			Client.FillListsDelay        = 10;
 
 			Client.RawMessageReceivedEvent += OnRawMessageReceivedReceived;
-			Client.ChannelJoinEvent     += OnChannelJoin;
-			Client.ChannelPartEvent     += OnChannelPart;
-			Client.MessageReceivedEvent += OnMessageReceived;
-			Client.NickChangedEvent     += OnNickChanged;
-			Client.NoticeReceivedEvent  += OnNoticeReceived;
-			Client.PingReceiptEvent     += OnPingReceipt;
-			Client.QuitEvent += OnQuit;
+			Client.ChannelJoinEvent        += OnChannelJoin;
+			Client.ChannelPartEvent        += OnChannelPart;
+			Client.MessageReceivedEvent    += OnMessageReceived;
+			Client.NickChangedEvent        += OnNickChanged;
+			Client.NoticeReceivedEvent     += OnNoticeReceived;
+			Client.PingReceiptEvent        += OnPingReceipt;
+			Client.QuitEvent               += OnQuit;
 #endif
 		}
 
