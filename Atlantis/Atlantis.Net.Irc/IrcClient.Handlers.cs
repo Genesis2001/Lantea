@@ -31,6 +31,7 @@ namespace Atlantis.Net.Irc
 		// PRIVMSG|NOTICE|JOIN|PART|QUIT|MODE|NICK|INVITE|KICK
 		private const string IRC_PROTOSTR = @"^:?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>[A-Z]) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$";
 		private const string IRC_USERSTR = @":?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+))";
+		private const string IRC_CHANEX = @":?(?<target>\#?[^\W]+)";
 
 		#endregion
 
@@ -230,7 +231,6 @@ namespace Atlantis.Net.Irc
 
 		protected virtual void JoinPartHandler(object sender, RawMessageEventArgs args)
 		{
-			var message = args.Message;
 			var toks    = args.Tokens;
 			
 			if (toks[1].Equals("JOIN") || toks[1].Equals("PART"))
@@ -244,7 +244,7 @@ namespace Atlantis.Net.Irc
 					string target = null;
 
 					Match n;
-					if (toks[2].TryMatch(@":?(?<target>\#?[^\W]+)", out n))
+					if (toks[2].TryMatch(IRC_CHANEX, out n))
 					{
 						target = n.Groups["target"].Value;
 					}
@@ -317,27 +317,47 @@ namespace Atlantis.Net.Irc
 			}
 		}
 
-		protected virtual void MessageNoticeHandler(object sender, ProtocolMessageEventArgs args)
+		protected virtual void MessageNoticeHandler(object sender, RawMessageEventArgs args)
 		{
-			var m = args.Match;
+			string[] toks = args.Tokens;
 
-			if (m.Groups["command"].Value.Matches(@"PRIVMSG|NOTICE"))
+			// ^:?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>[A-Z]) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$
+
+			if (toks[1].Equals("PRIVMSG") || toks[1].Equals("NOTICE"))
 			{
-				var nick   = m.Groups["source"].Value;
-				var target = m.Groups["target"].Value;
-				var msg    = m.Groups["params"].Value;
-
-				if (m.Groups["command"].Value.EqualsIgnoreCase("privmsg"))
+				Match m;
+				if (toks[0].TryMatch(IRC_USERSTR, out m))
 				{
-					MessageReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
-				}
-				else if (m.Groups["command"].Value.EqualsIgnoreCase("notice"))
-				{
-					NoticeReceivedEvent.Raise(this, new MessageReceivedEventArgs(nick, target, msg));
-				}
+					string source = m.Groups["source"].Value;
+					string target = null;
 
-				// TODO: Add support for (S)NOTICE messages.
-				// TODO: Add support for NOTICE AUTH messages.
+					Match n;
+					if (toks[2].TryMatch(IRC_CHANEX, out n))
+					{
+						target = n.Groups["target"].Value;
+					}
+
+					if (target != null)
+					{
+						string message = string.Join(" ", toks.Skip(3));
+						message = message.TrimStart(':');
+
+						if (toks[1].Equals("PRIVMSG"))
+						{
+							MessageReceivedEvent.Raise(this, new MessageReceivedEventArgs(source, target, message));
+						}
+						else if (toks[1].Equals("NOTICE"))
+						{
+							NoticeReceivedEvent.Raise(this, new MessageReceivedEventArgs(source, target, message));
+						}
+
+						// TODO: Add support for NOTICE AUTH messages.
+					}
+				}
+				else
+				{
+					// TODO: Add support for (S)NOTICE messages
+				}
 			}
 		}
 

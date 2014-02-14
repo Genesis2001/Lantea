@@ -55,8 +55,8 @@ namespace Atlantis.Net.Irc
 			RawMessageReceivedEvent += PingHandler;
 			RawMessageReceivedEvent += RfcNumericHandler;
 			RawMessageReceivedEvent += JoinPartHandler;
+			RawMessageReceivedEvent += MessageNoticeHandler;
 
-			ProtocolMessageReceivedEvent += MessageNoticeHandler;
 			ProtocolMessageReceivedEvent += ModeHandler;
 			ProtocolMessageReceivedEvent += NickHandler;
 			ProtocolMessageReceivedEvent += QuitHandler;
