@@ -7,7 +7,9 @@
 namespace Atlantis.Net.Irc
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Linq;
+	using System.Security.Cryptography;
 	using System.Text.RegularExpressions;
 	using System.Threading;
 	using System.Threading.Tasks;
@@ -20,8 +22,9 @@ namespace Atlantis.Net.Irc
 		#region Fields
 
 		internal string accessPrefixes;
+		internal string accessModes;
 		internal string accessRegex;
-		internal string channelModes;
+		internal string[] channelModes;
 
 		private bool registered;
 		private DateTime lastMessage;
@@ -29,7 +32,7 @@ namespace Atlantis.Net.Irc
 		private string rfcStringCase;
 
 		// PRIVMSG|NOTICE|JOIN|PART|QUIT|MODE|NICK|INVITE|KICK
-		private const string IRC_PROTOSTR = @"^:?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>[A-Z]) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$";
+		// private const string IRC_PROTOSTR = @"^:?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>[A-Z]) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$";
 		private const string IRC_USERSTR = @":?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+))";
 		private const string IRC_CHANEX = @":?(?<target>\#?[^\W]+)";
 
@@ -70,15 +73,20 @@ namespace Atlantis.Net.Irc
 				Match m;
 				if (message.TryMatch(@"PREFIX=\((\S+)\)(\S+)", out m))
 				{
+					accessModes    = m.Groups[1].Value;
 					accessPrefixes = m.Groups[2].Value;
 				}
 				else if (message.TryMatch(@"CHANMODES=(\S+)", out m))
 				{
-					channelModes = m.Groups[1].Value;
+					channelModes = m.Groups[1].Value.Split(',');
 				}
 				else if (message.TryMatch(@"CASEMAPPING=([a-z\-])", out m))
 				{
 					rfcStringCase = m.Groups[1].Value;
+				}
+				else if (message.TryMatch(@"MODES=(\d+)", out m))
+				{
+					// maximum modes per set.
 				}
 			}
 		}
@@ -154,7 +162,7 @@ namespace Atlantis.Net.Irc
 						break;
 				}
 
-				if (c.ListModes.Find(x => x.Mask.Equals(mask)) != null)
+				if (c.ListModes.Any(x => x.Mask.Equals(mask)))
 				{
 					return;
 				}
@@ -195,11 +203,10 @@ namespace Atlantis.Net.Irc
 
 		#region IRC Raw Message Handlers
 
-		protected virtual void ProtocalMessageReceivedHandler(object sender, RawMessageEventArgs args)
+		/*protected virtual void ProtocalMessageReceivedHandler(object sender, RawMessageEventArgs args)
 		{
 			var message = args.Message;
 			Match m;
-
 			// Regular Expression Credits
 			// created by Chris J. Hogben (http://cjh.im/)
 			// modified by Zack Loveless (http://zloveless.com)
@@ -209,7 +216,7 @@ namespace Atlantis.Net.Irc
 			{
 				ProtocolMessageReceivedEvent.Raise(this, new ProtocolMessageEventArgs(m, message));
 			}
-		}
+		}*/
 
 		protected virtual void QuitHandler(object sender, RawMessageEventArgs args)
 		{
@@ -317,8 +324,8 @@ namespace Atlantis.Net.Irc
 		{
 			if (string.IsNullOrEmpty(channelName)) throw new ArgumentNullException("channelName");
 
-			var listModes = channelModes.Split(',')[0];
-			foreach (var mode in listModes)
+			var modes = channelModes[0];
+			foreach (char mode in modes)
 			{
 				Send("MODE {0} +{1}", channelName, mode);
 			}
@@ -346,7 +353,9 @@ namespace Atlantis.Net.Irc
 
 					if (target != null)
 					{
-						string message = string.Join(" ", toks.Skip(3)).TrimStart(':');
+						string message = string.Join(" ", toks.Skip(3));
+
+						if (message.StartsWith(":")) message = message.Substring(1);
 
 						if (toks[1].Equals("PRIVMSG"))
 						{
@@ -369,34 +378,106 @@ namespace Atlantis.Net.Irc
 				}
 			}
 		}
-
-		private enum ChannelModeType
-		{
-			LIST,
-			SETUNSET,
-			SET,
-			NOPARAM,
-			ACCESS,
-		}
-
+		
 		protected virtual void ModeHandler(object sender, RawMessageEventArgs args)
 		{
-/*
-if ((m = Patterns.rUserHost.Match(toks[0])).Success && (n = Patterns.rChannelRegex.Match(toks[2])).Success)
-{
-    //Console.WriteLine("debug: {0}", input.Substring(input.IndexOf(toks[3])));
-    if (toks.Length > 4)
-    {
-        // chan-user mode
-        string s1 = input.Substring(input.IndexOf(toks[3])).Substring(toks[3].Length + 1);
-        OnRawChannelMode(n.Groups[1].Value, m.Groups[1].Value, toks[3], s1.Split(' '));
-    }
-    else
-    {
-        // generic channel mode
-        OnRawChannelMode(n.Groups[1].Value, m.Groups[1].Value, toks[3]);
-    }
-} */
+			string[] toks = args.Tokens;
+
+			if (toks[1].Equals("MODE"))
+			{
+				// ^:?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>[A-Z]) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$
+
+				Match m;
+				if (toks[0].TryMatch(IRC_USERSTR, out m))
+				{
+					string source = m.Groups["source"].Value;
+					string target = null;
+
+					Match n;
+					if (toks[2].TryMatch(IRC_CHANEX, out n))
+					{
+						target = n.Groups["target"].Value;
+					}
+
+					if (target != null)
+					{
+						string modes  = toks[3].TrimStart(':');
+						string[] data = toks.Skip(4).ToArray();
+
+						bool set = false;
+						
+						Channel channel = null;
+						if (target.StartsWith("#"))
+						{
+							channel = GetChannel(target);
+						}
+
+						// TODO: Add error checking to parameter list.
+						for (int i = 0; i < modes.Length; ++i)
+						{
+							if (modes[i] == '+') set = true;
+							else if (modes[i] == '-') set = false;
+							else if (channel == null)
+							{
+								Modes.Add(modes[i]);
+							}
+							else if (channelModes[0].Contains(modes[i]))
+							{
+								if (!channel.ListModes.Any(x => x.Mask.Equals(data[i])) && set)
+								{
+									channel.ListModes.Add(new ListMode(modes[i], DateTime.Now, data[i], source));
+								}
+								else if (channel.ListModes.Any(x => x.Mask.Equals(data[i])) && !set)
+								{
+									ListMode tmp = channel.ListModes.SingleOrDefault(x => x.Mask.Equals(data[i]));
+
+									if (tmp != null)
+									{
+										channel.ListModes.Remove(tmp);
+									}
+								}
+							}
+							else if (channelModes[1].Contains(modes[i]))
+							{
+								// mode that always has a parameter
+								if (channel.Modes.Any(x => x.Key.Equals(modes[i]) && x.Value.Equals(data[i])))
+								{
+									channel.Modes.Remove(modes[i]);
+									channel.Modes.Add(modes[i], data[i]);
+								}
+							}
+							else if (channelModes[2].Contains(modes[i]))
+							{
+								// mode that only has a parameter when being set
+							}
+							else if (channelModes[3].Contains(modes[i]))
+							{
+								channel.Modes.Add(modes[i], string.Empty);
+							}
+							else if (accessModes.Contains(modes[i]))
+							{
+								PrefixList list;
+								if (!channel.Users.TryGetValue(source, out list))
+								{
+									list = new PrefixList(this);
+									channel.Users.Add(source, list);
+								}
+
+								int pi      = accessModes.IndexOf(modes[i]);
+								char prefix = accessPrefixes[pi];
+
+								if (set) list.AddPrefix(prefix);
+								else list.RemovePrefix(prefix);
+
+								if (StrictNames)
+								{
+									Send("NAMES {0}", target);
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		protected virtual void NickHandler(object sender, RawMessageEventArgs args)

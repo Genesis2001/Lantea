@@ -51,12 +51,14 @@ namespace Atlantis.Net.Irc
 			FillListsOnJoin         = false;
 			FillListsDelay          = TimeSpan.FromSeconds(30.0).TotalMilliseconds;
 
+
+
 			RawMessageReceivedEvent += RegistrationHandler;
 			RawMessageReceivedEvent += PingHandler;
 			RawMessageReceivedEvent += RfcNumericHandler;
 			RawMessageReceivedEvent += JoinPartHandler;
 			RawMessageReceivedEvent += MessageNoticeHandler;
-			// RawMessageReceivedEvent += ModeHandler;
+			RawMessageReceivedEvent += ModeHandler;
 			RawMessageReceivedEvent += NickHandler;
 			RawMessageReceivedEvent += QuitHandler;
 

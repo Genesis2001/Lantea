@@ -35,7 +35,7 @@ namespace Lantea.Core
 			Client.FillListsOnJoin       = true;
 			Client.FillListsDelay        = 10;
 
-			Client.RawMessageReceivedEvent += OnRawMessageReceivedReceived;
+			// Client.RawMessageReceivedEvent += OnRawMessageReceivedReceived;
 			Client.ChannelJoinEvent        += OnChannelJoin;
 			Client.ChannelPartEvent        += OnChannelPart;
 			Client.MessageReceivedEvent    += OnMessageReceived;
