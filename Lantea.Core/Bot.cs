@@ -7,15 +7,12 @@
 namespace Lantea.Core
 {
 	using System;
-	using System.Collections.Generic;
 	using System.IO;
 	using Atlantis.Net.Irc;
 	using IO;
-	using Modules;
 
 	public class Bot : IDisposable
 	{
-		private IEnumerable<Lazy<IModule, IModuleMeta>> modules;
 		private ISettingsManager settings;
 
 		public string Nick { get; private set; }
@@ -36,13 +33,13 @@ namespace Lantea.Core
 			Client.FillListsDelay        = 10;
 
 			Client.RawMessageReceivedEvent += OnRawMessageReceivedReceived;
-			/*Client.ChannelJoinEvent        += OnChannelJoin;
-			Client.ChannelPartEvent        += OnChannelPart;*/
+			Client.ChannelJoinEvent        += OnChannelJoin;
+			Client.ChannelPartEvent        += OnChannelPart;
 			Client.MessageReceivedEvent    += OnMessageReceived;
-			/*Client.NickChangedEvent        += OnNickChanged;
+			Client.NickChangedEvent        += OnNickChanged;
 			Client.NoticeReceivedEvent     += OnNoticeReceived;
 			Client.PingReceiptEvent        += OnPingReceipt;
-			Client.QuitEvent               += OnQuit;*/
+			Client.QuitEvent               += OnQuit;
 #endif
 		}
 
