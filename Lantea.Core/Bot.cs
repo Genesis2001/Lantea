@@ -35,14 +35,14 @@ namespace Lantea.Core
 			Client.FillListsOnJoin       = true;
 			Client.FillListsDelay        = 10;
 
-			// Client.RawMessageReceivedEvent += OnRawMessageReceivedReceived;
-			Client.ChannelJoinEvent        += OnChannelJoin;
-			Client.ChannelPartEvent        += OnChannelPart;
+			Client.RawMessageReceivedEvent += OnRawMessageReceivedReceived;
+			/*Client.ChannelJoinEvent        += OnChannelJoin;
+			Client.ChannelPartEvent        += OnChannelPart;*/
 			Client.MessageReceivedEvent    += OnMessageReceived;
-			Client.NickChangedEvent        += OnNickChanged;
+			/*Client.NickChangedEvent        += OnNickChanged;
 			Client.NoticeReceivedEvent     += OnNoticeReceived;
 			Client.PingReceiptEvent        += OnPingReceipt;
-			Client.QuitEvent               += OnQuit;
+			Client.QuitEvent               += OnQuit;*/
 #endif
 		}
 
@@ -80,7 +80,7 @@ namespace Lantea.Core
 
 		private void OnMessageReceived(object sender, MessageReceivedEventArgs args)
 		{
-			if (Log != null) Log.DebugFormat("[MSG] Received message from {0} (to: {1}) sent: {2}", args.Source, args.Target, args.Message);
+			//if (Log != null) Log.DebugFormat("[MSG] Received message from {0} (to: {1}) sent: {2}", args.Source, args.Target, args.Message);
 
 			if (args.Message.StartsWith("!perm"))
 			{

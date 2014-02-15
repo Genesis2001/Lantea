@@ -24,6 +24,8 @@ namespace Atlantis.Net.Irc
 		internal string accessRegex;
 		internal string[] channelModes;
 
+		private bool useExtendedNames;
+
 		private bool registered;
 		private DateTime lastMessage;
 		private Timer timeoutTimer;
@@ -74,17 +76,27 @@ namespace Atlantis.Net.Irc
 					accessModes    = m.Groups[1].Value;
 					accessPrefixes = m.Groups[2].Value;
 				}
-				else if (message.TryMatch(@"CHANMODES=(\S+)", out m))
+				
+				if (message.TryMatch(@"CHANMODES=(\S+)", out m))
 				{
 					channelModes = m.Groups[1].Value.Split(',');
 				}
-				else if (message.TryMatch(@"CASEMAPPING=([a-z\-])", out m))
+				
+				if (message.TryMatch(@"CASEMAPPING=([a-z\-])", out m))
 				{
 					rfcStringCase = m.Groups[1].Value;
 				}
-				else if (message.TryMatch(@"MODES=(\d+)", out m))
+				
+				if (message.TryMatch(@"MODES=(\d+)", out m))
 				{
 					// maximum modes per set.
+				}
+				
+				// TODO: Maybe implement UHNAMES handling? For the moment, we just care about NAMESX. :)
+				if (message.Contains("NAMESX"))
+				{
+					Send("PROTOCTL NAMESX");
+					useExtendedNames = true;
 				}
 			}
 		}
@@ -110,18 +122,28 @@ namespace Atlantis.Net.Irc
 				{
 					foreach (Match item in collection)
 					{
-						var prefix = item.Groups["prefix"].Value.Length > 0 ? item.Groups["prefix"].Value[0] : (char)0;
-						var nick   = item.Groups["nick"].Value;
-
-						if (c.Users.ContainsKey(nick))
+						string nick = item.Groups["nick"].Value;
+						PrefixList list;
+						if (!c.Users.TryGetValue(nick, out list))
 						{
-							c.Users[nick].AddPrefix(prefix);
+							list = new PrefixList(this);
+							c.Users.Add(nick, list);
+						}
+
+						if (useExtendedNames)
+						{
+							string prefixes = item.Groups["prefix"].Value;
+							
+							foreach (char prefix in prefixes)
+							{
+								c.Users[nick].AddPrefix(prefix);
+							}
 						}
 						else
 						{
-							var p = new PrefixList(this);
-							p.AddPrefix(prefix);
-							c.Users.Add(nick, p);
+							char prefix = item.Groups["prefix"].Value.Length > 0 ? item.Groups["prefix"].Value[0] : (char)0;
+
+							c.Users[nick].AddPrefix(prefix);
 						}
 					}
 				}
