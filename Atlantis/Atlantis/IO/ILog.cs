@@ -4,7 +4,7 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.Core.IO
+namespace Atlantis.IO
 {
 	using System;
 

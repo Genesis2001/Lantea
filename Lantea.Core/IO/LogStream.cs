@@ -10,6 +10,7 @@ namespace Lantea.Core.IO
 	using System.IO;
 	using System.Linq;
 	using System.Text;
+	using Atlantis.IO;
 
 	public class LogStream<T> : ILog where T : Stream
 	{

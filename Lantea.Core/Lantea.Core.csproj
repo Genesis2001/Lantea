@@ -41,13 +41,14 @@
     </Compile>
     <Compile Include="Bot.cs" />
     <Compile Include="IObservableClass.cs" />
+    <Compile Include="IO\ConfigDocument.cs" />
+    <Compile Include="IO\ConfigReader.cs" />
     <Compile Include="IO\DualLog.cs" />
-    <Compile Include="IO\ILog.cs" />
     <Compile Include="IO\ISettingsManager.cs" />
     <Compile Include="IO\Log.cs" />
     <Compile Include="IO\LogStream.cs" />
-    <Compile Include="IO\LogThreshold.cs" />
     <Compile Include="IO\LogWriter.cs" />
+    <Compile Include="IO\MalformedConfigException.cs" />
     <Compile Include="IO\SettingsManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -55,6 +56,10 @@
     <ProjectReference Include="..\Atlantis\Atlantis.Net.Irc\Atlantis.Net.Irc.csproj">
       <Project>{07410E3A-D2CF-4A81-BA52-864C8D206664}</Project>
       <Name>Atlantis.Net.Irc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Atlantis\Atlantis\Atlantis.csproj">
+      <Project>{3464FCF7-A68E-40CC-A354-32B80E698890}</Project>
+      <Name>Atlantis</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
