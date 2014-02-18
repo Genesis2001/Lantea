@@ -88,10 +88,10 @@ namespace Lantea.Core.IO
 					}
 				}
 				else if (wordOrPhrase.Length > 1 && (state == ConfigurationState.Value || state == ConfigurationState.StringClosed))
-				{
+				{ // not solid logic.
 					if (openKeys.Count > 0)
 					{
-						string key = openKeys.Pop();
+						string key   = openKeys.Pop();
 						string value = wordOrPhrase.ToString();
 
 						bool add = false;
