@@ -17,7 +17,7 @@ namespace Lantea.Core.IO
 
 	public class ConfigReader
 	{
-		private static readonly string[] ValueKeywords = {Boolean.TrueString, Boolean.FalseString};
+		private static readonly string[] ValueKeywords = {Boolean.TrueString, Boolean.FalseString, "true", "false"};
 		private static readonly string[] DirectiveKeywords = {"include"};
 		private static readonly char[] SyntaxChars = {'{', '}', '=', '"'};
 
