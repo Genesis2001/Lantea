@@ -20,7 +20,7 @@ namespace Lantea.Core.IO
 		// ReSharper disable FieldCanBeMadeReadOnly.Local
 		private HashSet<Block> blocks;
 		private Block currentBlock;
-		private StringBuilder lastWord;
+		private StringBuilder wordOrPhrase;
 		private Stack<string> openBlocks;
 		private Stack<string> openKeys;
 		private ConfigurationState state;
@@ -29,7 +29,7 @@ namespace Lantea.Core.IO
 		public ConfigReader()
 		{
 			blocks = new HashSet<Block>();
-			lastWord = new StringBuilder();
+			wordOrPhrase = new StringBuilder();
 			openBlocks = new Stack<string>();
 			openKeys   = new Stack<string>();
 		}
@@ -70,11 +70,10 @@ namespace Lantea.Core.IO
 		private void ProcessLine(string line)
 		{
 			if (String.IsNullOrEmpty(line)) return;
-
-			if (line.StartsWith("#")) return; // ignore commented lines.
-
-			foreach (char c in line)
+			
+			for (int i = 0; i < line.Length; i++)
 			{
+				char c = line[i];
 				if (c == '"')
 				{
 					if (state == ConfigurationState.StringOpen)
@@ -83,10 +82,9 @@ namespace Lantea.Core.IO
 
 						if (openKeys.Count > 0)
 						{
-							// TODO: Determine whether the string has spanned multiple lines which isn't allowed.
 							string key = openKeys.Pop();
-							currentBlock.Add(key, lastWord.ToString());
-							lastWord.Clear();
+							currentBlock.Add(key, wordOrPhrase.ToString());
+							wordOrPhrase.Clear();
 						}
 					}
 					else
@@ -96,20 +94,25 @@ namespace Lantea.Core.IO
 				}
 				else if (state == ConfigurationState.StringOpen || state == ConfigurationState.OpenBracket)
 				{
-					lastWord.Append(c);
+					wordOrPhrase.Append(c);
+
+					if (state == ConfigurationState.StringOpen && i == line.Length - 1)
+					{
+						throw new MalformedConfigException("Multiline strings are not permitted.");
+					}
 				}
 				else if (c == '{')
 				{
 					if (state == ConfigurationState.NewDocument)
 					{
-						if (lastWord.Length == 0)
+						if (wordOrPhrase.Length == 0)
 						{
 							throw new MalformedConfigException("New document does not have a root block name.");
 						}
 
-						currentBlock = new Block(lastWord.ToString());
+						currentBlock = new Block(wordOrPhrase.ToString());
 						blocks.Add(currentBlock);
-						openBlocks.Push(lastWord.ToString());
+						openBlocks.Push(wordOrPhrase.ToString());
 					}
 
 					state = ConfigurationState.OpenBracket;
@@ -123,7 +126,7 @@ namespace Lantea.Core.IO
 				{
 					if (state == ConfigurationState.OpenBracket)
 					{
-						openKeys.Push(lastWord.ToString());
+						openKeys.Push(wordOrPhrase.ToString());
 						state = ConfigurationState.Key;
 					}
 				}
