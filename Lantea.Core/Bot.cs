@@ -8,6 +8,7 @@ namespace Lantea.Core
 {
 	using System;
 	using System.IO;
+	using Atlantis.IO;
 	using Atlantis.Net.Irc;
 	using IO;
 

@@ -115,7 +115,7 @@ namespace Atlantis.Net.Irc
 				MatchCollection collection;
 				if (string.IsNullOrEmpty(accessRegex))
 				{
-					accessRegex = string.Format(@"(?<prefix>[{0}]?)(?<nick>\S+)", accessPrefixes);
+					accessRegex = string.Format(@"(?<prefix>[{0}]*)(?<nick>\S+)", accessPrefixes);
 				}
 
 				if (names.TryMatches(accessRegex, out collection))

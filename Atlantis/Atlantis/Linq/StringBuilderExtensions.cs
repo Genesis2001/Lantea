@@ -18,7 +18,7 @@ namespace Atlantis.Linq
 				throw new ArgumentNullException("source", "The specified StringBuilder is null.");
 			}
 
-			if (condition != null && condition.Invoke(source))
+			if (condition != null && condition.Invoke(item))
 			{
 				return source.Append(item);
 			}
@@ -26,14 +26,14 @@ namespace Atlantis.Linq
 			return source;
 		}
 
-		public static StringBuilder AppendLineIf(this StringBuilder source, string item, Predicate<object> condition)
+		public static StringBuilder AppendLineIf(this StringBuilder source, string item, Predicate<string> condition)
 		{
 			if (source == null)
 			{
 				throw new ArgumentNullException("source", "The specified StringBuilder is null.");
 			}
 
-			if (condition != null && condition.Invoke(source))
+			if (condition != null && condition.Invoke(item))
 			{
 				return source.AppendLine(item);
 			}

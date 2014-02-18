@@ -9,13 +9,17 @@ namespace Lantea.Core.IO
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
+	using System.Globalization;
 	using System.IO;
+	using System.Linq;
 	using System.Text;
 	using Atlantis.Linq;
 
 	public class ConfigReader
 	{
-		private static readonly string[] keywords = {"include", "True", "False", "true", "false"};
+		private static readonly string[] ValueKeywords = {Boolean.TrueString, Boolean.FalseString};
+		private static readonly string[] DirectiveKeywords = {"include"};
+		private static readonly char[] SyntaxChars = {'{', '}', '=', '"'};
 
 		// ReSharper disable FieldCanBeMadeReadOnly.Local
 		private HashSet<Block> blocks;
@@ -31,7 +35,7 @@ namespace Lantea.Core.IO
 			blocks = new HashSet<Block>();
 			wordOrPhrase = new StringBuilder();
 			openBlocks = new Stack<string>();
-			openKeys   = new Stack<string>();
+			openKeys = new Stack<string>();
 		}
 
 		public ConfigDocument Load(string configFile)
@@ -58,7 +62,7 @@ namespace Lantea.Core.IO
 							string.Format("The specified file is properly structured.\n\nBlock \"{0}\" has been left open.", lastBlock));
 					}
 
-					return new ConfigDocument(blocks);
+					throw new NotImplementedException();
 				}
 			}
 			catch (FileNotFoundException)
@@ -70,50 +74,95 @@ namespace Lantea.Core.IO
 		private void ProcessLine(string line)
 		{
 			if (String.IsNullOrEmpty(line)) return;
-			
+
 			for (int i = 0; i < line.Length; i++)
 			{
 				char c = line[i];
-				if (c == '"')
+				if (!SyntaxChars.Contains(c))
 				{
+					wordOrPhrase.Append(c); // If the current character isn't part of the syntax/structure, append it.
+
+					if (state == ConfigurationState.StringOpen && (i == (line.Length - 1)))
+					{
+						throw new MalformedConfigException("Multiline strings are not permitted.");
+					}
+				}
+				else if (wordOrPhrase.Length > 1 && (state == ConfigurationState.Value || state == ConfigurationState.StringClosed))
+				{
+					if (openKeys.Count > 0)
+					{
+						string key = openKeys.Pop();
+						string value = wordOrPhrase.ToString();
+
+						bool add = false;
+						int iVal;
+						if (Int32.TryParse(value, out iVal))
+						{
+							currentBlock.Add(key, iVal);
+							add = true;
+						}
+						else if (ValueKeywords.Contains(value) || state == ConfigurationState.StringClosed)
+						{
+							if (ValueKeywords.Contains(value))
+							{
+								string sbVal = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value);
+								bool bVal;
+								if (Boolean.TryParse(sbVal, out bVal))
+								{
+									currentBlock.Add(key, bVal);
+									add = true;
+								}
+							}
+						}
+
+						if (!add)
+						{
+							currentBlock.Add(key, value);
+						}
+					}
+					else
+					{
+						throw new MalformedConfigException("Value detected without an associated key.");
+					}
+				}
+				else if (c == '"')
+				{
+					if (state != ConfigurationState.Value)
+					{
+						throw new MalformedConfigException("Quoted strings are not permitted as keys or block names.");
+					}
+
 					if (state == ConfigurationState.StringOpen)
 					{
-						state = ConfigurationState.StringClosed;
-
-						if (openKeys.Count > 0)
+						/*if (openKeys.Count > 0)
 						{
-							string key = openKeys.Pop();
-							currentBlock.Add(key, wordOrPhrase.ToString());
+							string key   = openKeys.Pop();
+							string value = wordOrPhrase.ToString();
+
+							currentBlock.Add(key, value);
 							wordOrPhrase.Clear();
-						}
+						}*/
+
+						state = ConfigurationState.StringClosed;
 					}
 					else
 					{
 						state = ConfigurationState.StringOpen;
 					}
 				}
-				else if (state == ConfigurationState.StringOpen || state == ConfigurationState.OpenBracket)
-				{
-					wordOrPhrase.Append(c);
-
-					if (state == ConfigurationState.StringOpen && i == line.Length - 1)
-					{
-						throw new MalformedConfigException("Multiline strings are not permitted.");
-					}
-				}
 				else if (c == '{')
 				{
-					if (state == ConfigurationState.NewDocument)
+					if (state == ConfigurationState.NewDocument && wordOrPhrase.Length == 0)
 					{
-						if (wordOrPhrase.Length == 0)
-						{
-							throw new MalformedConfigException("New document does not have a root block name.");
-						}
-
-						currentBlock = new Block(wordOrPhrase.ToString());
-						blocks.Add(currentBlock);
-						openBlocks.Push(wordOrPhrase.ToString());
+						throw new MalformedConfigException("New document does not have a root block name.");
 					}
+
+					string blockName = wordOrPhrase.ToString();
+
+					currentBlock = new Block(blockName);
+					blocks.Add(currentBlock);
+
+					openBlocks.Push(blockName);
 
 					state = ConfigurationState.OpenBracket;
 				}
@@ -127,7 +176,7 @@ namespace Lantea.Core.IO
 					if (state == ConfigurationState.OpenBracket)
 					{
 						openKeys.Push(wordOrPhrase.ToString());
-						state = ConfigurationState.Key;
+						state = ConfigurationState.Value;
 					}
 				}
 			}
@@ -140,7 +189,6 @@ namespace Lantea.Core.IO
 			NewDocument,
 			OpenBracket,
 			CloseBracket,
-			Key,
 			StringOpen,
 			StringClosed,
 			Value,
@@ -156,8 +204,8 @@ namespace Lantea.Core.IO
 
 			internal Block(string name)
 			{
-				dict     = new Dictionary<string, object>();
-				Name     = name;
+				dict = new Dictionary<string, object>();
+				Name = name;
 				Children = new HashSet<Block>();
 			}
 

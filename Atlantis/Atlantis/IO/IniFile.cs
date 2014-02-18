@@ -51,6 +51,8 @@ namespace Atlantis.IO
 
 					}
 				}
+
+				throw new NotImplementedException();
 			}
 		}
 
