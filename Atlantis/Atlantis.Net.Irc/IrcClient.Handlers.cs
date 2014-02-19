@@ -89,7 +89,7 @@ namespace Atlantis.Net.Irc
 				
 				if (message.TryMatch(@"MODES=(\d+)", out m))
 				{
-					// maximum modes per set.
+					// maximum modes per set request.
 				}
 				
 				// TODO: Maybe implement UHNAMES handling? For the moment, we just care about NAMESX. :)
@@ -333,7 +333,19 @@ namespace Atlantis.Net.Irc
 
 						if (StrictNames)
 						{
-							Send("NAMES {0}", target);
+							if (RequestInterval > 0)
+							{
+								Task.Factory.StartNew(() =>
+								                      {
+									                      Task.Delay((int)RequestInterval, token).Wait(token);
+
+									                      Send("NAMES {0}", target);
+								                      }, token);
+							}
+							else
+							{
+								Send("NAMES {0}", target);
+							}
 						}
 					}
 				}

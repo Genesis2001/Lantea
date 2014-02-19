@@ -50,6 +50,7 @@ namespace Atlantis.Net.Irc
 
 			FillListsOnJoin         = false;
 			FillListsDelay          = TimeSpan.FromSeconds(30.0).TotalMilliseconds;
+			RequestInterval         = TimeSpan.FromSeconds(3.0).TotalMilliseconds;
 
 
 
@@ -102,6 +103,10 @@ namespace Atlantis.Net.Irc
 		/// Gets or sets a value representing what type of encoding to use for encoding messages sent to the Host.
 		/// </summary>
 		public IrcEncoding Encoding { get; set; }
+
+		public bool FillListsOnJoin { get; set; }
+
+		public double FillListsDelay { get; set; }
 
 		/// <summary>
 		/// Gets or sets a <see cref="T:System.String" /> value representing the name of the Host in which the <see cref="T:IrcClient" /> will be connecting.
@@ -165,6 +170,8 @@ namespace Atlantis.Net.Irc
 		/// </summary>
 		public string RealName { get; set; }
 
+		public double RequestInterval { get; set; }
+
 		/// <summary>
 		/// Gets or sets a <see cref="T:System.Boolean" /> value indicating whether to retry connecting to the IRC server.
 		/// </summary>
@@ -189,11 +196,7 @@ namespace Atlantis.Net.Irc
 		/// Gets or sets a value representing the timeout interval for messages being received.
 		/// </summary>
 		public TimeSpan Timeout { get; set; }
-
-		public bool FillListsOnJoin { get; set; }
-
-		public double FillListsDelay { get; set; }
-
+		
 		#endregion
 
 		#region Events

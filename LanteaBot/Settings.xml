@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
 <Settings>
-	<Connection Host="irc.unifiedtech.org" Port="6667"
+	<Connection Host="irc.cncfps.com" Port="6667"
 							Nick="Lantea" RealName="Lantea IRC Bot"
 							Retry="60" RetryCount="10">
 		<Options>

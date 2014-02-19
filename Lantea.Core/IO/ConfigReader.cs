@@ -42,16 +42,24 @@ namespace Lantea.Core.IO
 		{
 			try
 			{
-				using (FileStream stream = new FileStream(configFile, FileMode.Open, FileAccess.Read))
+				return Load(new FileStream(configFile, FileMode.Open, FileAccess.Read));
+			}
+			catch (FileNotFoundException)
+			{
+				return null;
+			}
+		}
+
+		public ConfigDocument Load(Stream stream)
+		{
+			using (stream)
+				using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
 				{
 					state = ConfigurationState.NewDocument;
 
-					using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+					while (!reader.EndOfStream)
 					{
-						while (!reader.EndOfStream)
-						{
-							ProcessLine(reader.ReadLine().TrimIfNotNull());
-						}
+						ProcessLine(reader.ReadLine().TrimIfNotNull());
 					}
 
 					if (openBlocks.Count > 0)
@@ -61,14 +69,9 @@ namespace Lantea.Core.IO
 						throw new MalformedConfigException(
 							string.Format("The specified file is properly structured.\n\nBlock \"{0}\" has been left open.", lastBlock));
 					}
-
-					throw new NotImplementedException();
 				}
-			}
-			catch (FileNotFoundException)
-			{
-				return null;
-			}
+
+			return null;
 		}
 
 		private void ProcessLine(string line)

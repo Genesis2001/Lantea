@@ -6,7 +6,9 @@
 
 namespace Lantea.UnitTests.Fixtures
 {
+	using System.IO;
 	using Core.IO;
+	using Helpers;
 	using NUnit.Framework;
 
 	[TestFixture]
@@ -20,6 +22,15 @@ namespace Lantea.UnitTests.Fixtures
 			SUT = new ConfigReader();
 		}
 
+		[Test]
+		public void Load_BasicFileWithBasicTypes()
+		{
+			string data = ConfigReaderStrings.BasicBlock;
+			Stream stream = data.AsReadOnlyStream();
 
+			ConfigDocument doc = SUT.Load(stream);
+
+			Assert.That(doc, Is.Not.Null);
+		}
 	}
 }
