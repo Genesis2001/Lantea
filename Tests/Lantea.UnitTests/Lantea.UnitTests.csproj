@@ -38,6 +38,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Fixtures\ConfigReaderFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -48,9 +49,12 @@
       <Project>{FFDA6CBD-B19C-40F2-9204-3D2B015A8FB9}</Project>
       <Name>Lantea.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Lantea.Core\Lantea.Core.csproj">
+      <Project>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</Project>
+      <Name>Lantea.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Fixtures\" />
     <Folder Include="Helpers\" />
     <Folder Include="Mocks\" />
   </ItemGroup>
