@@ -87,8 +87,8 @@ namespace Lantea.Core.IO
 						throw new MalformedConfigException("Multiline strings are not permitted.");
 					}
 				}
-				else if (wordOrPhrase.Length > 1 && (state == ConfigurationState.Value || state == ConfigurationState.StringClosed))
-				{ // not solid logic.
+				else if (i == (line.Length - 1) && (state == ConfigurationState.Value || state == ConfigurationState.StringClosed))
+				{
 					if (openKeys.Count > 0)
 					{
 						string key   = openKeys.Pop();
