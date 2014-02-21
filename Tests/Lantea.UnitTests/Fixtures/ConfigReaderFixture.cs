@@ -25,8 +25,7 @@ namespace Lantea.UnitTests.Fixtures
 		[Test]
 		public void Load_BasicFileWithBasicTypes()
 		{
-			string data = ConfigReaderStrings.BasicBlock;
-			Stream stream = data.AsReadOnlyStream();
+			Stream stream = ConfigReaderStrings.BasicBlock.AsReadOnlyStream();
 
 			ConfigDocument doc = SUT.Load(stream);
 
