@@ -116,7 +116,7 @@ namespace Lantea.Core.IO
 					{
 						state = ConfigState.StringClosed;
 
-
+						// ...
 					}
 					else
 					{
@@ -254,14 +254,12 @@ namespace Lantea.Core.IO
 
 		public string Name { get; private set; }
 
-		public T Get<T>(string tag, T def = null) where T : class
+		public T Get<T>(string property, T def = default(T)) where T : class
 		{
-
-
 			throw new NotImplementedException();
 		}
 
-		public void Set<T>(string tag, T value) where T : class 
+		public void Set<T>(string property, T value) where T : class 
 		{
 			// 
 		}
