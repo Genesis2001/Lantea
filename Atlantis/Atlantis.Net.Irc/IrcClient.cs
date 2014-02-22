@@ -198,7 +198,12 @@ namespace Atlantis.Net.Irc
 
 		#region Events
 
+		/// <summary>
+		/// Raised when the <see cref="T:IrcClient" /> establishes a connection to the server.
+		/// It is strongly recommended that you delay any commands processed here if you disable EnableFakeLag.
+		/// </summary>
 		public event EventHandler ConnectionEstablishedEvent;
+
 		public event EventHandler<JoinPartEventArgs> ChannelJoinEvent;
 		public event EventHandler<JoinPartEventArgs> ChannelPartEvent;
 		public event EventHandler<MessageReceivedEventArgs> MessageReceivedEvent;
