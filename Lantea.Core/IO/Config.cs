@@ -218,7 +218,7 @@ namespace Lantea.Core.IO
 					{
 						if (blocks.Count == 0)
 						{
-							throw new MalformedConfigException(string.Format("Unexpected '}': {0}:{1}", fileName, lineNumber));
+							throw new MalformedConfigException(string.Format("Unexpected '}}': {0}:{1}", fileName, lineNumber));
 						}
 						
 						blocks.Pop();
@@ -228,6 +228,7 @@ namespace Lantea.Core.IO
 			}
 		}
 	}
+
 	internal enum ConfigState
 	{
 		None = 0,
