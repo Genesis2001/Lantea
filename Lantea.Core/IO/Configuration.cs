@@ -179,9 +179,9 @@ namespace Lantea.Core.IO
 					}
 					string item = buffer.ToString();
 
-					Block b = new Block(item);
+					Block b = blockStack.Count == 0 ? this : blockStack.Peek();
 					b.lineNumber = lineNumber;
-
+					b.blocks.Add(item, new Block(item));
 
 					blockStack.Push(b);
 					buffer.Clear();
@@ -189,7 +189,7 @@ namespace Lantea.Core.IO
 				}
 				else if (c == ';' || c == '}')
 				{
-					// 
+					// terminate word.
 				}
 				else
 				{
@@ -218,12 +218,17 @@ namespace Lantea.Core.IO
 							throw new MalformedConfigException(string.Format("Stray ';' outside of block: {0}:{1}", fileName, lineNumber));
 						}
 
-						Block block = blockStack.Pop();
+						Block b = blockStack.Peek();
 
-						if (block == null)
+						if (b != null)
 						{
-							
+							string key = keyStack.Pop();
+							string value = buffer.ToString();
+
+							b.items[key] = value;
 						}
+
+						buffer.Clear();
 					}
 
 					if (c == '}')
@@ -264,9 +269,8 @@ namespace Lantea.Core.IO
 		 */
 
 		internal int lineNumber;
-
-		protected readonly Dictionary<string, string> items;
-		protected readonly DictionaryList<string, Block> blocks;
+		internal readonly Dictionary<string, string> items;
+		internal readonly DictionaryList<string, Block> blocks;
 
 		internal Block(string name)
 		{
