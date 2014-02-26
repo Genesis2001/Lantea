@@ -10,7 +10,6 @@ namespace Atlantis.Collections
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.Linq;
-	using System.Security.Policy;
 
 	public class DictionaryList<TKey, TValue> : IDictionary<TKey, ICollection<TValue>>
 	{
