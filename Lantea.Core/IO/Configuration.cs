@@ -10,33 +10,27 @@ namespace Lantea.Core.IO
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Text;
+	using System.Linq;
 	using Atlantis.Collections;
 	using Atlantis.Linq;
 
 	public class Configuration : Block
 	{
-		/*
-		private static readonly string[] ValueKeywords = { Boolean.TrueString, Boolean.FalseString, "true", "false" };
-		private static readonly string[] DirectiveKeywords = { "include" };
-		private static readonly char[] SyntaxChars = { '{', '}', '=', '"' };
-		 */
-
-		private readonly Stack<Block> blocks;
+		private readonly Stack<Block> blockStack;
 		private readonly StringBuilder buffer;
 		private string fileName;
-		private readonly Stack<string> keys;
+		private readonly Stack<string> keyStack;
 		private ConfigState state;
 
 		public Configuration() : base("")
 		{
-			buffer = new StringBuilder();
-			blocks = new Stack<Block>();
-			keys   = new Stack<string>();
+			buffer     = new StringBuilder();
+			blockStack = new Stack<Block>();
+			keyStack   = new Stack<string>();
 		}
 
 		public Block GetModule(string name)
 		{
-
 			throw new NotImplementedException();
 		}
 
@@ -51,7 +45,7 @@ namespace Lantea.Core.IO
 		{
 			if (string.IsNullOrEmpty(fileName))
 			{
-				fileName = "(null)";
+				fileName = "(memory)";
 			}
 
 			using (stream)
@@ -78,7 +72,7 @@ namespace Lantea.Core.IO
 				throw new MalformedConfigException(string.Format("Untermniated string value at end of file: {0}", fileName));
 			}
 
-			if (buffer.Length > 0 || keys.Count > 0)
+			if (buffer.Length > 0 || keyStack.Count > 0)
 			{
 				throw new MalformedConfigException(string.Format("Unexpected junk at the end of file: {0}", fileName));
 			}
@@ -86,9 +80,9 @@ namespace Lantea.Core.IO
 			if (blocks.Count > 0)
 			{
 				throw new MalformedConfigException(string.Format("Unterminated block '{0}' at end of file. {1}:{2}",
-					blocks.Peek().Name,
+					blockStack.Peek().Name,
 					fileName,
-					blocks.Peek().lineNumber));
+					blockStack.Peek().lineNumber));
 			}
 		}
 
@@ -120,11 +114,6 @@ namespace Lantea.Core.IO
 					else if (c == '"')
 					{
 						state = ConfigState.StringClosed;
-
-						string key = keys.Pop();
-						string value = buffer.ToString();
-
-						buffer.Clear();
 					}
 					else
 					{
@@ -151,10 +140,9 @@ namespace Lantea.Core.IO
 					++i;
 					continue;
 				}
-				// 
 				else if (c == '"')
 				{
-					if (blocks.Count == 0 || keys.Peek() == null)
+					if (blockStack.Count == 0 || keyStack.Peek() == null)
 					{
 						throw new MalformedConfigException(string.Format("Unexpected quote string: {0}:{1}", fileName, lineNumber));
 					}
@@ -163,13 +151,13 @@ namespace Lantea.Core.IO
 				}
 				else if (c == '=')
 				{
-					if (blocks.Count == 0)
+					if (blockStack.Count == 0)
 					{
 						throw new MalformedConfigException(string.Format("Unexpected config item outside of section: {0}:{1}", fileName, lineNumber));
 					}
 
 					string item = buffer.ToString().Trim();
-					keys.Push(item);
+					keyStack.Push(item);
 					
 					buffer.Clear();
 				}
@@ -178,21 +166,24 @@ namespace Lantea.Core.IO
 					if (buffer.Length == 0)
 					{
 						// commented or unnamed section.
-						blocks.Push(null);
+
+						// blocks.push(null);
 						continue;
 					}
 
-					if (blocks.Count > 0 && blocks.Peek() != null)
+					if (blockStack.Count > 0 && blockStack.Peek() != null)
 					{
 						buffer.Clear();
-						blocks.Push(null);
+						blockStack.Push(null);
 						continue;
 					}
+					string item = buffer.ToString();
 
-					Block b = new Block(buffer.ToString());
+					Block b = new Block(item);
 					b.lineNumber = lineNumber;
 
-					blocks.Push(b);
+
+					blockStack.Push(b);
 					buffer.Clear();
 					continue;
 				}
@@ -220,56 +211,108 @@ namespace Lantea.Core.IO
 						buffer.Append(c);
 					}
 
-					// if itemname.empty()
+					if (keyStack.Count > 0 && keyStack.Peek() != null)
+					{
+						if (blockStack.Count == 0)
+						{
+							throw new MalformedConfigException(string.Format("Stray ';' outside of block: {0}:{1}", fileName, lineNumber));
+						}
+
+						Block block = blockStack.Pop();
+
+						if (block == null)
+						{
+							
+						}
+					}
 
 					if (c == '}')
 					{
-						if (blocks.Count == 0)
+						if (blockStack.Count == 0)
 						{
 							throw new MalformedConfigException(string.Format("Unexpected '}}': {0}:{1}", fileName, lineNumber));
 						}
-						
-						blocks.Pop();
+
+						blockStack.Pop();
 						state = ConfigState.BlockClosed;
 					}
 				}
 			}
 		}
-	}
 
-	internal enum ConfigState
-	{
-		None = 0,
-		BlockOpen,
-		BlockClosed,
-		StringOpen,
-		StringClosed,
-		CommentOpen,
-		CommentClosed,
-		CommentSingle,
+		private enum ConfigState
+		{
+			None = 0,
+			BlockOpen,
+			BlockClosed,
+			StringOpen,
+			StringClosed,
+			CommentOpen,
+			CommentClosed,
+		}
 	}
-
+	
 	public class Block
 	{
-		protected int lineNumber;
-		protected readonly DictionaryList<string, object> data;
+		/* 
+		 * template<typename T> class map : public std::map<string, T, ci::less> { };				// Dictionary<String, T>
+		 * template<typename T> class multimap : public std::multimap<string, T, ci::less> { };		// Dictionary<String, List<T>>
+		 * 
+		 * 
+		 * item_map items;
+		 * block_map blocks;
+		 */
 
-		protected Block(string name)
+		internal int lineNumber;
+
+		protected readonly Dictionary<string, string> items;
+		protected readonly DictionaryList<string, Block> blocks;
+
+		internal Block(string name)
 		{
-			Name = name;
-			data = new DictionaryList<string, object>();
+			Name   = name;
+			items  = new Dictionary<string, string>();
+			blocks = new DictionaryList<string, Block>();
 		}
 
 		public string Name { get; private set; }
 
-		public T Get<T>(string property, T def = default(T)) where T : class
+		public int CountBlock(string blockName)
 		{
+			return blocks.Count(x => x.Key.Equals(blockName));
+		}
+
+		public T Get<T>(string property, T def) where T : class
+		{
+			if (items.ContainsKey(property))
+			{
+				string value = items[property];
+
+				return (T)Convert.ChangeType(value, typeof (T));
+			}
+
+			return def;
+		}
+
+		public Block GetBlock(string blockName, int num)
+		{
+
+
 			throw new NotImplementedException();
 		}
 
-		public void Set<T>(string property, T value) where T : class 
+		public void Set<T>(string property, T value) where T : class
 		{
-			// 
+			string data = Convert.ToString(value);
+
+			if (items.ContainsKey(property))
+			{
+				items[property] = data;
+			}
+			else
+			{
+				items.Add(property, data);
+			}
 		}
 
 		#region Overrides of Object

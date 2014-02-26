@@ -10,14 +10,15 @@ namespace Atlantis.Collections
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.Linq;
+	using System.Security.Policy;
 
-	public class DictionaryList<TKey, TValue> : IDictionary<TKey, HashSet<TValue>>
+	public class DictionaryList<TKey, TValue> : IDictionary<TKey, ICollection<TValue>>
 	{
-		private readonly Dictionary<TKey, HashSet<TValue>> dict;
+		private readonly Dictionary<TKey, ICollection<TValue>> dict;
 
 		public DictionaryList()
 		{
-			dict = new Dictionary<TKey, HashSet<TValue>>();
+			dict = new Dictionary<TKey, ICollection<TValue>>();
 		}
 
 		#region Implementation of IEnumerable
@@ -28,7 +29,7 @@ namespace Atlantis.Collections
 		/// <returns>
 		///     A <see cref="T:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.
 		/// </returns>
-		public IEnumerator<KeyValuePair<TKey, HashSet<TValue>>> GetEnumerator()
+		public IEnumerator<KeyValuePair<TKey, ICollection<TValue>>> GetEnumerator()
 		{
 			return dict.GetEnumerator();
 		}
@@ -56,7 +57,7 @@ namespace Atlantis.Collections
 		///     The <see cref="T:System.Collections.Generic.ICollection`1" /> is
 		///     read-only.
 		/// </exception>
-		void ICollection<KeyValuePair<TKey, HashSet<TValue>>>.Add(KeyValuePair<TKey, HashSet<TValue>> item)
+		void ICollection<KeyValuePair<TKey, ICollection<TValue>>>.Add(KeyValuePair<TKey, ICollection<TValue>> item)
 		{
 			item.Value.ToList().ForEach(x => Add(item.Key, x));
 		}
@@ -81,7 +82,7 @@ namespace Atlantis.Collections
 		///     otherwise, false.
 		/// </returns>
 		/// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-		bool ICollection<KeyValuePair<TKey, HashSet<TValue>>>.Contains(KeyValuePair<TKey, HashSet<TValue>> item)
+		bool ICollection<KeyValuePair<TKey, ICollection<TValue>>>.Contains(KeyValuePair<TKey, ICollection<TValue>> item)
 		{
 			throw new NotImplementedException();
 		}
@@ -103,7 +104,7 @@ namespace Atlantis.Collections
 		///     <see cref="T:System.Collections.Generic.ICollection`1" /> is greater than the available space from
 		///     <paramref name="arrayIndex" /> to the end of the destination <paramref name="array" />.
 		/// </exception>
-		void ICollection<KeyValuePair<TKey, HashSet<TValue>>>.CopyTo(KeyValuePair<TKey, HashSet<TValue>>[] array, int arrayIndex)
+		void ICollection<KeyValuePair<TKey, ICollection<TValue>>>.CopyTo(KeyValuePair<TKey, ICollection<TValue>>[] array, int arrayIndex)
 		{
 			throw new NotImplementedException();
 		}
@@ -122,15 +123,15 @@ namespace Atlantis.Collections
 		///     The <see cref="T:System.Collections.Generic.ICollection`1" /> is
 		///     read-only.
 		/// </exception>
-		bool ICollection<KeyValuePair<TKey, HashSet<TValue>>>.Remove(KeyValuePair<TKey, HashSet<TValue>> item)
+		bool ICollection<KeyValuePair<TKey, ICollection<TValue>>>.Remove(KeyValuePair<TKey, ICollection<TValue>> item)
 		{
-			HashSet<TValue> values;
+			ICollection<TValue> values;
 			if (!dict.TryGetValue(item.Key, out values))
 			{
 				return false;
 			}
 
-			values.RemoveWhere(x => item.Value.Contains(x));
+			((HashSet<TValue>)values).RemoveWhere(x => item.Value.Contains(x));
 			return true;
 		}
 
@@ -189,9 +190,9 @@ namespace Atlantis.Collections
 		///     The <see cref="T:System.Collections.Generic.IDictionary`2" /> is
 		///     read-only.
 		/// </exception>
-		public void Add(TKey key, HashSet<TValue> value)
+		public void Add(TKey key, ICollection<TValue> value)
 		{
-			HashSet<TValue> values;
+			ICollection<TValue> values;
 			if (!dict.TryGetValue(key, out values))
 			{
 				values = new HashSet<TValue>();
@@ -203,7 +204,7 @@ namespace Atlantis.Collections
 
 		public void Add(TKey key, TValue value)
 		{
-			HashSet<TValue> values;
+			ICollection<TValue> values;
 			if (!dict.TryGetValue(key, out values))
 			{
 				values = new HashSet<TValue>();
@@ -248,7 +249,7 @@ namespace Atlantis.Collections
 		///     uninitialized.
 		/// </param>
 		/// <exception cref="T:System.ArgumentNullException"><paramref name="key" /> is null.</exception>
-		public bool TryGetValue(TKey key, out HashSet<TValue> value)
+		public bool TryGetValue(TKey key, out ICollection<TValue> value)
 		{
 			return dict.TryGetValue(key, out value);
 		}
@@ -269,7 +270,7 @@ namespace Atlantis.Collections
 		///     The property is set and the
 		///     <see cref="T:System.Collections.Generic.IDictionary`2" /> is read-only.
 		/// </exception>
-		public HashSet<TValue> this[TKey key]
+		public ICollection<TValue> this[TKey key]
 		{
 			get { throw new NotImplementedException(); }
 			set { throw new NotImplementedException(); }
@@ -296,7 +297,7 @@ namespace Atlantis.Collections
 		///     An <see cref="T:System.Collections.Generic.ICollection`1" /> containing the values in the object that implements
 		///     <see cref="T:System.Collections.Generic.IDictionary`2" />.
 		/// </returns>
-		public ICollection<HashSet<TValue>> Values
+		public ICollection<ICollection<TValue>> Values
 		{
 			get { return dict.Values; }
 		}
