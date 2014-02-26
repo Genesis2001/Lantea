@@ -144,14 +144,14 @@ namespace Lantea.Core.IO
 				{
 					if (blockStack.Count == 0 || keyStack.Peek() == null)
 					{
-						throw new MalformedConfigException(string.Format("Unexpected quote string: {0}:{1}", fileName, lineNumber));
+						throw new MalformedConfigException("Unexpected quote string", fileName, lineNumber);
 					}
 
 					state = ConfigState.StringOpen;
 				}
 				else if (c == '=')
 				{
-					if (blockStack.Count == 0)
+					if (blockStack.Count == 0/* && state != ConfigState.BlockOpen*/)
 					{
 						throw new MalformedConfigException(string.Format("Unexpected config item outside of section: {0}:{1}", fileName, lineNumber));
 					}
@@ -167,7 +167,7 @@ namespace Lantea.Core.IO
 					{
 						// commented or unnamed section.
 
-						// blocks.push(null);
+						blockStack.Push(null);
 						continue;
 					}
 
@@ -300,7 +300,15 @@ namespace Lantea.Core.IO
 
 		public Block GetBlock(string blockName, int num)
 		{
+			List<String> list = blocks.Where(x => x.Key.Equals(blockName)).Select(x => x.Key).ToList();
 
+			for (int i = 0; i < list.Count; ++i)
+			{
+				if (i == num)
+				{
+					
+				}
+			}
 
 			throw new NotImplementedException();
 		}

@@ -14,6 +14,11 @@ namespace Lantea.Core.IO
 		{
 		}
 
+		public MalformedConfigException(string message, string fileName, int lineNumber)
+			: base(string.Format("{0}: {1}:{2}", message, fileName, lineNumber))
+		{
+		}
+
 		public MalformedConfigException(string message, Exception innerException) : base(message, innerException)
 		{
 		}
