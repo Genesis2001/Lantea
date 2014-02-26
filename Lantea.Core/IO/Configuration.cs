@@ -13,7 +13,7 @@ namespace Lantea.Core.IO
 	using Atlantis.Collections;
 	using Atlantis.Linq;
 
-	public class Config
+	public class Configuration : Block
 	{
 		/*
 		private static readonly string[] ValueKeywords = { Boolean.TrueString, Boolean.FalseString, "true", "false" };
@@ -25,14 +25,19 @@ namespace Lantea.Core.IO
 		private readonly StringBuilder buffer;
 		private string fileName;
 		private readonly Stack<string> keys;
-		private int lineNumber;
 		private ConfigState state;
 
-		public Config()
+		public Configuration() : base("")
 		{
 			buffer = new StringBuilder();
 			blocks = new Stack<Block>();
 			keys   = new Stack<string>();
+		}
+
+		public Block GetModule(string name)
+		{
+
+			throw new NotImplementedException();
 		}
 
 		public void Load(string path)
@@ -116,7 +121,10 @@ namespace Lantea.Core.IO
 					{
 						state = ConfigState.StringClosed;
 
-						// ...
+						string key = keys.Pop();
+						string value = buffer.ToString();
+
+						buffer.Clear();
 					}
 					else
 					{
@@ -241,12 +249,12 @@ namespace Lantea.Core.IO
 		CommentSingle,
 	}
 
-	internal class Block
+	public class Block
 	{
-		internal int lineNumber;
-		private readonly DictionaryList<string, object> data;
+		protected int lineNumber;
+		protected readonly DictionaryList<string, object> data;
 
-		public Block(string name)
+		protected Block(string name)
 		{
 			Name = name;
 			data = new DictionaryList<string, object>();

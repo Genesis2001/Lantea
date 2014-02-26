@@ -7,7 +7,6 @@
 namespace LanteaBot
 {
 	using System;
-	using Lantea.Core;
 	using Lantea.Core.IO;
 
 	public class Program
@@ -17,9 +16,9 @@ namespace LanteaBot
 			Console.Title = "Lantea Bot";
 			Console.SetWindowSize(125, 30);
 
-			Config config = new Config();
+			Configuration configuration = new Configuration();
 
-			config.Load("example.conf.txt");
+			configuration.Load("example.conf.txt");
 
 			/*using (var bot = new Bot())
 			{

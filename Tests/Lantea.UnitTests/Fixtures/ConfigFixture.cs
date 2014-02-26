@@ -15,12 +15,12 @@ namespace Lantea.UnitTests.Fixtures
 	[TestFixture]
 	public class ConfigFixture
 	{
-		private Config SUT;
+		private Configuration SUT;
 
 		[SetUp]
 		public void Setup()
 		{
-			SUT = new Config();
+			SUT = new Configuration();
 		}
 
 		[Test]
