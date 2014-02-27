@@ -10,7 +10,6 @@ namespace Lantea.Core.IO
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Text;
-	using System.Xml;
 	using Atlantis.Linq;
 
 	public class Configuration : Block
@@ -20,6 +19,7 @@ namespace Lantea.Core.IO
 		private string fileName;
 		private string itemname;
 		private ConfigState state;
+		private int currentLine;
 
 		public Configuration() : base("")
 		{
@@ -54,7 +54,7 @@ namespace Lantea.Core.IO
 				{
 					while (!reader.EndOfStream)
 					{
-						lineNumber++;
+						currentLine++;
 
 						string line = reader.ReadLine().TrimIfNotNull();
 						ProcessLine(line);
@@ -127,8 +127,10 @@ namespace Lantea.Core.IO
 						state = ConfigState.CommentClosed;
 						++i;
 					}
-
-					continue;
+					else
+					{
+						continue;
+					}
 				}
 				else if (c == '#' || (c == '/' && i + 1 < len && line[i + 1] == '/'))
 				{
@@ -144,7 +146,7 @@ namespace Lantea.Core.IO
 				{
 					if (blockStack.Count == 0 || itemname == null)
 					{
-						throw new MalformedConfigException("Unexpected quote string", fileName, lineNumber);
+						throw new MalformedConfigException("Unexpected quote string", fileName, currentLine);
 					}
 
 					state = ConfigState.StringOpen;
@@ -153,11 +155,15 @@ namespace Lantea.Core.IO
 				{
 					if (blockStack.Count == 0/* && state != ConfigState.BlockOpen*/)
 					{
-						throw new MalformedConfigException(string.Format("Unexpected config item outside of section: {0}:{1}", fileName, lineNumber));
+						throw new MalformedConfigException(string.Format("Unexpected config item outside of section: {0}:{1}", fileName, currentLine));
+					}
+
+					if (!String.IsNullOrEmpty(itemname) || buffer.Length == 0)
+					{
+						throw new MalformedConfigException("Stray '=' or item without value", fileName, currentLine);
 					}
 
 					itemname = buffer.ToString().Trim();
-					
 					buffer.Clear();
 				}
 				else if (c == '{')
@@ -171,6 +177,7 @@ namespace Lantea.Core.IO
 
 					if (blockStack.Count > 0 && blockStack.Peek() != null)
 					{
+						// named block inside of comment block.
 						buffer.Clear();
 						blockStack.Push(null);
 						continue;
@@ -183,7 +190,7 @@ namespace Lantea.Core.IO
 					b.blocks.Add(block);
 
 					b = block.Value;
-					b.lineNumber = lineNumber;
+					b.lineNumber = currentLine;
 
 					blockStack.Push(b);
 					buffer.Clear();
@@ -195,6 +202,8 @@ namespace Lantea.Core.IO
 				}
 				else
 				{
+					// if !in_word and buffer.Length > 0 // unexpected word?
+
 					buffer.Append(c);
 				}
 
@@ -217,7 +226,7 @@ namespace Lantea.Core.IO
 					{
 						if (blockStack.Count == 0)
 						{
-							throw new MalformedConfigException("Stray ';' outside of block", fileName, lineNumber);
+							throw new MalformedConfigException("Stray ';' outside of block", fileName, currentLine);
 						}
 
 						Block b = blockStack.Peek();
@@ -246,7 +255,7 @@ namespace Lantea.Core.IO
 					{
 						if (blockStack.Count == 0)
 						{
-							throw new MalformedConfigException("Unexpected '}'", fileName, lineNumber);
+							throw new MalformedConfigException("Unexpected '}'", fileName, currentLine);
 						}
 
 						blockStack.Pop();
