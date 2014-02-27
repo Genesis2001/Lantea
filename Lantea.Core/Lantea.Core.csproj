@@ -41,6 +41,7 @@
     </Compile>
     <Compile Include="Bot.cs" />
     <Compile Include="IObservableClass.cs" />
+    <Compile Include="IO\Block.cs" />
     <Compile Include="IO\Configuration.cs" />
     <Compile Include="IO\DualLog.cs" />
     <Compile Include="IO\ISettingsManager.cs" />

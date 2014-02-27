@@ -216,6 +216,21 @@ namespace Atlantis.Collections
 			}
 		}
 
+		public void Add(KeyValuePair<TKey, TValue> kvp)
+		{
+			ICollection<TValue> values;
+			if (!dict.TryGetValue(kvp.Key, out values))
+			{
+				values = new HashSet<TValue> {kvp.Value};
+				dict.Add(kvp.Key, values);
+			}
+
+			if (values.Contains(kvp.Value))
+			{
+				values.Add(kvp.Value);
+			}
+		}
+
 		/// <summary>
 		///     Removes the element with the specified key from the <see cref="T:System.Collections.Generic.IDictionary`2" />.
 		/// </summary>
