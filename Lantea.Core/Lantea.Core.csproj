@@ -43,6 +43,7 @@
     <Compile Include="IObservableClass.cs" />
     <Compile Include="IO\Block.cs" />
     <Compile Include="IO\Configuration.cs" />
+    <Compile Include="IO\ConfigurationLoadEventArgs.cs" />
     <Compile Include="IO\DualLog.cs" />
     <Compile Include="IO\ISettingsManager.cs" />
     <Compile Include="IO\Log.cs" />

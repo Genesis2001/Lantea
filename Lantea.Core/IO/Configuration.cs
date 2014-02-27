@@ -16,7 +16,7 @@ namespace Lantea.Core.IO
 	{
 		private readonly Stack<Block> blockStack;
 		private readonly StringBuilder buffer;
-		private string fileName;
+		private string currentFileName;
 		private string itemname;
 		private ConfigState state;
 		private int currentLine;
@@ -27,6 +27,8 @@ namespace Lantea.Core.IO
 			blockStack = new Stack<Block>();
 		}
 
+		public event EventHandler<ConfigurationLoadEventArgs> ConfigurationLoadEvent;
+
 		public Block GetModule(string name)
 		{
 			throw new NotImplementedException();
@@ -34,18 +36,38 @@ namespace Lantea.Core.IO
 
 		public void Load(string path)
 		{
-			fileName = Path.GetFileName(path);
+			try
+			{
+				currentFileName = Path.GetFileName(path);
+				string rootPath = Path.GetDirectoryName(path);
 
-			Load(new FileStream(path, FileMode.Open, FileAccess.Read));
+				Load(new FileStream(path, FileMode.Open, FileAccess.Read));
 
-			// TODO: parse directives.
+				/*for (int i = 0; i < CountBlock("include"); ++i)
+				{
+					Block include = GetBlock("include", i);
+
+					string file = include.Get<String>("name");
+					Load(new FileStream(Path.Combine(rootPath, file), FileMode.Open, FileAccess.Read));
+				}*/
+
+				ConfigurationLoadEvent.Raise(this, new ConfigurationLoadEventArgs(true));
+			}
+			catch (FileNotFoundException e)
+			{
+				ConfigurationLoadEvent.Raise(this, new ConfigurationLoadEventArgs(false, e));
+			}
+			catch (MalformedConfigException e)
+			{
+				ConfigurationLoadEvent.Raise(this, new ConfigurationLoadEventArgs(false, e));
+			}
 		}
 
 		internal void Load(Stream stream)
 		{
-			if (string.IsNullOrEmpty(fileName))
+			if (string.IsNullOrEmpty(currentFileName))
 			{
-				fileName = "(memory)";
+				currentFileName = "(memory)";
 			}
 
 			using (stream)
@@ -64,24 +86,24 @@ namespace Lantea.Core.IO
 
 			if (state == ConfigState.CommentOpen)
 			{
-				throw new MalformedConfigException(string.Format("Unterminated multiline comment at end of file: {0}", fileName));
+				throw new MalformedConfigException(string.Format("Unterminated multiline comment at end of file: {0}", currentFileName));
 			}
 
 			if (state == ConfigState.StringOpen)
 			{
-				throw new MalformedConfigException(string.Format("Untermniated string value at end of file: {0}", fileName));
+				throw new MalformedConfigException(string.Format("Untermniated string value at end of file: {0}", currentFileName));
 			}
 
 			if (buffer.Length > 0 || !String.IsNullOrEmpty(itemname))
 			{
-				throw new MalformedConfigException(string.Format("Unexpected junk at the end of file: {0}", fileName));
+				throw new MalformedConfigException(string.Format("Unexpected junk at the end of file: {0}", currentFileName));
 			}
 
 			if (blocks.Count > 0)
 			{
 				throw new MalformedConfigException(string.Format("Unterminated block '{0}' at end of file. {1}:{2}",
 					blockStack.Peek().Name,
-					fileName,
+					currentFileName,
 					blockStack.Peek().lineNumber));
 			}
 		}
@@ -146,7 +168,7 @@ namespace Lantea.Core.IO
 				{
 					if (blockStack.Count == 0 || itemname == null)
 					{
-						throw new MalformedConfigException("Unexpected quote string", fileName, currentLine);
+						throw new MalformedConfigException("Unexpected quote string", currentFileName, currentLine);
 					}
 
 					state = ConfigState.StringOpen;
@@ -155,12 +177,12 @@ namespace Lantea.Core.IO
 				{
 					if (blockStack.Count == 0/* && state != ConfigState.BlockOpen*/)
 					{
-						throw new MalformedConfigException(string.Format("Unexpected config item outside of section: {0}:{1}", fileName, currentLine));
+						throw new MalformedConfigException(string.Format("Unexpected config item outside of section: {0}:{1}", currentFileName, currentLine));
 					}
 
 					if (!String.IsNullOrEmpty(itemname) || buffer.Length == 0)
 					{
-						throw new MalformedConfigException("Stray '=' or item without value", fileName, currentLine);
+						throw new MalformedConfigException("Stray '=' or item without value", currentFileName, currentLine);
 					}
 
 					itemname = buffer.ToString().Trim();
@@ -226,7 +248,7 @@ namespace Lantea.Core.IO
 					{
 						if (blockStack.Count == 0)
 						{
-							throw new MalformedConfigException("Stray ';' outside of block", fileName, currentLine);
+							throw new MalformedConfigException("Stray ';' outside of block", currentFileName, currentLine);
 						}
 
 						Block b = blockStack.Peek();
@@ -255,7 +277,7 @@ namespace Lantea.Core.IO
 					{
 						if (blockStack.Count == 0)
 						{
-							throw new MalformedConfigException("Unexpected '}'", fileName, currentLine);
+							throw new MalformedConfigException("Unexpected '}'", currentFileName, currentLine);
 						}
 
 						blockStack.Pop();
