@@ -46,7 +46,7 @@ namespace Lantea.Core.IO
 				/*for (int i = 0; i < CountBlock("include"); ++i)
 				{
 					Block include = GetBlock("include", i);
-
+					
 					string file = include.Get<String>("name");
 					Load(new FileStream(Path.Combine(rootPath, file), FileMode.Open, FileAccess.Read));
 				}*/
@@ -57,10 +57,12 @@ namespace Lantea.Core.IO
 			{
 				ConfigurationLoadEvent.Raise(this, new ConfigurationLoadEventArgs(false, e));
 			}
+#if !DEBUG
 			catch (MalformedConfigException e)
 			{
 				ConfigurationLoadEvent.Raise(this, new ConfigurationLoadEventArgs(false, e));
 			}
+#endif
 		}
 
 		internal void Load(Stream stream)
@@ -99,7 +101,7 @@ namespace Lantea.Core.IO
 				throw new MalformedConfigException(string.Format("Unexpected junk at the end of file: {0}", currentFileName));
 			}
 
-			if (blocks.Count > 0)
+			if (blockStack.Count > 0)
 			{
 				throw new MalformedConfigException(string.Format("Unterminated block '{0}' at end of file. {1}:{2}",
 					blockStack.Peek().Name,
@@ -175,7 +177,7 @@ namespace Lantea.Core.IO
 				}
 				else if (c == '=')
 				{
-					if (blockStack.Count == 0/* && state != ConfigState.BlockOpen*/)
+					if (blockStack.Count == 0)
 					{
 						throw new MalformedConfigException(string.Format("Unexpected config item outside of section: {0}:{1}", currentFileName, currentLine));
 					}
@@ -193,7 +195,7 @@ namespace Lantea.Core.IO
 					if (buffer.Length == 0)
 					{
 						// commented or unnamed section.
-						blockStack.Push(null);
+						blockStack.Push(new Block(null));
 						continue;
 					}
 
@@ -201,7 +203,7 @@ namespace Lantea.Core.IO
 					{
 						// named block inside of comment block.
 						buffer.Clear();
-						blockStack.Push(null);
+						blockStack.Push(new Block(null));
 						continue;
 					}
 
@@ -268,6 +270,7 @@ namespace Lantea.Core.IO
 						if (b != null)
 						{
 							b.items[itemname] = buffer.ToString();
+							itemname = null;
 						}
 
 						buffer.Clear();
