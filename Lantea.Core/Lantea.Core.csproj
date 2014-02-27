@@ -39,7 +39,6 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Bot.cs" />
     <Compile Include="IObservableClass.cs" />
     <Compile Include="IO\Block.cs" />
     <Compile Include="IO\Configuration.cs" />

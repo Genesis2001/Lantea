@@ -43,13 +43,13 @@ namespace Lantea.Core.IO
 
 				Load(new FileStream(path, FileMode.Open, FileAccess.Read));
 
-				/*for (int i = 0; i < CountBlock("include"); ++i)
+				for (int i = 0; i < CountBlock("include"); ++i)
 				{
 					Block include = GetBlock("include", i);
 					
 					string file = include.Get<String>("name");
 					Load(new FileStream(Path.Combine(rootPath, file), FileMode.Open, FileAccess.Read));
-				}*/
+				}
 
 				ConfigurationLoadEvent.Raise(this, new ConfigurationLoadEventArgs(true));
 			}

@@ -38,8 +38,8 @@
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Collections\Concurrent\ConcurrentQueueAdapter.cs" />
-    <Compile Include="Collections\DictionaryList.cs" />
     <Compile Include="Collections\IQueue.cs" />
+    <Compile Include="Collections\DictionaryList.cs" />
     <Compile Include="Collections\QueueAdapter.cs" />
     <Compile Include="IO\ILog.cs" />
     <Compile Include="IO\IniFile.cs" />

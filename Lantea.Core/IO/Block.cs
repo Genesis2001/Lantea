@@ -22,22 +22,22 @@ namespace Lantea.Core.IO
 		 * block_map blocks;
 		 */
 
-		internal readonly DictionaryList<string, Block> blocks;
+		internal readonly DictionaryList<Block> blocks;
 		internal readonly Dictionary<string, string> items;
 		internal int lineNumber;
 
 		internal Block(string name)
 		{
-			Name = name;
-			items = new Dictionary<string, string>();
-			blocks = new DictionaryList<string, Block>();
+			Name   = name;
+			items  = new Dictionary<string, string>();
+			blocks = new DictionaryList<Block>();
 		}
 
 		public string Name { get; private set; }
 
 		public int CountBlock(string blockName)
 		{
-			return blocks.Count(x => x.Key.Equals(blockName));
+			return blocks.Keys.Count(x => x.Equals(blockName));
 		}
 
 		public T Get<T>(string property, T def = null) where T : class
@@ -54,16 +54,7 @@ namespace Lantea.Core.IO
 
 		public Block GetBlock(string blockName, int num)
 		{
-			List<string> list = blocks.Where(x => x.Key.Equals(blockName)).Select(x => x.Key).ToList();
-
-			for (int i = 0; i < list.Count; ++i)
-			{
-				if (i == num)
-				{
-				}
-			}
-
-			throw new NotImplementedException();
+			return blocks[blockName].Where((t, i) => i == num).FirstOrDefault();
 		}
 
 		public void Set<T>(string property, T value) where T : class
