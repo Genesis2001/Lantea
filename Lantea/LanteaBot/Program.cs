@@ -10,7 +10,7 @@ namespace LanteaBot
 	using System.ComponentModel.Composition;
 	using System.ComponentModel.Composition.Hosting;
 	using System.Reflection;
-	using System.Threading.Tasks;
+	using System.Threading;
 	using Lantea.Core.Extensibility;
 	using Lantea.Core.IO;
 	using NDesk.Options;
@@ -39,7 +39,16 @@ namespace LanteaBot
 #endif
 		}
 
-		private readonly OptionSet parser = new OptionSet();
+		public Program()
+		{
+			parser = new OptionSet
+			         {
+				         {"config=", "Sets the configuration file the bot will use for it's configuration.", x => config = x},
+			         };
+		}
+
+		private string config;
+		private readonly OptionSet parser;
 		[Import] private IBotCore bot;
 
 		public void Compose()
@@ -48,13 +57,11 @@ namespace LanteaBot
 			var catalog   = new AssemblyCatalog(asm);
 			var container = new CompositionContainer(catalog);
 
-			 bot = container.GetExportedValue<IBotCore>();
+			bot = container.GetExportedValue<IBotCore>();
 		}
 
-		public async void Run(params string[] args)
+		public void Run(params string[] args)
 		{
-			string config = null;
-			parser.Add("config=", "", x => config = x);
 			parser.Parse(args);
 
 			if (String.IsNullOrEmpty(config))
@@ -66,13 +73,17 @@ namespace LanteaBot
 			bot.Load(config);
 			bot.Initialize();
 
-			ConsoleKeyInfo key;
+			bool exit = false;
 			do
 			{
-				await Task.Delay(100);
+				Thread.Sleep(100);
 
-				key = Console.ReadKey(true);
-			} while (!(key.Modifiers == ConsoleModifiers.Control && key.Key == ConsoleKey.C));
+				ConsoleKeyInfo key = Console.ReadKey(true);
+				if (key.Modifiers == ConsoleModifiers.Control && key.Key == ConsoleKey.C)
+				{
+					exit = true;
+				}
+			} while (!exit);
 		}
 
 		#region Implementation of IDisposable

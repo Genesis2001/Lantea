@@ -24,7 +24,6 @@ namespace LanteaBot
 
 		public void Initialize()
 		{
-			throw new NotImplementedException();
 		}
 
 		public Configuration Load(string path)
