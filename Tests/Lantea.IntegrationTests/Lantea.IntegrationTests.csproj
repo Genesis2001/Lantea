@@ -58,7 +58,7 @@
       <Project>{ffda6cbd-b19c-40f2-9204-3d2b015a8fb9}</Project>
       <Name>Lantea.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Lantea.Core\Lantea.Core.csproj">
+    <ProjectReference Include="..\..\Lantea\Lantea.Core\Lantea.Core.csproj">
       <Project>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</Project>
       <Name>Lantea.Core</Name>
     </ProjectReference>

@@ -44,7 +44,7 @@ namespace Atlantis.Net.Irc
 			Options                 = ConnectOptions.Default;
 			QueueInteval            = 1000;
 			EnableFakeLag           = true;
-			RetryInterval           = TimeSpan.FromMinutes(10.0).TotalMilliseconds;
+			RetryInterval           = TimeSpan.FromMinutes(1.0).TotalMilliseconds;
 			Timeout                 = TimeSpan.FromMinutes(10.0);
 			Modes                   = new List<char>();
 

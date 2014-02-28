@@ -629,11 +629,11 @@ namespace Atlantis.Net.Irc
 		{
 			if ((e.SignalTime - lastMessage) < Timeout)
 			{
-				tokenSource.Cancel();
-				queueTokenSource.Cancel();
-
 				var args = new TimeoutEventArgs();
 				TimeoutEvent.Raise(this, args);
+
+                tokenSource.Cancel();
+                if (queueTokenSource != null) queueTokenSource.Cancel();
 
 				if (!args.Handled)
 				{

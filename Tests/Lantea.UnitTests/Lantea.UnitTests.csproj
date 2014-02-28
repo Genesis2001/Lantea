@@ -51,7 +51,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Lantea.Core\Lantea.Core.csproj">
+    <ProjectReference Include="..\..\Lantea\Lantea.Core\Lantea.Core.csproj">
       <Project>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</Project>
       <Name>Lantea.Core</Name>
     </ProjectReference>

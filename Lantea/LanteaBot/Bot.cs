@@ -92,6 +92,7 @@ namespace LanteaBot
 			{
 				Client.ConnectionEstablishedEvent += OnClientConnect;
 				Client.MessageReceivedEvent += OnMessageReceived;
+			    Client.TimeoutEvent += OnTimeoutDetected;
 				Client.Start();
 
 				foreach (IModule m in Modules)
@@ -101,8 +102,15 @@ namespace LanteaBot
 			}
 		}
 
-		private void OnClientConnect(object sender, EventArgs args)
+	    private void OnTimeoutDetected(object sender, TimeoutEventArgs e)
+	    {
+	        Console.WriteLine("Timeout detected.");
+	    }
+
+	    private void OnClientConnect(object sender, EventArgs args)
 		{
+            Console.WriteLine("Connection established to IRC server.");
+
 			Task.Factory.StartNew(() =>
 			                      {
 				                      if (!Client.EnableFakeLag)
