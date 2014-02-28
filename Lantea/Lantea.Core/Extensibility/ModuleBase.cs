@@ -6,6 +6,7 @@
 
 namespace Lantea.Core.Extensibility
 {
+	using System.Collections.Generic;
 	using IO;
 
 	public abstract class ModuleBase : IModule
@@ -18,6 +19,8 @@ namespace Lantea.Core.Extensibility
 		#region Implementation of IModule
 
 		public IBotCore Bot { get; set; }
+
+		public IList<ICommand> Commands { get; protected set; }
 
 		public abstract void Initialize();
 

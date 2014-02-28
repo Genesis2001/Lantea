@@ -489,7 +489,7 @@ namespace Atlantis.Net.Irc
 							else if (accessModes.Contains(modes[i]))
 							{
 								PrefixList list;
-								if (!channel.Users.TryGetValue(source, out list))
+								if (!channel.Users.TryGetValue(data[i - 1], out list))
 								{
 									list = new PrefixList(this);
 									channel.Users.Add(source, list);

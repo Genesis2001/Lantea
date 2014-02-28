@@ -11,51 +11,42 @@ namespace TestExtension
 	using Lantea.Core.IO;
 
 	[Module(ModuleType.EXTRA, "1.0")]
-	public class TestExtension : IModule
+	public class TestExtension : ModuleBase
 	{
-		public TestExtension()
+		public TestExtension(IBotCore bot) : base(bot)
 		{
-			Commands = new List<ICommand>();
 		}
 
-		#region Implementation of IModuleAttribute
+		#region Overrides of ModuleBase
 
-		public string Name
+		public override void Initialize()
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public override void Rehash(Configuration config)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public override string Name
 		{
 			get { return "Test Extension"; }
 		}
 
-		public string Author
+		public override string Author
 		{
 			get { return "Zack Loveless"; }
 		}
 
-		public ModuleType Type
+		public override ModuleType Type
 		{
 			get { return ModuleType.EXTRA; }
 		}
 
-		public string Version
+		public override string Version
 		{
 			get { return "1.0"; }
-		}
-
-		#endregion
-
-		#region Implementation of IModule
-
-		public IBotCore Bot { get; set; }
-
-		public IList<ICommand> Commands { get; private set; }
-
-		public void Initialize()
-		{
-			Commands.Add(new TestCommand());
-		}
-
-		public void Rehash(Configuration config)
-		{
-			throw new System.NotImplementedException();
 		}
 
 		#endregion

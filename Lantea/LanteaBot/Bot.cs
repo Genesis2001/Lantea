@@ -91,6 +91,7 @@ namespace LanteaBot
 			if (Client != null)
 			{
 				Client.ConnectionEstablishedEvent += OnClientConnect;
+				Client.MessageReceivedEvent += OnMessageReceived;
 				Client.Start();
 
 				foreach (IModule m in Modules)
@@ -112,6 +113,23 @@ namespace LanteaBot
 									  // TODO: read list of perform commands from config.
 				                      Client.Send("JOIN #UnifiedTech");
 			                      });
+		}
+
+		private void OnMessageReceived(object sender, MessageReceivedEventArgs args)
+		{
+			if (args.Message.StartsWith("!perm"))
+			{
+				Channel c = Client.GetChannel(args.Target);
+				PrefixList perms;
+				if (c.Users.TryGetValue(args.Source, out perms))
+				{
+					Client.Message(c.Name,
+						"{0}, I see you have '{1}' as your highest prefix. You also have '{2}' as your prefix(es).",
+						args.Source,
+						perms.HighestPrefix,
+						perms.ToString());
+				}
+			}
 		}
 
 		public Configuration Load(string path)
