@@ -13,7 +13,7 @@ namespace Lantea.Core.Extensibility
 	{
 		IBotCore Bot { get; set; }
 
-		IEnumerable<ICommand> Commands { get; } 
+		IList<ICommand> Commands { get; } 
 		
 		void Initialize();
 
