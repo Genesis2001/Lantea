@@ -47,6 +47,7 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Bot.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -59,6 +60,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Atlantis\Atlantis.Net.Irc\Atlantis.Net.Irc.csproj">
+      <Project>{07410E3A-D2CF-4A81-BA52-864C8D206664}</Project>
+      <Name>Atlantis.Net.Irc</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Lantea.Core\Lantea.Core.csproj">
       <Project>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</Project>
       <Name>Lantea.Core</Name>

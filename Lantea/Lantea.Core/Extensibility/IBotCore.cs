@@ -17,12 +17,12 @@ namespace Lantea.Core.Extensibility
 	{
 		IrcClient Client { get; }
 
-		ConfigDocument Config { get; }
+		Configuration Config { get; }
 
 		IEnumerable<Lazy<IModule, IModuleAttribute>> Modules { get; }
 
 		void Initialize();
 
-		ConfigDocument Load(string configPath);
+		Configuration Load(string path);
 	}
 }
