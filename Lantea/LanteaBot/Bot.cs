@@ -8,23 +8,73 @@ namespace LanteaBot
 {
 	using System;
 	using System.Collections.Generic;
+	using System.ComponentModel.Composition;
+	using System.ComponentModel.Composition.Hosting;
+	using System.Configuration;
+	using System.IO;
+	using System.Linq;
+	using System.Reflection;
 	using Atlantis.Net.Irc;
 	using Lantea.Core.Extensibility;
 	using Lantea.Core.IO;
 
 	public class Bot : IBotCore
 	{
+		[ImportMany] private IEnumerable<Lazy<IModule, IModuleAttribute>> modules;
+		
+		private void Compose()
+		{
+			var container = GetCompositionContainer();
+
+			modules = container.GetExports<IModule, IModuleAttribute>();
+		}
+
+		// ReSharper disable once InconsistentNaming
+		private void LoadIRC()
+		{
+			Block uplink = Config.GetBlock("connection");
+
+			if (uplink == null)
+			{
+				throw new Exception("No connection block found in config.");
+			}
+
+			string nick = uplink.Get<String>("nick");
+
+			Client = new IrcClient(nick)
+			         {
+				         Host     = uplink.Get<String>("server"),
+				         Port     = uplink.Get<Int32>("port"),
+				         RealName = uplink.Get<String>("name"),
+			         };
+		}
+
 		#region Implementation of IBotCore
 
 		public IrcClient Client { get; private set; }
 		
 		public Configuration Config { get; private set; }
-		
-		public IEnumerable<Lazy<IModule, IModuleAttribute>> Modules { get; private set; }
 
-		private void Compose()
+		public IEnumerable<IModule> Modules
 		{
-			// foo
+			get { return modules != null ? modules.Select(x => x.Value) : Enumerable.Empty<IModule>(); }
+		}
+		
+		private static CompositionContainer GetCompositionContainer()
+		{
+			// ReSharper disable AssignNullToNotNullAttribute
+			var asm          = Assembly.GetAssembly(typeof (Bot));
+			string bLocation = Path.GetDirectoryName(asm.Location);
+			string mLocation = Path.Combine(bLocation, "Extensions");
+			// ReSharper restore AssignNullToNotNullAttribute
+
+			if (!Directory.Exists(mLocation))
+			{
+				Directory.CreateDirectory(mLocation);
+			}
+
+			var catalog = new AggregateCatalog(new DirectoryCatalog(mLocation));
+			return new CompositionContainer(catalog);
 		}
 
 		public void Initialize()
@@ -35,11 +85,23 @@ namespace LanteaBot
 			}
 
 			Compose();
+			LoadIRC();
+
+			if (Client != null)
+			{
+				Client.Start();
+
+				foreach (IModule m in Modules)
+				{
+					m.Initialize();
+				}
+			}
 		}
 
 		public Configuration Load(string path)
 		{
 			Config = new Configuration();
+
 			Config.ConfigurationLoadEvent += OnRehash;
 			Config.Load(path);
 
@@ -50,8 +112,9 @@ namespace LanteaBot
 		{
 			if (args.Success)
 			{
-				foreach (var m in Modules)
+				foreach (IModule m in Modules)
 				{
+					m.Rehash(Config);
 				}
 			}
 		}

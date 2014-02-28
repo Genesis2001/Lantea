@@ -9,6 +9,7 @@ namespace LanteaBot
 	using System;
 	using System.ComponentModel.Composition;
 	using System.ComponentModel.Composition.Hosting;
+	using System.IO;
 	using System.Reflection;
 	using System.Threading;
 	using Lantea.Core.Extensibility;
@@ -70,8 +71,15 @@ namespace LanteaBot
 				Environment.Exit(2);
 			}
 
+			var asm     = Assembly.GetAssembly(typeof (Program));
+			string root = Path.GetDirectoryName(asm.Location);
+
+			config = Path.Combine(root, config);
+
 			bot.Load(config);
 			bot.Initialize();
+
+			Console.WriteLine("Press <CTRL+C> to terminate the bot.");
 
 			bool exit = false;
 			do

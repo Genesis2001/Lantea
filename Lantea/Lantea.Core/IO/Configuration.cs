@@ -39,7 +39,7 @@ namespace Lantea.Core.IO
 			try
 			{
 				currentFileName = Path.GetFileName(path);
-				string rootPath = Path.GetDirectoryName(path);
+				string root = Path.GetDirectoryName(path);
 
 				Load(new FileStream(path, FileMode.Open, FileAccess.Read));
 
@@ -48,7 +48,7 @@ namespace Lantea.Core.IO
 					Block include = GetBlock("include", i);
 					
 					string file = include.Get<String>("name");
-					Load(new FileStream(Path.Combine(rootPath, file), FileMode.Open, FileAccess.Read));
+					Load(new FileStream(Path.Combine(root, file), FileMode.Open, FileAccess.Read));
 				}
 
 				ConfigurationLoadEvent.Raise(this, new ConfigurationLoadEventArgs(true));
@@ -269,7 +269,7 @@ namespace Lantea.Core.IO
 						
 						if (b != null)
 						{
-							b.items[itemname] = buffer.ToString();
+							b.items[itemname] = buffer.ToString().Trim();
 							itemname = null;
 						}
 

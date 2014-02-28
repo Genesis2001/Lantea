@@ -19,7 +19,7 @@ namespace Lantea.Core.Extensibility
 
 		Configuration Config { get; }
 
-		IEnumerable<Lazy<IModule, IModuleAttribute>> Modules { get; }
+		IEnumerable<IModule> Modules { get; }
 
 		void Initialize();
 
