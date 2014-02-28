@@ -52,8 +52,6 @@ namespace Atlantis.Net.Irc
 			FillListsDelay          = TimeSpan.FromSeconds(30.0).TotalMilliseconds;
 			RequestInterval         = TimeSpan.FromSeconds(3.0).TotalMilliseconds;
 
-
-
 			RawMessageReceivedEvent += RegistrationHandler;
 			RawMessageReceivedEvent += PingHandler;
 			RawMessageReceivedEvent += RfcNumericHandler;

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------------
-//  <copyright file="IModule.cs" company="Zack Loveless">
+//  <copyright file="ICommand.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------------
@@ -7,16 +7,17 @@
 namespace Lantea.Core.Extensibility
 {
 	using System.Collections.Generic;
-	using IO;
 
-	public interface IModule : IModuleAttribute
+	public interface ICommand
 	{
-		IBotCore Bot { get; set; }
+		// Modeled after System.Windows.ICommand.
 
-		IEnumerable<ICommand> Commands { get; } 
-		
-		void Initialize();
+		IList<string> Triggers { get; }
 
-		void Rehash(Configuration config);
+		string Description { get; set; }
+
+		bool CanExecute(object parameter);
+
+		void Execute(object parameter);
 	}
 }
