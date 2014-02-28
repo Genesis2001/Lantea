@@ -6,15 +6,14 @@
 
 namespace Lantea.Core.Extensibility
 {
-	using System;
+	using IO;
 
 	public interface IModule : IModuleAttribute
 	{
 		IBotCore Bot { get; set; }
-
-		/// <summary>
-		///	Initializes the module for consumption.
-		/// </summary>
+		
 		void Initialize();
+
+		void Rehash(Configuration config);
 	}
 }

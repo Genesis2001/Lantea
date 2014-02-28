@@ -22,16 +22,38 @@ namespace LanteaBot
 		
 		public IEnumerable<Lazy<IModule, IModuleAttribute>> Modules { get; private set; }
 
+		private void Compose()
+		{
+			// foo
+		}
+
 		public void Initialize()
 		{
+			if (Config == null)
+			{
+				throw new InvalidOperationException("Unable to initialize core. Configuration not loaded.");
+			}
+
+			Compose();
 		}
 
 		public Configuration Load(string path)
 		{
 			Config = new Configuration();
+			Config.ConfigurationLoadEvent += OnRehash;
 			Config.Load(path);
 
 			return Config;
+		}
+
+		private void OnRehash(object sender, ConfigurationLoadEventArgs args)
+		{
+			if (args.Success)
+			{
+				foreach (var m in Modules)
+				{
+				}
+			}
 		}
 
 		#endregion

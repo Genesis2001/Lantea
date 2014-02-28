@@ -6,6 +6,8 @@
 
 namespace Lantea.Core.Extensibility
 {
+	using IO;
+
 	public abstract class ModuleBase : IModule
 	{
 		protected ModuleBase(IBotCore bot)
@@ -18,6 +20,8 @@ namespace Lantea.Core.Extensibility
 		public IBotCore Bot { get; set; }
 
 		public abstract void Initialize();
+
+		public abstract void Rehash(Configuration config);
 
 		#endregion
 
