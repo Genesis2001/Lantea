@@ -14,6 +14,7 @@ namespace LanteaBot
 	using System.IO;
 	using System.Linq;
 	using System.Reflection;
+	using System.Threading.Tasks;
 	using Atlantis.Net.Irc;
 	using Lantea.Core.Extensibility;
 	using Lantea.Core.IO;
@@ -89,6 +90,7 @@ namespace LanteaBot
 
 			if (Client != null)
 			{
+				Client.ConnectionEstablishedEvent += OnClientConnect;
 				Client.Start();
 
 				foreach (IModule m in Modules)
@@ -96,6 +98,20 @@ namespace LanteaBot
 					m.Initialize();
 				}
 			}
+		}
+
+		private void OnClientConnect(object sender, EventArgs args)
+		{
+			Task.Factory.StartNew(() =>
+			                      {
+				                      if (!Client.EnableFakeLag)
+				                      {
+										  Task.Delay(15000).Wait();
+				                      }
+
+									  // TODO: read list of perform commands from config.
+				                      Client.Send("JOIN #UnifiedTech");
+			                      });
 		}
 
 		public Configuration Load(string path)
@@ -136,7 +152,7 @@ namespace LanteaBot
 		{
 			if (!disposing) return;
 
-			// 
+			Client.Disconnect("Exiting.");
 		}
 
 		#endregion

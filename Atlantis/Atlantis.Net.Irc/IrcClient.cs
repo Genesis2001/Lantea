@@ -229,6 +229,20 @@ namespace Atlantis.Net.Irc
 			Send("NICK {0}", nick);
 		}
 
+		public void Disconnect(string message = null)
+		{
+			Send("QUIT {0}", string.IsNullOrEmpty(message) ? "" : ":" + message);
+
+			// ReSharper disable MethodSupportsCancellation
+			Task.Factory.StartNew(() =>
+			                      {
+				                      Task.Delay(250).Wait();
+
+									  Dispose();
+			                      });
+			// ReSharper restore MethodSupportsCancellation
+		}
+
 		public Channel GetChannel(string channelName)
 		{
 			if (string.IsNullOrEmpty(channelName))
