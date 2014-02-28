@@ -38,22 +38,32 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fixtures\QueueFixture.cs" />
-    <Compile Include="Helpers\XmlStreamHelper.cs" />
-    <Compile Include="Mocks\MockModule.cs" />
-    <Compile Include="Fixtures\ModuleFixture.cs" />
+    <Compile Include="Fixtures\ConfigFixture.cs" />
+    <Compile Include="Helpers\StringHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Fixtures\SettingsFixture.cs" />
-    <Compile Include="Fixtures\VersionFixture.cs" />
+    <Compile Include="ConfigReaderStrings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConfigReaderStrings.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Lantea.Common\Lantea.Common.csproj">
-      <Project>{FFDA6CBD-B19C-40F2-9204-3D2B015A8FB9}</Project>
-      <Name>Lantea.Common</Name>
+    <ProjectReference Include="..\..\Lantea.Core\Lantea.Core.csproj">
+      <Project>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</Project>
+      <Name>Lantea.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mocks\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ConfigReaderStrings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ConfigReaderStrings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

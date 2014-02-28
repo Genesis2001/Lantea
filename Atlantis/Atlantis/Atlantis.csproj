@@ -39,12 +39,19 @@
     </Compile>
     <Compile Include="Collections\Concurrent\ConcurrentQueueAdapter.cs" />
     <Compile Include="Collections\IQueue.cs" />
+    <Compile Include="Collections\DictionaryList.cs" />
     <Compile Include="Collections\QueueAdapter.cs" />
+    <Compile Include="IO\ILog.cs" />
+    <Compile Include="IO\IniFile.cs" />
+    <Compile Include="IO\LogThreshold.cs" />
     <Compile Include="Linq\EventExtensions.cs" />
     <Compile Include="Linq\NumericExtensions.cs" />
+    <Compile Include="Linq\StringBuilderExtensions.cs" />
+    <Compile Include="Linq\RegexExtensions.cs" />
     <Compile Include="Linq\StringExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
