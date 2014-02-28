@@ -36,6 +36,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanteaBot", "Lantea\LanteaB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lantea.Core", "Lantea\Lantea.Core\Lantea.Core.csproj", "{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{F5165F2E-06DB-45A6-9B7F-0FD23BF07ED3}"
+	ProjectSection(SolutionItems) = preProject
+		lib\NDesk.Options.dll = lib\NDesk.Options.dll
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
