@@ -637,7 +637,7 @@ namespace Atlantis.Net.Irc
 
 				if (!args.Handled)
 				{
-					tokenSource = new CancellationTokenSource();
+					tokenSource      = new CancellationTokenSource();
 					queueTokenSource = new CancellationTokenSource();
 
 					if (RetryInterval > 0)
