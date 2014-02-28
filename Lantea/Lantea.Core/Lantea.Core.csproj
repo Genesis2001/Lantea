@@ -39,6 +39,12 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Extensibility\IBotCore.cs" />
+    <Compile Include="Extensibility\IModule.cs" />
+    <Compile Include="Extensibility\IModuleAttribute.cs" />
+    <Compile Include="Extensibility\ModuleAttribute.cs" />
+    <Compile Include="Extensibility\ModuleBase.cs" />
+    <Compile Include="Extensibility\ModuleType.cs" />
     <Compile Include="IObservableClass.cs" />
     <Compile Include="IO\Block.cs" />
     <Compile Include="IO\Configuration.cs" />

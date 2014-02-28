@@ -11,6 +11,7 @@ namespace LanteaBot
 	using System.ComponentModel.Composition.Hosting;
 	using System.Reflection;
 	using System.Threading.Tasks;
+	using Lantea.Core.Extensibility;
 	using Lantea.Core.IO;
 	using NDesk.Options;
 
