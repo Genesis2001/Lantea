@@ -341,11 +341,11 @@ namespace Atlantis.Net.Irc
 
 						if (StrictNames)
 						{
-							if (RequestInterval > 0)
+							if (RequestDelay > 0)
 							{
 								Task.Factory.StartNew(() =>
 								                      {
-									                      Task.Delay((int)RequestInterval, token).Wait(token);
+									                      Task.Delay((int)RequestDelay, token).Wait(token);
 
 									                      Send("NAMES {0}", target);
 								                      }, token);

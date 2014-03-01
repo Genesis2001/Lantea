@@ -50,7 +50,7 @@ namespace Atlantis.Net.Irc
 
 			FillListsOnJoin         = false;
 			FillListsDelay          = TimeSpan.FromSeconds(30.0).TotalMilliseconds;
-			RequestInterval         = TimeSpan.FromSeconds(3.0).TotalMilliseconds;
+			RequestDelay         = TimeSpan.FromSeconds(3.0).TotalMilliseconds;
 
 			RawMessageReceivedEvent += RegistrationHandler;
 			RawMessageReceivedEvent += PingHandler;
@@ -168,7 +168,7 @@ namespace Atlantis.Net.Irc
 		/// </summary>
 		public string RealName { get; set; }
 
-		public double RequestInterval { get; set; }
+		public double RequestDelay { get; set; }
 
 		/// <summary>
 		/// Gets or sets a <see cref="T:System.Boolean" /> value indicating whether to retry connecting to the IRC server.

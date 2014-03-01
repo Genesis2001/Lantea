@@ -13,13 +13,17 @@ namespace LanteaBot
 	using System.IO;
 	using System.Linq;
 	using System.Reflection;
+	using System.Text;
 	using System.Threading.Tasks;
+	using Atlantis.Linq;
 	using Atlantis.Net.Irc;
 	using Lantea.Core.Extensibility;
 	using Lantea.Core.IO;
 
 	public class Bot : IBotCore
 	{
+	    private DateTime start;
+	    private DateTime lastDisconnected;
 		[ImportMany] private IEnumerable<Lazy<IModule, IModuleAttribute>> modules;
 		
 		private void Compose()
@@ -106,10 +110,12 @@ namespace LanteaBot
 	    private void OnTimeoutDetected(object sender, TimeoutEventArgs e)
 	    {
 	        Console.WriteLine("Timeout detected.");
+	        lastDisconnected = DateTime.Now;
 	    }
 
 	    private void OnClientConnect(object sender, EventArgs args)
-		{
+	    {
+	        start = lastDisconnected = DateTime.Now;
             Console.WriteLine("Connection established to IRC server.");
 
 			Task.Factory.StartNew(() =>
@@ -126,7 +132,7 @@ namespace LanteaBot
 
 		private void OnMessageReceived(object sender, MessageReceivedEventArgs args)
 		{
-			if (args.Message.StartsWith("!perm"))
+            if (args.Message.StartsWith("!perm") && (!args.Target.EqualsIgnoreCase("#renegadex")))
 			{
 				Channel c = Client.GetChannel(args.Target);
 				PrefixList perms;
@@ -139,6 +145,55 @@ namespace LanteaBot
 						perms.ToString());
 				}
 			}
+            else if (args.Message.StartsWith("!dump") && (args.Target.EqualsIgnoreCase("#Genesis") || args.Target.EqualsIgnoreCase("#UnifiedTech")))
+            {
+                string[] toks = args.Message.Split(' ');
+
+                StringBuilder builder = new StringBuilder();
+                foreach (Channel c in Client.Channels)
+                {
+                    if (toks.Length >= 2)
+                    {
+                        if (toks[1].StartsWith("#") && !c.Name.EqualsIgnoreCase(toks[1])) continue;
+                    }
+
+                    builder.AppendFormat("PRIVMSG {0} :{1}: ", args.Target, c.Name);
+
+                    foreach (KeyValuePair<string, PrefixList> p in c.Users)
+                    {
+                        if (builder.Length >= 130)
+                        {
+                            string buffer = builder.ToString().TrimEnd(' ', ',');
+                            Client.Send(buffer);
+
+                            builder.Clear();
+                            builder.AppendFormat("PRIVMSG {0} :{1}: ", args.Target, c.Name);
+                        }
+
+                        builder.Append(p.Value.HighestPrefix);
+                        builder.Append(p.Key);
+                        builder.Append(", ");
+                    }
+
+                    builder.Append('\n');
+                }
+            }
+            else if (args.Message.StartsWith("!uptime") && (args.Target.EqualsIgnoreCase("#Genesis") || args.Target.EqualsIgnoreCase("#UnifiedTech")))
+            {
+                TimeSpan connected = (DateTime.Now - lastDisconnected);
+                StringBuilder builder = new StringBuilder();
+
+                if (connected == TimeSpan.Zero) builder.Append("0 minutes");
+
+                if (connected.Days > 0) builder.AppendFormat("{0} days, ", connected.Days);
+                if (connected.Hours > 0) builder.AppendFormat("{0} hours, ", connected.Hours);
+                if (connected.Minutes > 0) builder.AppendFormat("{0} minutes, ", connected.Minutes);
+                if (connected.Seconds > 0) builder.AppendFormat("{0} seconds, ", connected.Seconds);
+
+                string buffer = builder.ToString().TrimEnd(',', ' ');
+
+                Client.Message(args.Target, buffer);
+            }
 		}
 
 		public Configuration Load(string path)
