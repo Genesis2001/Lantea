@@ -10,7 +10,6 @@ namespace LanteaBot
 	using System.Collections.Generic;
 	using System.ComponentModel.Composition;
 	using System.ComponentModel.Composition.Hosting;
-	using System.Configuration;
 	using System.IO;
 	using System.Linq;
 	using System.Reflection;
@@ -26,8 +25,27 @@ namespace LanteaBot
 		private void Compose()
 		{
 			var container = GetCompositionContainer();
+			container.ComposeExportedValue<IBotCore>(this);
 
 			modules = container.GetExports<IModule, IModuleAttribute>();
+		}
+
+		private static CompositionContainer GetCompositionContainer()
+		{
+			// ReSharper disable AssignNullToNotNullAttribute
+			Assembly asm = Assembly.GetAssembly(typeof(Bot));
+			string bLocation = Path.GetDirectoryName(asm.Location);
+			string mLocation = Path.Combine(bLocation, "Extensions");
+			// ReSharper restore AssignNullToNotNullAttribute
+
+			if (!Directory.Exists(mLocation))
+			{
+				Directory.CreateDirectory(mLocation);
+			}
+
+			var catalog = new AggregateCatalog(new DirectoryCatalog(mLocation));
+
+			return new CompositionContainer(catalog);
 		}
 
 		// ReSharper disable once InconsistentNaming
@@ -61,23 +79,6 @@ namespace LanteaBot
 			get { return modules != null ? modules.Select(x => x.Value) : Enumerable.Empty<IModule>(); }
 		}
 		
-		private static CompositionContainer GetCompositionContainer()
-		{
-			// ReSharper disable AssignNullToNotNullAttribute
-			var asm          = Assembly.GetAssembly(typeof (Bot));
-			string bLocation = Path.GetDirectoryName(asm.Location);
-			string mLocation = Path.Combine(bLocation, "Extensions");
-			// ReSharper restore AssignNullToNotNullAttribute
-
-			if (!Directory.Exists(mLocation))
-			{
-				Directory.CreateDirectory(mLocation);
-			}
-
-			var catalog = new AggregateCatalog(new DirectoryCatalog(mLocation));
-			return new CompositionContainer(catalog);
-		}
-
 		public void Initialize()
 		{
 			if (Config == null)

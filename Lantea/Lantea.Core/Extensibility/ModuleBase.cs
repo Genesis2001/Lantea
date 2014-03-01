@@ -7,11 +7,13 @@
 namespace Lantea.Core.Extensibility
 {
 	using System.Collections.Generic;
+	using System.ComponentModel.Composition;
 	using IO;
 
 	public abstract class ModuleBase : IModule
 	{
-		protected ModuleBase(IBotCore bot)
+		[ImportingConstructor]
+		protected ModuleBase([Import] IBotCore bot)
 		{
 			Bot = bot;
 		}

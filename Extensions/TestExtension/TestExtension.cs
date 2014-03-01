@@ -6,7 +6,6 @@
 
 namespace TestExtension
 {
-	using System.Collections.Generic;
 	using Lantea.Core.Extensibility;
 	using Lantea.Core.IO;
 
