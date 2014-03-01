@@ -29,6 +29,7 @@ namespace Atlantis.Net.Irc
 		private bool registered;
 		private DateTime lastMessage;
 		private Timer timeoutTimer;
+	    private Timer pingTimer;
 		private string rfcStringCase;
 
 		// PRIVMSG|NOTICE|JOIN|PART|QUIT|MODE|NICK|INVITE|KICK
@@ -43,6 +44,13 @@ namespace Atlantis.Net.Irc
 
 		private void TickTimeout()
 		{
+            if (pingTimer != null) pingTimer.Dispose();
+            if (timeoutTimer != null) timeoutTimer.Dispose();
+
+            pingTimer = new Timer(Timeout.TotalMilliseconds / 2);
+		    pingTimer.Elapsed += SendPingPacket;
+            pingTimer.Start();
+
 			timeoutTimer          = new Timer(Timeout.TotalMilliseconds);
 			timeoutTimer.Elapsed += OnTimeoutTimerElapsed;
 			timeoutTimer.Start();
@@ -625,15 +633,20 @@ namespace Atlantis.Net.Irc
 			client.Close();
 		}
 
+	    private void SendPingPacket(object sender, ElapsedEventArgs e)
+	    {
+	        Send("PING :{0}", Host);
+	    }
+
 		private void OnTimeoutTimerElapsed(object sender, ElapsedEventArgs e)
 		{
-			if ((e.SignalTime - lastMessage) < Timeout)
+			if ((e.SignalTime - lastMessage) > Timeout)
 			{
 				var args = new TimeoutEventArgs();
 				TimeoutEvent.Raise(this, args);
 
-                tokenSource.Cancel();
-                if (queueTokenSource != null) queueTokenSource.Cancel();
+                tokenSource.Dispose();
+                if (queueTokenSource != null) queueTokenSource.Dispose();
 
 				if (!args.Handled)
 				{

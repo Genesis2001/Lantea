@@ -291,21 +291,9 @@ namespace Atlantis.Net.Irc
 						GetType().Name));
 			}
 
-			Encoding encoding;
-			switch (Encoding)
-			{
-				default:
-					encoding = new ASCIIEncoding();
-					break;
-
-				case IrcEncoding.UTF8:
-					encoding = new UTF8Encoding(false);
-					break;
-			}
+			
 
 			SetDefaults();
-
-			client = new TcpClientAsyncAdapter(new TcpClient(), encoding);
 
 			Connect();
 		}
@@ -314,6 +302,19 @@ namespace Atlantis.Net.Irc
 		{
 			try
 			{
+                Encoding encoding;
+                switch (Encoding)
+                {
+                    default:
+                        encoding = new ASCIIEncoding();
+                        break;
+
+                    case IrcEncoding.UTF8:
+                        encoding = new UTF8Encoding(false);
+                        break;
+                }
+
+                client = new TcpClientAsyncAdapter(new TcpClient(), encoding);
 				if (Options.HasFlag(ConnectOptions.Secure))
 				{
 					// TODO: Call client.ConnectSecurely(string host, int port, [something] certificate);
