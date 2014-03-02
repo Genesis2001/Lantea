@@ -6,15 +6,16 @@
 
 namespace Lantea.Core.Extensibility
 {
-	using System.Collections.Generic;
+	using System.ComponentModel.Composition;
 
+	[InheritedExport(typeof (ICommand))]
 	public interface ICommand
 	{
 		// Modeled after System.Windows.ICommand.
 
-		IList<string> Triggers { get; }
+		string[] Triggers { get; }
 
-		string Description { get; set; }
+		string Description { get; }
 
 		bool CanExecute(object parameter);
 

@@ -11,7 +11,6 @@ namespace Lantea.Core.Extensibility
 	using System.Collections.ObjectModel;
 	using System.ComponentModel.Composition;
 	using System.ComponentModel.Composition.Hosting;
-	using System.Linq;
 	using IO;
 
 	public abstract class ModuleBase : IModule, ICommandManager
@@ -20,7 +19,7 @@ namespace Lantea.Core.Extensibility
 
 		protected ModuleBase(IBotCore bot)
 		{
-			Bot = bot;
+			Bot      = bot;
 			Commands = new ObservableCollection<ICommand>();
 		}
 
@@ -53,6 +52,7 @@ namespace Lantea.Core.Extensibility
 			var asm       = GetType().Assembly;
 			var catalog   = new AssemblyCatalog(asm);
 			var container = new CompositionContainer(catalog);
+			container.ComposeExportedValue<IModule>(this);
 			
 			var commands  = container.GetExportedValues<ICommand>();
 

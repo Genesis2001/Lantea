@@ -6,26 +6,20 @@
 
 namespace Lantea.Core.Extensibility
 {
-	using System;
-	using System.Collections.Generic;
-
 	public abstract class CommandBase : ICommand
 	{
-		protected Predicate<object> condition;
+		protected readonly IModule module;
 
-		/// <summary>
-		///     Initializes a new instance of the <see cref="T:System.Object" /> class.
-		/// </summary>
-		protected CommandBase()
+		protected CommandBase(IModule module)
 		{
-			Triggers = new List<string>();
+			this.module = module;
 		}
 
 		#region Implementation of ICommand
 
-		public IList<string> Triggers { get; private set; }
+		public abstract string[] Triggers { get; }
 
-		public string Description { get; set; }
+		public abstract string Description { get; }
 
 		public abstract bool CanExecute(object parameter);
 
