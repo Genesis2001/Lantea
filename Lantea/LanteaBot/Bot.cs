@@ -110,17 +110,6 @@ namespace LanteaBot
 	    private void OnClientConnect(object sender, EventArgs args)
 	    {
             Console.WriteLine("Connection established to IRC server.");
-
-			Task.Factory.StartNew(() =>
-			                      {
-				                      if (!Client.EnableFakeLag)
-				                      {
-										  Task.Delay(15000).Wait();
-				                      }
-
-									  // TODO: read list of perform commands from config.
-				                      Client.Send("JOIN #UnifiedTech");
-			                      });
 		}
 
 		public Configuration Load(string path)
