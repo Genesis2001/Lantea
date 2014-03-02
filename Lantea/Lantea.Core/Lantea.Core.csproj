@@ -42,6 +42,7 @@
     <Compile Include="Extensibility\CommandBase.cs" />
     <Compile Include="Extensibility\IBotCore.cs" />
     <Compile Include="Extensibility\ICommand.cs" />
+    <Compile Include="Extensibility\ICommandManager.cs" />
     <Compile Include="Extensibility\IModule.cs" />
     <Compile Include="Extensibility\IModuleAttribute.cs" />
     <Compile Include="Extensibility\ModuleAttribute.cs" />

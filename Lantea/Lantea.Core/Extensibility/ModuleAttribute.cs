@@ -17,13 +17,13 @@ namespace Lantea.Core.Extensibility
 		/// </summary>
 		public ModuleAttribute(ModuleType type, string version) : base(typeof (IModule))
 		{
-			Type = type;
+			Type    = type;
 			Version = version;
 		}
 
 		#region Implementation of IModuleAttribute
 
-		public string Name { get; private set; }
+		public string Name { get; set; }
 
 		public string Author { get; set; }
 

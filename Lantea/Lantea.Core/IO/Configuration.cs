@@ -227,7 +227,6 @@ namespace Lantea.Core.IO
 				else
 				{
 					// if !in_word and buffer.Length > 0 // unexpected word?
-
 					buffer.Append(c);
 				}
 

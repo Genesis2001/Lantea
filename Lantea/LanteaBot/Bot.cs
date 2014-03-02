@@ -96,13 +96,19 @@ namespace LanteaBot
 			if (Client != null)
 			{
 				Client.ConnectionEstablishedEvent += OnClientConnect;
-				Client.MessageReceivedEvent += OnMessageReceived;
-			    Client.TimeoutEvent += OnTimeoutDetected;
+				Client.MessageReceivedEvent       += OnMessageReceived;
+			    Client.TimeoutEvent               += OnTimeoutDetected;
 				Client.Start();
 
 				foreach (IModule m in Modules)
 				{
 					m.Initialize();
+
+					var manager = m as ICommandManager;
+					if (manager != null)
+					{
+						manager.LoadCommands();
+					}
 				}
 			}
 		}

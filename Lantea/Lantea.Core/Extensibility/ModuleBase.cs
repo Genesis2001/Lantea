@@ -6,39 +6,61 @@
 
 namespace Lantea.Core.Extensibility
 {
+	using System;
 	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
 	using System.ComponentModel.Composition;
+	using System.ComponentModel.Composition.Hosting;
+	using System.Linq;
 	using IO;
 
-	public abstract class ModuleBase : IModule
+	public abstract class ModuleBase : IModule, ICommandManager
 	{
-		[ImportingConstructor]
-		protected ModuleBase([Import] IBotCore bot)
+		protected Configuration config;
+
+		protected ModuleBase(IBotCore bot)
 		{
 			Bot = bot;
+			Commands = new ObservableCollection<ICommand>();
 		}
 
 		#region Implementation of IModule
 
 		public IBotCore Bot { get; set; }
 
-		public IList<ICommand> Commands { get; protected set; }
-
 		public abstract void Initialize();
 
-		public abstract void Rehash(Configuration config);
+		public virtual void Rehash(Configuration config)
+		{
+			if (config == null) throw new ArgumentNullException("config");
+
+			this.config = config;
+		}
 
 		#endregion
 
-		#region Implementation of IModuleAttribute
+		#region Implementation of ICommandManager
 
-		public abstract string Name { get; }
+		public IModule Owner
+		{
+			get { return this; }
+		}
 
-		public abstract string Author { get; }
+		[ImportMany] public IList<ICommand> Commands { get; private set; }
 
-		public abstract ModuleType Type { get; }
+		public virtual void LoadCommands()
+		{
+			var asm       = GetType().Assembly;
+			var catalog   = new AssemblyCatalog(asm);
+			var container = new CompositionContainer(catalog);
+			
+			var commands  = container.GetExportedValues<ICommand>();
 
-		public abstract string Version { get; }
+			foreach (ICommand c in commands)
+			{
+				Commands.Add(c);
+			}
+		}
 
 		#endregion
 	}

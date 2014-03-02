@@ -1,21 +1,19 @@
 ﻿// -----------------------------------------------------------------------------
-//  <copyright file="IModule.cs" company="Zack Loveless">
+//  <copyright file="ICommandManager.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------------
 
 namespace Lantea.Core.Extensibility
 {
-	using System.ComponentModel.Composition;
-	using IO;
+	using System.Collections.Generic;
 
-	[InheritedExport(typeof (IModule))]
-	public interface IModule
+	public interface ICommandManager
 	{
-		IBotCore Bot { get; set; }
+		IModule Owner { get; }
 
-		void Initialize();
+		IList<ICommand> Commands { get; }
 
-		void Rehash(Configuration config);
+		void LoadCommands();
 	}
 }

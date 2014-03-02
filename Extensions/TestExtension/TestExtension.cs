@@ -6,13 +6,15 @@
 
 namespace TestExtension
 {
+	using System;
+	using System.ComponentModel.Composition;
 	using Lantea.Core.Extensibility;
-	using Lantea.Core.IO;
 
-	[Module(ModuleType.EXTRA, "1.0")]
+	[Module(ModuleType.EXTRA, "1.0", Name = "Example Extension", Author = "Zack Loveless")]
 	public class TestExtension : ModuleBase
 	{
-		public TestExtension(IBotCore bot) : base(bot)
+		[ImportingConstructor]
+		public TestExtension([Import] IBotCore bot) : base(bot)
 		{
 		}
 
@@ -20,51 +22,9 @@ namespace TestExtension
 
 		public override void Initialize()
 		{
-			throw new System.NotImplementedException();
+			Console.WriteLine("Test Extension loaded.");
 		}
-
-		public override void Rehash(Configuration config)
-		{
-			throw new System.NotImplementedException();
-		}
-
-		public override string Name
-		{
-			get { return "Test Extension"; }
-		}
-
-		public override string Author
-		{
-			get { return "Zack Loveless"; }
-		}
-
-		public override ModuleType Type
-		{
-			get { return ModuleType.EXTRA; }
-		}
-
-		public override string Version
-		{
-			get { return "1.0"; }
-		}
-
-		#endregion
-	}
-
-	public class TestCommand : CommandBase
-	{
-		#region Overrides of CommandBase
-
-		public override bool CanExecute(object parameter)
-		{
-			return true;
-		}
-
-		public override void Execute(object parameter)
-		{
-
-		}
-
+		
 		#endregion
 	}
 }
