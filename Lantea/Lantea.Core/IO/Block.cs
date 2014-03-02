@@ -40,7 +40,7 @@ namespace Lantea.Core.IO
 			return blocks.Keys.Count(x => x.Equals(blockName));
 		}
 
-		public T Get<T>(string property, T def = null) where T : class
+		public T Get<T>(string property, T def = default(T))
 		{
 			if (items.ContainsKey(property))
 			{
@@ -52,7 +52,7 @@ namespace Lantea.Core.IO
 			return def;
 		}
 
-		public Block GetBlock(string blockName, int num)
+		public Block GetBlock(string blockName, int num = 0)
 		{
 			return blocks[blockName].Where((t, i) => i == num).FirstOrDefault();
 		}

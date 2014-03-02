@@ -4,63 +4,73 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AE6B2EAC-6D88-4E70-87F6-415EDED3A022}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LanteaBot</RootNamespace>
-    <AssemblyName>LanteaBot</AssemblyName>
+    <RootNamespace>Lantea.Core</RootNamespace>
+    <AssemblyName>Lantea.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\build\Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\build\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignManifests>false</SignManifests>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="Extensibility\CommandBase.cs" />
+    <Compile Include="Extensibility\IBotCore.cs" />
+    <Compile Include="Extensibility\ICommand.cs" />
+    <Compile Include="Extensibility\ICommandManager.cs" />
+    <Compile Include="Extensibility\IModule.cs" />
+    <Compile Include="Extensibility\IModuleAttribute.cs" />
+    <Compile Include="Extensibility\ModuleAttribute.cs" />
+    <Compile Include="Extensibility\ModuleBase.cs" />
+    <Compile Include="Extensibility\ModuleType.cs" />
+    <Compile Include="IObservableClass.cs" />
+    <Compile Include="IO\Block.cs" />
+    <Compile Include="IO\Configuration.cs" />
+    <Compile Include="IO\ConfigurationLoadEventArgs.cs" />
+    <Compile Include="IO\DualLog.cs" />
+    <Compile Include="IO\Log.cs" />
+    <Compile Include="IO\LogStream.cs" />
+    <Compile Include="IO\LogWriter.cs" />
+    <Compile Include="IO\MalformedConfigException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="example.conf.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Settings.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Lantea.Core\Lantea.Core.csproj">
-      <Project>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</Project>
-      <Name>Lantea.Core</Name>
+    <ProjectReference Include="..\..\Atlantis\Atlantis.Net.Irc\Atlantis.Net.Irc.csproj">
+      <Project>{07410E3A-D2CF-4A81-BA52-864C8D206664}</Project>
+      <Name>Atlantis.Net.Irc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Atlantis\Atlantis\Atlantis.csproj">
+      <Project>{3464FCF7-A68E-40CC-A354-32B80E698890}</Project>
+      <Name>Atlantis</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Lantea.conf" />
+    <Folder Include="Modules\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
