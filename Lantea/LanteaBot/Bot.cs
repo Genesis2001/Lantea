@@ -13,17 +13,13 @@ namespace LanteaBot
 	using System.IO;
 	using System.Linq;
 	using System.Reflection;
-	using System.Text;
 	using System.Threading.Tasks;
-	using Atlantis.Linq;
 	using Atlantis.Net.Irc;
 	using Lantea.Core.Extensibility;
 	using Lantea.Core.IO;
 
 	public class Bot : IBotCore
 	{
-	    private DateTime start;
-	    private DateTime lastDisconnected;
 		[ImportMany] private IEnumerable<Lazy<IModule, IModuleAttribute>> modules;
 		
 		private void Compose()
@@ -37,7 +33,7 @@ namespace LanteaBot
 		private static CompositionContainer GetCompositionContainer()
 		{
 			// ReSharper disable AssignNullToNotNullAttribute
-			Assembly asm = Assembly.GetAssembly(typeof(Bot));
+			Assembly asm     = Assembly.GetAssembly(typeof(Bot));
 			string bLocation = Path.GetDirectoryName(asm.Location);
 			string mLocation = Path.Combine(bLocation, "Extensions");
 			// ReSharper restore AssignNullToNotNullAttribute
@@ -96,8 +92,6 @@ namespace LanteaBot
 			if (Client != null)
 			{
 				Client.ConnectionEstablishedEvent += OnClientConnect;
-				Client.MessageReceivedEvent       += OnMessageReceived;
-			    Client.TimeoutEvent               += OnTimeoutDetected;
 				Client.Start();
 
 				foreach (IModule m in Modules)
@@ -113,15 +107,8 @@ namespace LanteaBot
 			}
 		}
 
-	    private void OnTimeoutDetected(object sender, TimeoutEventArgs e)
-	    {
-	        Console.WriteLine("Timeout detected.");
-	        lastDisconnected = DateTime.Now;
-	    }
-
 	    private void OnClientConnect(object sender, EventArgs args)
 	    {
-	        start = lastDisconnected = DateTime.Now;
             Console.WriteLine("Connection established to IRC server.");
 
 			Task.Factory.StartNew(() =>
@@ -134,72 +121,6 @@ namespace LanteaBot
 									  // TODO: read list of perform commands from config.
 				                      Client.Send("JOIN #UnifiedTech");
 			                      });
-		}
-
-		private void OnMessageReceived(object sender, MessageReceivedEventArgs args)
-		{
-            if (args.Message.StartsWith("!perm") && (!args.Target.EqualsIgnoreCase("#renegadex")))
-			{
-				Channel c = Client.GetChannel(args.Target);
-				PrefixList perms;
-				if (c.Users.TryGetValue(args.Source, out perms))
-				{
-					Client.Message(c.Name,
-						"{0}, I see you have '{1}' as your highest prefix. You also have '{2}' as your prefix(es).",
-						args.Source,
-						perms.HighestPrefix,
-						perms.ToString());
-				}
-			}
-            else if (args.Message.StartsWith("!dump") && (args.Target.EqualsIgnoreCase("#Genesis") || args.Target.EqualsIgnoreCase("#UnifiedTech")))
-            {
-                string[] toks = args.Message.Split(' ');
-
-                StringBuilder builder = new StringBuilder();
-                foreach (Channel c in Client.Channels)
-                {
-                    if (toks.Length >= 2)
-                    {
-                        if (toks[1].StartsWith("#") && !c.Name.EqualsIgnoreCase(toks[1])) continue;
-                    }
-
-                    builder.AppendFormat("PRIVMSG {0} :{1}: ", args.Target, c.Name);
-
-                    foreach (KeyValuePair<string, PrefixList> p in c.Users)
-                    {
-                        if (builder.Length >= 130)
-                        {
-                            string buffer = builder.ToString().TrimEnd(' ', ',');
-                            Client.Send(buffer);
-
-                            builder.Clear();
-                            builder.AppendFormat("PRIVMSG {0} :{1}: ", args.Target, c.Name);
-                        }
-
-                        builder.Append(p.Value.HighestPrefix);
-                        builder.Append(p.Key);
-                        builder.Append(", ");
-                    }
-
-                    builder.Append('\n');
-                }
-            }
-            else if (args.Message.StartsWith("!uptime") && (args.Target.EqualsIgnoreCase("#Genesis") || args.Target.EqualsIgnoreCase("#UnifiedTech")))
-            {
-                TimeSpan connected = (DateTime.Now - lastDisconnected);
-                StringBuilder builder = new StringBuilder();
-
-                if (connected == TimeSpan.Zero) builder.Append("0 minutes");
-
-                if (connected.Days > 0) builder.AppendFormat("{0} days, ", connected.Days);
-                if (connected.Hours > 0) builder.AppendFormat("{0} hours, ", connected.Hours);
-                if (connected.Minutes > 0) builder.AppendFormat("{0} minutes, ", connected.Minutes);
-                if (connected.Seconds > 0) builder.AppendFormat("{0} seconds, ", connected.Seconds);
-
-                string buffer = builder.ToString().TrimEnd(',', ' ');
-
-                Client.Message(args.Target, buffer);
-            }
 		}
 
 		public Configuration Load(string path)
