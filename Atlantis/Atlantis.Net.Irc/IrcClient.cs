@@ -29,7 +29,6 @@ namespace Atlantis.Net.Irc
 		private CancellationTokenSource queueTokenSource;
 		private CancellationTokenSource tokenSource;
 		private CancellationToken token;
-		private CancellationToken queueToken;
 		private bool enableFakeLag;
 		// ReSharper restore FieldCanBeMadeReadOnly.Local
 
@@ -211,7 +210,6 @@ namespace Atlantis.Net.Irc
 		public event EventHandler<NickChangeEventArgs> NickChangedEvent;
 		public event EventHandler<MessageReceivedEventArgs> NoticeReceivedEvent;
 		public event EventHandler PingReceiptEvent;
-		public event EventHandler<ProtocolMessageEventArgs> ProtocolMessageReceivedEvent;
 		public event EventHandler<QuitEventArgs> QuitEvent;
 		public event EventHandler<RawMessageEventArgs> RawMessageReceivedEvent;
 		public event EventHandler<RfcNumericEventArgs> RfcNumericEvent;
@@ -338,7 +336,7 @@ namespace Atlantis.Net.Irc
 
 		private void StartQueue()
 		{
-			queueRunner = Task.Run(new Action(QueueProcessor), queueToken);
+			queueRunner = Task.Run(new Action(QueueProcessor), queueTokenSource.Token);
 		}
 		
 		private void Send(string data)

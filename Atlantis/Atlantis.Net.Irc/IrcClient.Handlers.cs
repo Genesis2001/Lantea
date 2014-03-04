@@ -616,7 +616,7 @@ namespace Atlantis.Net.Irc
 						Send(messageQueue.Pop());
 					}
 
-					Task.Delay(QueueInteval, queueToken).Wait(queueToken);
+					Task.Delay(QueueInteval, queueTokenSource.Token).Wait(queueTokenSource.Token);
 				}
 			}
 			catch (TaskCanceledException)

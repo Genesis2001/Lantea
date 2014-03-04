@@ -42,7 +42,6 @@
     <Compile Include="Collections\DictionaryList.cs" />
     <Compile Include="Collections\QueueAdapter.cs" />
     <Compile Include="IO\ILog.cs" />
-    <Compile Include="IO\IniFile.cs" />
     <Compile Include="IO\LogThreshold.cs" />
     <Compile Include="Linq\EventExtensions.cs" />
     <Compile Include="Linq\NumericExtensions.cs" />
