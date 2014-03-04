@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C19276F0-875B-4997-B5DB-0CF05DB7F36F}"
 	ProjectSection(SolutionItems) = preProject
 		GlobalAssemblyInfo.cs = GlobalAssemblyInfo.cs
+		lantea-tests.nunit = lantea-tests.nunit
 		LanteaMap.dgml = LanteaMap.dgml
 		LICENSE = LICENSE
 		README = README
