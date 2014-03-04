@@ -17,14 +17,14 @@ namespace Lantea.UnitTests
 	public class JenkinsTestFixture
 	{
 		[Test]
-		//[ExpectedException(typeof (AssertionException))]
+		[ExpectedException(typeof (AssertionException))]
 		public void Jenkins_TestShouldFail()
 		{
 			Assert.Fail();
 		}
 
 		[Test]
-		// [ExpectedException(typeof (InconclusiveException))]
+		[ExpectedException(typeof (InconclusiveException))]
 		public void Jenkins_TestShouldBeInconclusive()
 		{
 			Assert.Inconclusive();
@@ -37,7 +37,7 @@ namespace Lantea.UnitTests
 		}
 
 		[Test]
-		// [ExpectedException(typeof(IgnoreException))]
+		[ExpectedException(typeof(IgnoreException))]
 		public void Jenkins_TestShouldBeIgnored()
 		{
 			Assert.Ignore();
