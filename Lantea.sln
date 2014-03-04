@@ -5,7 +5,6 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C19276F0-875B-4997-B5DB-0CF05DB7F36F}"
 	ProjectSection(SolutionItems) = preProject
-		GlobalAssemblyInfo.cs = GlobalAssemblyInfo.cs
 		lantea-tests.nunit = lantea-tests.nunit
 		LanteaMap.dgml = LanteaMap.dgml
 		LICENSE = LICENSE
@@ -28,6 +27,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlantis", "Atlantis\Atlantis\Atlantis.csproj", "{3464FCF7-A68E-40CC-A354-32B80E698890}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lantea", "Lantea", "{623D97C7-AB65-4C5B-9085-7B4478DF0266}"
+	ProjectSection(SolutionItems) = preProject
+		Lantea\GlobalAssemblyInfo.cs = Lantea\GlobalAssemblyInfo.cs
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanteaBot", "Lantea\LanteaBot\LanteaBot.csproj", "{AE6B2EAC-6D88-4E70-87F6-415EDED3A022}"
 EndProject

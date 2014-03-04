@@ -6,7 +6,7 @@
 
 namespace Lantea.Core.Extensibility
 {
-	public enum ModuleType : uint
+	public enum ModuleType
 	{
 		THIRD  = 0, // Third-party module
 		VENDOR = 1, // official vendor module
