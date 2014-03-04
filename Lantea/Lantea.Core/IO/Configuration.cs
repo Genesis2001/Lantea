@@ -65,7 +65,7 @@ namespace Lantea.Core.IO
 #endif
 		}
 
-		internal void Load(Stream stream)
+		public void Load(Stream stream)
 		{
 			if (string.IsNullOrEmpty(currentFileName))
 			{

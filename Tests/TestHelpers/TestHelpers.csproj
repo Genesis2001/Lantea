@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CB160C49-C9F6-4623-A93A-3144D78EB729}</ProjectGuid>
+    <ProjectGuid>{DAD11188-590D-4544-BAC0-6334D403A094}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lantea.UnitTests</RootNamespace>
-    <AssemblyName>Lantea.UnitTests</AssemblyName>
+    <RootNamespace>TestHelpers</RootNamespace>
+    <AssemblyName>TestHelpers</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,41 +30,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigurationFixture.cs" />
-    <Compile Include="ConfigurationStrings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ConfigurationStrings.resx</DependentUpon>
-    </Compile>
-    <Compile Include="JenkinsTestFixture.cs" />
+    <Compile Include="StreamHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Lantea\Lantea.Core\Lantea.Core.csproj">
-      <Project>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</Project>
-      <Name>Lantea.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TestHelpers\TestHelpers.csproj">
-      <Project>{DAD11188-590D-4544-BAC0-6334D403A094}</Project>
-      <Name>TestHelpers</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="ConfigurationStrings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ConfigurationStrings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
