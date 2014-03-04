@@ -39,6 +39,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{F5165F2E-06D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestExtension", "Extensions\TestExtension\TestExtension.csproj", "{AA672440-0652-494B-B35B-A1130E2E39F0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lantea.UnitTests", "Tests\Lantea.UnitTests\Lantea.UnitTests.csproj", "{CB160C49-C9F6-4623-A93A-3144D78EB729}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,11 +71,16 @@ Global
 		{AA672440-0652-494B-B35B-A1130E2E39F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA672440-0652-494B-B35B-A1130E2E39F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA672440-0652-494B-B35B-A1130E2E39F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB160C49-C9F6-4623-A93A-3144D78EB729}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB160C49-C9F6-4623-A93A-3144D78EB729}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB160C49-C9F6-4623-A93A-3144D78EB729}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB160C49-C9F6-4623-A93A-3144D78EB729}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{CB160C49-C9F6-4623-A93A-3144D78EB729} = {5DDB5526-4C70-4822-B64F-D012D28396AE}
 		{AA672440-0652-494B-B35B-A1130E2E39F0} = {C12C37ED-8216-40CA-88BD-01E522A759D4}
 		{186F735C-F866-4DE0-8F99-CDE961675397} = {81749574-CF46-4ED8-99AE-53559DA70D3F}
 		{07410E3A-D2CF-4A81-BA52-864C8D206664} = {81749574-CF46-4ED8-99AE-53559DA70D3F}
