@@ -1,4 +1,5 @@
-﻿// -----------------------------------------------------------------------------
+﻿#if DEBUG
+// -----------------------------------------------------------------------------
 //  <copyright file="JenkinsTestFixture.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
 //  </copyright>
@@ -6,6 +7,7 @@
 
 namespace Lantea.UnitTests
 {
+
 	using NUnit.Framework;
 
 	// ReSharper disable InconsistentNaming
@@ -45,3 +47,5 @@ namespace Lantea.UnitTests
 	// ReSharper enable InconsistentNaming
 	// ReSharper enable PossibleNullReferenceException
 }
+
+#endif

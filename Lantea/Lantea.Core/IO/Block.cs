@@ -9,6 +9,7 @@ namespace Lantea.Core.IO
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
+	using System.Security.Cryptography.X509Certificates;
 	using Atlantis.Collections;
 
 	public class Block
@@ -37,7 +38,12 @@ namespace Lantea.Core.IO
 
 		public int CountBlock(string blockName)
 		{
-			return blocks.Keys.Count(x => x.Equals(blockName));
+			if (blockName == null)
+			{
+				throw new ArgumentNullException("blockName");
+			}
+
+			return !blocks.ContainsKey(blockName) ? 0 : blocks[blockName].Count;
 		}
 
 		public T Get<T>(string property, T def = default(T))
@@ -54,6 +60,9 @@ namespace Lantea.Core.IO
 
 		public Block GetBlock(string blockName, int num = 0)
 		{
+			if (blockName == null) throw new ArgumentNullException("blockName");
+			if (!blocks.ContainsKey(blockName)) throw new KeyNotFoundException("The specified block name was not found.");
+
 			return blocks[blockName].Where((t, i) => i == num).FirstOrDefault();
 		}
 

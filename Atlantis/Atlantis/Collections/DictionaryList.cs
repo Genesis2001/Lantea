@@ -32,7 +32,7 @@ namespace Atlantis.Collections
 			List<T> values;
 			if (!dict.TryGetValue(pair.Key, out values))
 			{
-				values = new List<T>();
+				values         = new List<T>();
 				dict[pair.Key] = values;
 			}
 
@@ -40,6 +40,11 @@ namespace Atlantis.Collections
 			{
 				values.Add(pair.Value);
 			}
+		}
+
+		public bool ContainsKey(string key)
+		{
+			return dict.ContainsKey(key);
 		}
 
 		public bool Remove(string key, T value)
