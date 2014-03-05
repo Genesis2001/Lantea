@@ -5,6 +5,9 @@
 // -----------------------------------------------------------------------------
 namespace Lantea.UnitTests
 {
+	// ReSharper disable InconsistentNaming
+	// ReSharper disable PossibleNullReferenceException
+
 	using System;
 	using System.Collections.Generic;
 	using System.IO;
@@ -88,7 +91,7 @@ namespace Lantea.UnitTests
 		}
 
 		[Test]
-		public void CountBlock_WhenConfigurationIsNotLoaded_ShouldReturnZero()
+		public void CountBlock_WithUnloadedConfiguration_ShouldReturnZero()
 		{
 			const int expected = 0;
 			int result         = SUT.CountBlock("block");
@@ -98,7 +101,7 @@ namespace Lantea.UnitTests
 
 		[Test]
 		[ExpectedException(typeof (ArgumentNullException))]
-		public void GetBlock_WhenPassedNull_ShouldThrowArgumentNullException()
+		public void GetBlock_WithNullArgument_ShouldThrowArgumentNullException()
 		{
 			Stream stream = ConfigurationStrings.SingleEmptyBlock.AsStream();
 
@@ -109,9 +112,29 @@ namespace Lantea.UnitTests
 
 		[Test]
 		[ExpectedException(typeof (KeyNotFoundException))]
-		public void GetBlock_WhenPassedNonExistantBlockName_ShouldThrowKeyNotFoundException()
+		public void GetBlock_WithNonExistantBlockName_ShouldThrowKeyNotFoundException()
 		{
 			SUT.GetBlock("none"); // exception
 		}
+
+		[Test]
+		public void GetBlock_WithExistingBlock_ShouldReturnMatchingBlock()
+		{
+			Stream stream = ConfigurationStrings.SingleBlockWithNameProperty.AsStream();
+
+			SUT.Load(stream);
+
+			const string expected = "some block";
+			Block block           = SUT.GetBlock("block");
+
+			Assert.That(block, Is.Not.Null);
+
+			string result         = block.Get<String>("name");
+
+			Assert.That(result, Is.EqualTo(expected));
+		}
 	}
+
+	// ReSharper enable InconsistentNaming
+	// ReSharper enable PossibleNullReferenceException
 }

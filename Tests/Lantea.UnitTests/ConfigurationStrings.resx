@@ -120,6 +120,12 @@
   <data name="EmptyFile" xml:space="preserve">
     <value />
   </data>
+  <data name="SingleBlockWithNameProperty" xml:space="preserve">
+    <value>block
+{
+	name = "some block"
+}</value>
+  </data>
   <data name="SingleEmptyBlock" xml:space="preserve">
     <value>block
 {

@@ -7,7 +7,6 @@
 
 namespace Lantea.UnitTests
 {
-
 	using NUnit.Framework;
 
 	// ReSharper disable InconsistentNaming
