@@ -118,6 +118,16 @@ namespace Lantea.UnitTests
 		}
 
 		[Test]
+		public void GetBlock_WithBlockAndAttributes_ShouldReturnListOfAttributes()
+		{
+			Stream stream = ConfigurationStrings.SingleBlockWithNameProperty.AsStream();
+
+			SUT.Load(stream);
+
+			Block block = SUT.GetBlock("block");
+		}
+
+		[Test]
 		public void GetBlock_WithExistingBlock_ShouldReturnMatchingBlock()
 		{
 			Stream stream = ConfigurationStrings.SingleBlockWithNameProperty.AsStream();
