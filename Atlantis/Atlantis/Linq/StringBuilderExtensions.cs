@@ -11,6 +11,13 @@ namespace Atlantis.Linq
 
 	public static partial class Extensions
 	{
+		public static StringBuilder AppendFormatLine(this StringBuilder source, string format, params object[] args)
+		{
+			source.AppendFormat(format, args);
+
+			return source.Append(Environment.NewLine);
+		}
+
 		public static StringBuilder AppendIf(this StringBuilder source, object item, Predicate<object> condition)
 		{
 			if (source == null)

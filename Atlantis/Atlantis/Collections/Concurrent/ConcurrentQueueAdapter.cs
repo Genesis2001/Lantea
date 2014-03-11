@@ -33,6 +33,12 @@ namespace Atlantis.Collections.Concurrent
 			get { return queue.Count; }
 		}
 
+		public T Peek()
+		{
+			T item;
+			return queue.TryPeek(out item) ? item : null;
+		}
+
 		public T Pop()
 		{
 			T result;

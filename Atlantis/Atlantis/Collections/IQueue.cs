@@ -10,6 +10,8 @@ namespace Atlantis.Collections
 	{
 		int Count { get; }
 
+		T Peek();
+
 		T Pop();
 
 		void Push(T item);

@@ -8,12 +8,14 @@ namespace Atlantis.Linq
 {
 	using System;
 
-	public static class NumericExtensions
+	public static partial class Extensions
 	{
 		private static readonly DateTime ORIGIN = new DateTime(1970, 1, 1, 0, 0, 0);
 
 		public static DateTime ToDateTime(this double source)
 		{
+			if (source < 0) throw new ArgumentException("The value cannot be less than zero.", "source");
+
 			return ORIGIN.AddSeconds(source);
 		}
 
