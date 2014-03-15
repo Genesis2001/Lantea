@@ -29,6 +29,11 @@ namespace Atlantis.Collections
 			get { return queue.Count; }
 		}
 
+		public T Peek()
+		{
+			return queue.Peek();
+		}
+
 		public T Pop()
 		{
 			return queue.Dequeue();

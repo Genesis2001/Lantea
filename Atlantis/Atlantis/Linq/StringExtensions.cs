@@ -11,21 +11,14 @@ namespace Atlantis.Linq
 
 	public static partial class Extensions
 	{
-		public static StringBuilder AppendFormatLine(this StringBuilder source, string format, params object[] args)
-		{
-			source.AppendFormat(format, args);
-
-			return source.Append(Environment.NewLine);
-		}
-
 		public static bool EqualsIgnoreCase(this string source, string value)
 		{
-			return source.Equals(value, StringComparison.InvariantCultureIgnoreCase);
+			return source.Equals(value, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public static bool StartsWithIgnoreCase(this string source, string value)
 		{
-			return source.StartsWith(value, StringComparison.InvariantCultureIgnoreCase);
+			return source.StartsWith(value, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public static string TrimIfNotNull(this string source)
