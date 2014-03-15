@@ -113,7 +113,6 @@ namespace Lantea.Core.IO
 		private void ProcessLine(string line)
 		{
 			int len = line.Length;
-
 			for (int i = 0; i < len; ++i)
 			{
 				char c = line[i];
@@ -253,18 +252,6 @@ namespace Lantea.Core.IO
 						}
 
 						Block b = blockStack.Peek();
-
-						/*for (int j = 0; j < CountBlock("define"); ++j)
-						{
-							Block define = GetBlock("define", j);
-
-							string dname = define.Get<String>("name");
-							if (dname == buffer.ToString() && define != b)
-							{
-								buffer.Clear();
-								buffer.Append(define.Get<String>("value"));
-							}
-						}*/
 						
 						if (b != null)
 						{

@@ -61,6 +61,23 @@ namespace Lantea.UnitTests {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to blockA
+        ///{
+        ///	itema = &quot;value a&quot;
+        ///
+        ///	blockB
+        ///	{
+        ///		itemb = &quot;value b&quot;
+        ///	}
+        ///}.
+        /// </summary>
+        internal static string BlockWithinBlock {
+            get {
+                return ResourceManager.GetString("BlockWithinBlock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         internal static string EmptyFile {
@@ -89,6 +106,15 @@ namespace Lantea.UnitTests {
         internal static string SingleEmptyBlock {
             get {
                 return ResourceManager.GetString("SingleEmptyBlock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to block { name = &quot;hello world&quot;; }.
+        /// </summary>
+        internal static string SingleLineBlock {
+            get {
+                return ResourceManager.GetString("SingleLineBlock", resourceCulture);
             }
         }
         

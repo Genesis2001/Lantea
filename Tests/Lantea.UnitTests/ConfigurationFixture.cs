@@ -124,7 +124,12 @@ namespace Lantea.UnitTests
 
 			SUT.Load(stream);
 
-			Block block = SUT.GetBlock("block");
+			Block block           = SUT.GetBlock("block");
+
+			const string expected = "some block";
+			string actual         = block.Get<String>("name");
+
+			Assert.That(actual, Is.EqualTo(expected));
 		}
 
 		[Test]
@@ -136,12 +141,29 @@ namespace Lantea.UnitTests
 
 			const string expected = "some block";
 			Block block           = SUT.GetBlock("block");
-
 			Assert.That(block, Is.Not.Null);
 
 			string result         = block.Get<String>("name");
-
 			Assert.That(result, Is.EqualTo(expected));
+		}
+
+		[Test, Category("GitHub Issue #12")]
+		public void GetBlock_WithNestedBlock_ShouldGetNestedBlock()
+		{
+			Stream stream = ConfigurationStrings.BlockWithinBlock.AsStream();
+
+			SUT.Load(stream);
+
+			Block blockA = SUT.GetBlock("blockA");
+			Assert.That(blockA, Is.Not.Null);
+
+			Block blockB = blockA.GetBlock("blockB");
+			Assert.That(blockB, Is.Not.Null);
+		}
+
+		[Test, Category("GitHub Issue #4")]
+		public void Load_WithSingleLineBlock_ShouldLoadMatchingBlock()
+		{
 		}
 	}
 

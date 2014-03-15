@@ -18,7 +18,6 @@ namespace Lantea.Core.IO
 		 * template<typename T> class map : public std::map<string, T, ci::less> { };				// Dictionary<String, T>
 		 * template<typename T> class multimap : public std::multimap<string, T, ci::less> { };		// Dictionary<String, List<T>>
 		 * 
-		 * 
 		 * item_map items;
 		 * block_map blocks;
 		 */
