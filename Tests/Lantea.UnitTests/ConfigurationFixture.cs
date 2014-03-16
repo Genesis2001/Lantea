@@ -164,6 +164,12 @@ namespace Lantea.UnitTests
 		[Test, Category("GitHub Issue #4")]
 		public void Load_WithSingleLineBlock_ShouldLoadMatchingBlock()
 		{
+			Stream stream = ConfigurationStrings.SingleLineBlock.AsStream();
+
+			SUT.Load(stream);
+
+			Block actual = SUT.GetBlock("block");
+			Assert.That(actual, Is.Not.Null);
 		}
 	}
 
