@@ -5,9 +5,7 @@
 // -----------------------------------------------------------------------------
 namespace Lantea.UnitTests
 {
-	// ReSharper disable InconsistentNaming
-	// ReSharper disable PossibleNullReferenceException
-
+	using System.Diagnostics.CodeAnalysis;
 	using System;
 	using System.Collections.Generic;
 	using System.IO;
@@ -15,7 +13,11 @@ namespace Lantea.UnitTests
 	using NUnit.Framework;
 	using TestHelpers;
 
+	// ReSharper disable InconsistentNaming
+	// ReSharper disable PossibleNullReferenceException
+
 	[TestFixture]
+	[ExcludeFromCodeCoverage]
 	public class ConfigurationFixture
 	{
 		private Configuration SUT;

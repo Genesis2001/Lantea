@@ -7,9 +7,11 @@
 namespace Lantea.UnitTests
 {
 	using System;
+	using System.Diagnostics.CodeAnalysis;
 	using Atlantis.Linq;
 	using NUnit.Framework;
 
+	[ExcludeFromCodeCoverage]
 	public class ExtensionsFixture
 	{
 		[Test]

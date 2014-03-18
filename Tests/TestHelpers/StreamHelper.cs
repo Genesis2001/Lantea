@@ -6,9 +6,11 @@
 
 namespace TestHelpers
 {
+	using System.Diagnostics.CodeAnalysis;
 	using System.IO;
 	using System.Text;
 
+	[ExcludeFromCodeCoverage]
 	public static class StreamHelper
 	{
 		public static Stream AsStream(this string source)

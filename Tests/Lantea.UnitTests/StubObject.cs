@@ -7,7 +7,9 @@
 namespace Lantea.UnitTests
 {
 	using System;
+	using System.Diagnostics.CodeAnalysis;
 
+	[ExcludeFromCodeCoverage]
 	internal class StubObject
 	{
 		public Guid Id { get; set; }
