@@ -18,8 +18,11 @@ namespace Lantea.Core.IO
 		private readonly StringBuilder buffer;
 		private string currentFileName;
 		private string itemname;
-		private ConfigState state;
 		private int currentLine;
+
+		private bool in_word;
+		private bool in_quote;
+		private bool in_comment;
 
 		public Configuration() : base("")
 		{
@@ -86,12 +89,12 @@ namespace Lantea.Core.IO
 				}
 			}
 
-			if (state == ConfigState.CommentOpen)
+			if (in_comment)
 			{
 				throw new MalformedConfigException(string.Format("Unterminated multiline comment at end of file: {0}", currentFileName));
 			}
 
-			if (state == ConfigState.StringOpen)
+			if (in_quote)
 			{
 				throw new MalformedConfigException(string.Format("Untermniated string value at end of file: {0}", currentFileName));
 			}
@@ -116,7 +119,7 @@ namespace Lantea.Core.IO
 			for (int i = 0; i < len; ++i)
 			{
 				char c = line[i];
-				if (state == ConfigState.StringOpen)
+				if (in_quote)
 				{
 					if (i == 0)
 					{
@@ -136,18 +139,18 @@ namespace Lantea.Core.IO
 					}
 					else if (c == '"')
 					{
-						state = ConfigState.StringClosed;
+						in_quote = in_word = false;
 					}
 					else
 					{
 						buffer.Append(c);
 					}
 				}
-				else if (state == ConfigState.CommentOpen)
+				else if (in_comment)
 				{
 					if (c == '*' && (i + 1 < len) && line[i + 1] == '/')
 					{
-						state = ConfigState.CommentClosed;
+						in_comment = false;
 						++i;
 					}
 					else
@@ -161,18 +164,23 @@ namespace Lantea.Core.IO
 				}
 				else if (c == '/' && (i + 1 < len) && line[i + 1] == '*')
 				{
-					state = ConfigState.CommentOpen;
+					in_comment = true;
 					++i;
 					continue;
 				}
 				else if (c == '"')
 				{
-					if (blockStack.Count == 0 || itemname == null)
+					if (blockStack.Count == 0 || string.IsNullOrWhiteSpace(itemname))
 					{
 						throw new MalformedConfigException("Unexpected quote string", currentFileName, currentLine);
 					}
 
-					state = ConfigState.StringOpen;
+					if (in_word || buffer.Length > 0)
+					{
+						throw new MalformedConfigException("Unexpected quoted string (prior unhandled words)", currentFileName, lineNumber);
+					}
+
+					in_quote = in_word = true;
 				}
 				else if (c == '=')
 				{
@@ -186,6 +194,7 @@ namespace Lantea.Core.IO
 						throw new MalformedConfigException("Stray '=' or item without value", currentFileName, currentLine);
 					}
 
+					in_word  = false;
 					itemname = buffer.ToString().Trim();
 					buffer.Clear();
 				}
@@ -201,6 +210,7 @@ namespace Lantea.Core.IO
 					if (blockStack.Count > 0 && blockStack.Peek() != null)
 					{
 						// named block inside of comment block.
+						in_word = false;
 						buffer.Clear();
 						blockStack.Push(new Block(null));
 						continue;
@@ -209,41 +219,52 @@ namespace Lantea.Core.IO
 					string blockName = buffer.ToString();
 					Block b          = blockStack.Count == 0 ? this : blockStack.Peek();
 
-					KeyValuePair<string, Block> block = new KeyValuePair<string, Block>(blockName, new Block(blockName));
-					b.blocks.Add(block);
+					// Tuple<String, Block> pair = new Tuple<string, Block>(blockName, new Block(blockName));
+					KeyValuePair<string, Block> pair = new KeyValuePair<string, Block>(blockName, new Block(blockName));
+					b.blocks.Add(pair);
 
-					b = block.Value;
+					b = pair.Value;
 					b.lineNumber = currentLine;
-
 					blockStack.Push(b);
+
+					in_word = false;
 					buffer.Clear();
 					continue;
 				}
-				else if (c == ';' || c == '}')
+				else if (c == ' ' || c == '\r' || c == '\t')
 				{
-					// terminate word.
+					in_word = false;
 				}
+				else if (c == ';' || c == '}')
+					;
 				else
 				{
+					if (!in_word && buffer.Length > 0)
+					{
+						throw new MalformedConfigException("Unexpected word", currentFileName, lineNumber);
+					}
+
 					// if !in_word and buffer.Length > 0 // unexpected word?
 					buffer.Append(c);
+					in_word = true;
 				}
 
 				if (c == ';' || c == '}' || i + 1 >= len)
 				{
 					bool eol = i + 1 >= len;
 
-					if (!eol && state == ConfigState.StringOpen)
+					if (!eol && in_quote)
 					{
 						continue;
 					}
 
-					if (state == ConfigState.StringOpen)
+					if (in_quote)
 					{
 						buffer.Append('\n');
 						continue;
 					}
 
+					in_word = false;
 					if (!string.IsNullOrEmpty(itemname))
 					{
 						if (blockStack.Count == 0)
@@ -270,21 +291,9 @@ namespace Lantea.Core.IO
 						}
 
 						blockStack.Pop();
-						state = ConfigState.BlockClosed;
 					}
 				}
 			}
-		}
-
-		private enum ConfigState
-		{
-			None = 0,
-			BlockOpen,
-			BlockClosed,
-			StringOpen,
-			StringClosed,
-			CommentOpen,
-			CommentClosed,
 		}
 	}
 }
