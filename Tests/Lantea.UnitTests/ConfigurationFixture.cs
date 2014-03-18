@@ -170,6 +170,10 @@ namespace Lantea.UnitTests
 
 			Block actual = SUT.GetBlock("block");
 			Assert.That(actual, Is.Not.Null);
+
+			const String expectedName = "hello world";
+			String actualName         = actual.Get<String>("name");
+			Assert.That(actualName, Is.EqualTo(expectedName));
 		}
 	}
 

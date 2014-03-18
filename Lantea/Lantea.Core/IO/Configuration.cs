@@ -219,11 +219,11 @@ namespace Lantea.Core.IO
 					string blockName = buffer.ToString();
 					Block b          = blockStack.Count == 0 ? this : blockStack.Peek();
 
-					// Tuple<String, Block> pair = new Tuple<string, Block>(blockName, new Block(blockName));
-					KeyValuePair<string, Block> pair = new KeyValuePair<string, Block>(blockName, new Block(blockName));
-					b.blocks.Add(pair);
+					Tuple<String, Block> pair = new Tuple<string, Block>(blockName, new Block(blockName));
+					//KeyValuePair<string, Block> pair = new KeyValuePair<string, Block>(blockName, new Block(blockName));
+					b.blocks.Add(pair.Item1, pair.Item2);
 
-					b = pair.Value;
+					b            = pair.Item2;
 					b.lineNumber = currentLine;
 					blockStack.Push(b);
 

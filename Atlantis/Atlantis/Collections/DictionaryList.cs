@@ -11,9 +11,9 @@ namespace Atlantis.Collections
 
 	public class DictionaryList<T>
 	{
-		private readonly Dictionary<string, List<T>> dict = new Dictionary<string, List<T>>();
+		private readonly Dictionary<String, List<T>> dict = new Dictionary<String, List<T>>();
 
-		public void Add(string key, T value)
+		public void Add(String key, T value)
 		{
 			List<T> values;
 			if (!dict.TryGetValue(key, out values))
@@ -27,27 +27,12 @@ namespace Atlantis.Collections
 			}
 		}
 
-		public void Add(KeyValuePair<string, T> pair)
-		{
-			List<T> values;
-			if (!dict.TryGetValue(pair.Key, out values))
-			{
-				values         = new List<T>();
-				dict[pair.Key] = values;
-			}
-
-			if (!values.Contains(pair.Value))
-			{
-				values.Add(pair.Value);
-			}
-		}
-
-		public bool ContainsKey(string key)
+		public Boolean ContainsKey(String key)
 		{
 			return dict.ContainsKey(key);
 		}
 
-		public bool Remove(string key, T value)
+		public Boolean Remove(String key, T value)
 		{
 			List<T> values;
 
@@ -59,7 +44,12 @@ namespace Atlantis.Collections
 			get { return dict.Keys; }
 		}
 
-		public List<T> this[string key]
+		public Boolean TryGetValue(String key, out List<T> value)
+		{
+			return dict.TryGetValue(key, out value);
+		}
+
+		public List<T> this[String key]
 		{
 			get
 			{
