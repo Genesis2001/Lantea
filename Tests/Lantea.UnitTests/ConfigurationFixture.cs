@@ -28,7 +28,7 @@ namespace Lantea.UnitTests
 			SUT = new Configuration();
 		}
 
-		[Test]
+		[Test, Category("Configuration Tests")]
 		public void CountBlock_WithSingleEmptyBlock_ShouldReturnOne()
 		{
 			Stream stream = ConfigurationStrings.SingleEmptyBlock.AsStream();
@@ -41,7 +41,7 @@ namespace Lantea.UnitTests
 			Assert.That(result, Is.EqualTo(expected));
 		}
 
-		[Test]
+		[Test, Category("Configuration Tests")]
 		public void CountBlock_WithNoBlocks_ShouldReturnZero()
 		{
 			Stream stream = ConfigurationStrings.EmptyFile.AsStream();
@@ -54,7 +54,7 @@ namespace Lantea.UnitTests
 			Assert.That(result, Is.EqualTo(expected));
 		}
 
-		[Test]
+		[Test, Category("Configuration Tests")]
 		public void CountBlock_WithNoMatchingBlocks_ShouldReturnZero()
 		{
 			Stream stream = ConfigurationStrings.SingleEmptyBlock.AsStream();
@@ -68,7 +68,7 @@ namespace Lantea.UnitTests
 		}
 
 
-		[Test]
+		[Test, Category("Configuration Tests")]
 		public void CountBlock_WithThreeIdenticalBlocks_ShouldReturnThree()
 		{
 			Stream stream = ConfigurationStrings.ThreeEmptyBlocks.AsStream();
@@ -81,7 +81,7 @@ namespace Lantea.UnitTests
 			Assert.That(result, Is.EqualTo(expected));
 		}
 
-		[Test]
+		[Test, Category("Configuration Tests")]
 		[ExpectedException(typeof(ArgumentNullException))]
 		public void CountBlock_WithNullArgument_ShouldThrowArgumentNullException()
 		{
@@ -92,7 +92,7 @@ namespace Lantea.UnitTests
 			SUT.CountBlock(null); // exception
 		}
 
-		[Test]
+		[Test, Category("Configuration Tests")]
 		public void CountBlock_WithUnloadedConfiguration_ShouldReturnZero()
 		{
 			const int expected = 0;
@@ -101,7 +101,7 @@ namespace Lantea.UnitTests
 			Assert.That(result, Is.EqualTo(expected));
 		}
 
-		[Test]
+		[Test, Category("Configuration Tests")]
 		[ExpectedException(typeof (ArgumentNullException))]
 		public void GetBlock_WithNullArgument_ShouldThrowArgumentNullException()
 		{
@@ -112,14 +112,14 @@ namespace Lantea.UnitTests
 			SUT.GetBlock(null); // exception
 		}
 
-		[Test]
+		[Test, Category("Configuration Tests")]
 		[ExpectedException(typeof (KeyNotFoundException))]
 		public void GetBlock_WithNonExistantBlockName_ShouldThrowKeyNotFoundException()
 		{
 			SUT.GetBlock("none"); // exception
 		}
 
-		[Test]
+		[Test, Category("Configuration Tests")]
 		public void GetBlock_WithBlockAndAttributes_ShouldReturnListOfAttributes()
 		{
 			Stream stream = ConfigurationStrings.SingleBlockWithNameProperty.AsStream();
@@ -134,7 +134,7 @@ namespace Lantea.UnitTests
 			Assert.That(actual, Is.EqualTo(expected));
 		}
 
-		[Test]
+		[Test, Category("Configuration Tests")]
 		public void GetBlock_WithExistingBlock_ShouldReturnMatchingBlock()
 		{
 			Stream stream = ConfigurationStrings.SingleBlockWithNameProperty.AsStream();
@@ -149,7 +149,7 @@ namespace Lantea.UnitTests
 			Assert.That(result, Is.EqualTo(expected));
 		}
 
-		[Test, Category("GitHub Issue #12")]
+		[Test, Category("Github Issue #12"), Category("Configuration Tests")]
 		public void GetBlock_WithNestedBlock_ShouldGetNestedBlock()
 		{
 			Stream stream = ConfigurationStrings.BlockWithinBlock.AsStream();
@@ -163,7 +163,7 @@ namespace Lantea.UnitTests
 			Assert.That(blockB, Is.Not.Null);
 		}
 
-		[Test, Category("GitHub Issue #4")]
+		[Test, Category("Github Issue #4"), Category("Configuration Tests")]
 		public void Load_WithSingleLineBlock_ShouldLoadMatchingBlock()
 		{
 			Stream stream = ConfigurationStrings.SingleLineBlock.AsStream();

@@ -9,10 +9,10 @@ namespace Lantea.Core.Extensibility
 	using System.ComponentModel.Composition;
 	using IO;
 
-	[InheritedExport(typeof (IModule))]
-	public interface IModule
+	[InheritedExport("Module", typeof(IModule))]
+	public interface IModule : IModuleAttribute
 	{
-		IBotCore Bot { get; set; }
+		IBotCore Bot { get; }
 
 		void Initialize();
 

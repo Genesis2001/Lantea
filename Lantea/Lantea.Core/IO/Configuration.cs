@@ -220,7 +220,6 @@ namespace Lantea.Core.IO
 					Block b          = block_stack.Count == 0 ? this : block_stack.Peek();
 
 					Tuple<String, Block> pair = new Tuple<string, Block>(blockName, new Block(blockName));
-					//KeyValuePair<string, Block> pair = new KeyValuePair<string, Block>(blockName, new Block(blockName));
 					b.blocks.Add(pair.Item1, pair.Item2);
 
 					b            = pair.Item2;

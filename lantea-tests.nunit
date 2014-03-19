@@ -2,8 +2,10 @@
 	<Settings activeconfig="Debug"/>
 	<Config name="Debug">
 		<assembly path="Tests\Lantea.UnitTests\bin\Debug\Lantea.UnitTests.dll" />
+		<assembly path="Tests\Lantea.IntegrationTests\bin\Debug\Lantea.IntegrationTests.dll" />
 	</Config>
 	<Config name="Release">
 		<assembly path="Tests\Lantea.UnitTests\bin\Release\Lantea.UnitTests.dll" />
+		<assembly path="Tests\Lantea.IntegrationTests\bin\Release\Lantea.IntegrationTests.dll" />
 	</Config>
 </NUnitProject>

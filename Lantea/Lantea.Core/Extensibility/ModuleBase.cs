@@ -23,6 +23,32 @@ namespace Lantea.Core.Extensibility
 			Commands = new ObservableCollection<ICommand>();
 		}
 
+		#region Implementation of ICommandManager
+
+		public IModule Owner
+		{
+			get { return this; }
+		}
+
+		public IList<ICommand> Commands { get; private set; }
+
+		public virtual void LoadCommands()
+		{
+			var asm = GetType().Assembly;
+			var catalog = new AssemblyCatalog(asm);
+			var container = new CompositionContainer(catalog);
+			container.ComposeExportedValue<IModule>(this);
+
+			var commands = container.GetExportedValues<ICommand>();
+
+			foreach (ICommand c in commands)
+			{
+				Commands.Add(c);
+			}
+		}
+
+		#endregion
+
 		#region Implementation of IModule
 
 		public IBotCore Bot { get; set; }
@@ -38,29 +64,15 @@ namespace Lantea.Core.Extensibility
 
 		#endregion
 
-		#region Implementation of ICommandManager
+		#region Implementation of IModuleAttribute
 
-		public IModule Owner
-		{
-			get { return this; }
-		}
+		public abstract string Name { get; }
 
-		[ImportMany] public IList<ICommand> Commands { get; private set; }
+		public abstract string Author { get; }
 
-		public virtual void LoadCommands()
-		{
-			var asm       = GetType().Assembly;
-			var catalog   = new AssemblyCatalog(asm);
-			var container = new CompositionContainer(catalog);
-			container.ComposeExportedValue<IModule>(this);
-			
-			var commands  = container.GetExportedValues<ICommand>();
+		public abstract ModuleType Type { get; }
 
-			foreach (ICommand c in commands)
-			{
-				Commands.Add(c);
-			}
-		}
+		public abstract string Version { get; }
 
 		#endregion
 	}

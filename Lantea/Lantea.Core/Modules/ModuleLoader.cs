@@ -1,15 +1,12 @@
 ﻿// -----------------------------------------------------------------------------
-//  <copyright file="ModuleType.cs" company="Zack Loveless">
+//  <copyright file="ModuleLoader.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.Core.Extensibility
+namespace Lantea.Core.Modules
 {
-	public enum ModuleType
+	public class ModuleLoader
 	{
-		THIRD  = 0,
-		VENDOR = 1,
-		EXTRA  = 2,
 	}
 }

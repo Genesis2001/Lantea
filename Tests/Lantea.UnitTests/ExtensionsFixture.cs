@@ -14,7 +14,7 @@ namespace Lantea.UnitTests
 	[ExcludeFromCodeCoverage]
 	public class ExtensionsFixture
 	{
-		[Test]
+		[Test, Category("Atlantis Extension Tests")]
 		public void EqualsIgnoreCase_WithLowerString_ShouldEqualSameStringInUpperCase()
 		{
 			const string upperCase = "STRING";
@@ -25,7 +25,7 @@ namespace Lantea.UnitTests
 			Assert.That(actual, Is.True);
 		}
 
-		[Test]
+		[Test, Category("Atlantis Extension Tests")]
 		public void StartsWithIgnoreCase_WithLowerString_ShouldReturnTrueWhenComparedWithUpperString()
 		{
 			const string testString = "STRTest";
@@ -36,7 +36,7 @@ namespace Lantea.UnitTests
 			Assert.That(actual, Is.True);
 		}
 
-		[Test]
+		[Test, Category("Atlantis Extension Tests")]
 		public void StringMatches_WithRegularExpression_ShouldReturnTrueForStringMatching()
 		{
 			const string testString = "1234";
@@ -47,7 +47,7 @@ namespace Lantea.UnitTests
 			Assert.That(actual, Is.True);
 		}
 
-		[Test]
+		[Test, Category("Atlantis Extension Tests")]
 		[ExpectedException(typeof (FormatException))]
 		public void StringToDouble_WithNonDouble_ShouldThrowFormatException()
 		{
@@ -56,7 +56,7 @@ namespace Lantea.UnitTests
 			double expected         = testString.ToDouble();
 		}
 
-		[Test]
+		[Test, Category("Atlantis Extension Tests")]
 		public void StringToDouble_WithDoubleAsString_ShouldReturnStringAsDouble()
 		{
 			const string testString = "10.0";
@@ -66,7 +66,7 @@ namespace Lantea.UnitTests
 			Assert.That(expected, Is.EqualTo(10.0));
 		}
 
-		[Test]
+		[Test, Category("Atlantis Extension Tests")]
 		public void ToDateTime_WithOneWeekSeconds_ShouldReturnCorrectDateTime()
 		{
 			// 604800
@@ -78,7 +78,7 @@ namespace Lantea.UnitTests
 			Assert.That(actual, Is.EqualTo(expected));
 		}
 
-		[Test]
+		[Test, Category("Atlantis Extension Tests")]
 		[ExpectedException(typeof (ArgumentException))]
 		public void ToDateTime_WithNegativeValue_ShouldThrowArgumentException()
 		{
