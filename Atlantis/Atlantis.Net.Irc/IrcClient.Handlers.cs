@@ -452,6 +452,8 @@ namespace Atlantis.Net.Irc
 							channel = GetChannel(target);
 						}
 
+						bool accessList = false;
+
 						// TODO: Add error checking to parameter list.
 						for (int i = 0; i < modes.Length; ++i)
 						{
@@ -509,10 +511,15 @@ namespace Atlantis.Net.Irc
 								if (set) list.AddPrefix(prefix);
 								else list.RemovePrefix(prefix);
 
-								if (StrictNames)
-								{
-									Send("NAMES {0}", target);
-								}
+								accessList = true;
+							}
+						}
+
+						if (accessList)
+						{
+							if (StrictNames)
+							{
+								Send("NAMES {0}", target);
 							}
 						}
 					}
