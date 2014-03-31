@@ -1,19 +1,17 @@
 ﻿// -----------------------------------------------------------------------------
-//  <copyright file="ICommandManager.cs" company="Zack Loveless">
+//  <copyright file="ModuleCore.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------------
 
 namespace Lantea.Core.Extensibility
 {
-	using System.Collections.Generic;
+	using IO;
 
-	public interface ICommandManager
+	public abstract class ModuleCore
 	{
-		IModule Owner { get; }
-
-		IList<ICommand> Commands { get; }
-
-		void LoadCommands();
+		protected ModuleCore(IBotCore bot, Configuration config)
+		{
+		}
 	}
 }

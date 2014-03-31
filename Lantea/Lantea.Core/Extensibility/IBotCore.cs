@@ -23,6 +23,6 @@ namespace Lantea.Core.Extensibility
 
 		void Initialize();
 
-		Configuration Load(string path);
+		void Load(String path, String module = null);
 	}
 }

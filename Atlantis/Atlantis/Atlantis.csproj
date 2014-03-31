@@ -41,8 +41,11 @@
     <Compile Include="Collections\IQueue.cs" />
     <Compile Include="Collections\DictionaryList.cs" />
     <Compile Include="Collections\QueueAdapter.cs" />
+    <Compile Include="IO\FileLog.cs" />
     <Compile Include="IO\ILog.cs" />
+    <Compile Include="IO\LogBaseClass.cs" />
     <Compile Include="IO\LogThreshold.cs" />
+    <Compile Include="IO\MultiLog.cs" />
     <Compile Include="Linq\EventExtensions.cs" />
     <Compile Include="Linq\NumericExtensions.cs" />
     <Compile Include="Linq\StringBuilderExtensions.cs" />

@@ -12,28 +12,28 @@ namespace Atlantis.IO
 	{
 		LogThreshold Threshold { get; set; }
 
-		bool PrefixLog { get; set; }
+		Boolean PrefixLog { get; set; }
 
-		string Prefix { get; set; }
+		String Prefix { get; set; }
 
-		void Debug(string line);
+		void Debug(String message);
 
-		void DebugFormat(string format, params object[] args);
+		void DebugFormat(String format, params Object[] args);
 
-		void Error(string line);
+		void Error(String message);
 
-		void ErrorFormat(string format, params object[] args);
+		void ErrorFormat(String format, params Object[] args);
 
-		void Fatal(string line);
+		void Fatal(String message);
 
-		void FatalFormat(string format, params object[] args);
+		void FatalFormat(String format, params Object[] args);
 
-		void Info(string line);
+		void Info(String message);
 
-		void InfoFormat(string format, params object[] args);
+		void InfoFormat(String format, params Object[] args);
 
-		void Warn(string line);
+		void Warn(String message);
 
-		void WarnFormat(string format, params object[] args);
+		void WarnFormat(String format, params Object[] args);
 	}
 }

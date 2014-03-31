@@ -73,10 +73,10 @@ namespace Lantea.Core.IO
 			}
 		}
 
-		public void Debug(string line)
+		public void Debug(string message)
 		{
-			log1.Debug(line);
-			log2.Debug(line);
+			log1.Debug(message);
+			log2.Debug(message);
 		}
 
 		public void DebugFormat(string format, params object[] args)
@@ -85,10 +85,10 @@ namespace Lantea.Core.IO
 			log2.DebugFormat(format, args);
 		}
 
-		public void Error(string line)
+		public void Error(string message)
 		{
-			log1.Error(line);
-			log2.Error(line);
+			log1.Error(message);
+			log2.Error(message);
 		}
 
 		public void ErrorFormat(string format, params object[] args)
@@ -97,10 +97,10 @@ namespace Lantea.Core.IO
 			log2.ErrorFormat(format, args);
 		}
 
-		public void Fatal(string line)
+		public void Fatal(string message)
 		{
-			log1.Fatal(line);
-			log2.Fatal(line);
+			log1.Fatal(message);
+			log2.Fatal(message);
 		}
 
 		public void FatalFormat(string format, params object[] args)
@@ -109,10 +109,10 @@ namespace Lantea.Core.IO
 			log2.FatalFormat(format, args);
 		}
 
-		public void Info(string line)
+		public void Info(string message)
 		{
-			log1.Info(line);
-			log2.Info(line);
+			log1.Info(message);
+			log2.Info(message);
 		}
 
 		public void InfoFormat(string format, params object[] args)
@@ -121,10 +121,10 @@ namespace Lantea.Core.IO
 			log2.InfoFormat(format, args);
 		}
 
-		public void Warn(string line)
+		public void Warn(string message)
 		{
-			log1.Warn(line);
-			log2.Warn(line);
+			log1.Warn(message);
+			log2.Warn(message);
 		}
 
 		public void WarnFormat(string format, params object[] args)

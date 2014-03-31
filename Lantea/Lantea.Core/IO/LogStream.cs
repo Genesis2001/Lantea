@@ -73,9 +73,9 @@ namespace Lantea.Core.IO
 
 		public string Prefix { get; set; }
 
-		public void Debug(string line)
+		public void Debug(string message)
 		{
-			Write(LogThreshold.Debug, line);
+			Write(LogThreshold.Debug, message);
 		}
 
 		public void DebugFormat(string format, params object[] args)
@@ -83,9 +83,9 @@ namespace Lantea.Core.IO
 			Write(LogThreshold.Debug, format, args);
 		}
 
-		public void Error(string line)
+		public void Error(string message)
 		{
-			Write(LogThreshold.Error, line);
+			Write(LogThreshold.Error, message);
 		}
 
 		public void ErrorFormat(string format, params object[] args)
@@ -93,9 +93,9 @@ namespace Lantea.Core.IO
 			Write(LogThreshold.Error, format, args);
 		}
 
-		public void Fatal(string line)
+		public void Fatal(string message)
 		{
-			Write(LogThreshold.Fatal, line);
+			Write(LogThreshold.Fatal, message);
 		}
 
 		public void FatalFormat(string format, params object[] args)
@@ -103,9 +103,9 @@ namespace Lantea.Core.IO
 			Write(LogThreshold.Fatal, format, args);
 		}
 
-		public void Info(string line)
+		public void Info(string message)
 		{
-			Write(LogThreshold.Info, line);
+			Write(LogThreshold.Info, message);
 		}
 
 		public void InfoFormat(string format, params object[] args)
@@ -113,9 +113,9 @@ namespace Lantea.Core.IO
 			Write(LogThreshold.Info, format, args);
 		}
 
-		public void Warn(string line)
+		public void Warn(string message)
 		{
-			Write(LogThreshold.Warning, line);
+			Write(LogThreshold.Warning, message);
 		}
 
 		public void WarnFormat(string format, params object[] args)

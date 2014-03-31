@@ -13,7 +13,6 @@ namespace LanteaBot
 	using System.IO;
 	using System.Linq;
 	using System.Reflection;
-	using System.Threading.Tasks;
 	using Atlantis.Net.Irc;
 	using Lantea.Core.Extensibility;
 	using Lantea.Core.IO;
@@ -51,20 +50,20 @@ namespace LanteaBot
 		// ReSharper disable once InconsistentNaming
 		private void LoadIRC()
 		{
-			Block uplink = Config.GetBlock("connection");
+			Block connection = Config.GetBlock("connection");
 
-			if (uplink == null)
+			if (connection == null)
 			{
 				throw new Exception("No connection block found in config.");
 			}
 
-			string nick = uplink.Get<String>("nick");
+			String nick = connection.Get<String>("nick");
 
 			Client = new IrcClient(nick)
 			         {
-				         Host     = uplink.Get<String>("server"),
-				         Port     = uplink.Get<Int32>("port"),
-				         RealName = uplink.Get<String>("name"),
+				         Host     = connection.Get<String>("server"),
+				         Port     = connection.Get<Int32>("port"),
+				         RealName = connection.Get<String>("name"),
 			         };
 		}
 
@@ -96,13 +95,7 @@ namespace LanteaBot
 
 				foreach (IModule m in Modules)
 				{
-					m.Initialize();
-
-					var manager = m as ICommandManager;
-					if (manager != null)
-					{
-						manager.LoadCommands();
-					}
+					// 
 				}
 			}
 		}
@@ -112,23 +105,21 @@ namespace LanteaBot
             Console.WriteLine("Connection established to IRC server.");
 		}
 
-		public Configuration Load(string path)
+		public void Load(string path, string module = null)
 		{
 			Config = new Configuration();
 
 			Config.ConfigurationLoadEvent += OnRehash;
 			Config.Load(path);
-
-			return Config;
 		}
 
-		private void OnRehash(object sender, ConfigurationLoadEventArgs args)
+		private void OnRehash(Object sender, ConfigurationLoadEventArgs args)
 		{
 			if (args.Success)
 			{
 				foreach (IModule m in Modules)
 				{
-					m.Rehash(Config);
+					// 
 				}
 			}
 		}

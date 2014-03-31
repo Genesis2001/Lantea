@@ -6,14 +6,16 @@
 
 namespace Lantea.Core.Extensibility
 {
+	using System;
+
 	public interface IModuleAttribute
 	{
-		string Name { get; }
+		String Author { get; }
 
-		string Author { get; }
+		String Name { get; }
+
+		String Version { get; }
 
 		ModuleType Type { get; }
-
-		string Version { get; }
 	}
 }

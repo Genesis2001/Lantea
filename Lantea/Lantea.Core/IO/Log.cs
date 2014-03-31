@@ -53,9 +53,9 @@ namespace Lantea.Core.IO
 
 		public string Prefix { get; set; }
 
-		public void Debug(string line)
+		public void Debug(string message)
 		{
-			if (Threshold.HasFlag(LogThreshold.Debug)) Write(LogThreshold.Debug, line);
+			if (Threshold.HasFlag(LogThreshold.Debug)) Write(LogThreshold.Debug, message);
 		}
 
 		public void DebugFormat(string format, params object[] args)
@@ -63,9 +63,9 @@ namespace Lantea.Core.IO
 			if (Threshold.HasFlag(LogThreshold.Debug)) Write(LogThreshold.Debug, format, args);
 		}
 
-		public void Error(string line)
+		public void Error(string message)
 		{
-			if (Threshold.HasFlag(LogThreshold.Error)) Write(LogThreshold.Error, line);
+			if (Threshold.HasFlag(LogThreshold.Error)) Write(LogThreshold.Error, message);
 		}
 
 		public void ErrorFormat(string format, params object[] args)
@@ -73,9 +73,9 @@ namespace Lantea.Core.IO
 			if (Threshold.HasFlag(LogThreshold.Error)) Write(LogThreshold.Error, format, args);
 		}
 
-		public void Fatal(string line)
+		public void Fatal(string message)
 		{
-			if (Threshold.HasFlag(LogThreshold.Error)) Write(LogThreshold.Error, line);
+			if (Threshold.HasFlag(LogThreshold.Error)) Write(LogThreshold.Error, message);
 		}
 
 		public void FatalFormat(string format, params object[] args)
@@ -83,9 +83,9 @@ namespace Lantea.Core.IO
 			if (Threshold.HasFlag(LogThreshold.Error)) Write(LogThreshold.Error, format, args);
 		}
 
-		public void Info(string line)
+		public void Info(string message)
 		{
-			if ((Threshold & LogThreshold.Info) == LogThreshold.Info) Write(LogThreshold.Info, line);
+			if ((Threshold & LogThreshold.Info) == LogThreshold.Info) Write(LogThreshold.Info, message);
 		}
 
 		public void InfoFormat(string format, params object[] args)
@@ -93,9 +93,9 @@ namespace Lantea.Core.IO
 			if (Threshold.HasFlag(LogThreshold.Info)) Write(LogThreshold.Info, format, args);
 		}
 
-		public void Warn(string line)
+		public void Warn(string message)
 		{
-			if (Threshold.HasFlag(LogThreshold.Warning)) Write(LogThreshold.Warning, line);
+			if (Threshold.HasFlag(LogThreshold.Warning)) Write(LogThreshold.Warning, message);
 		}
 
 		public void WarnFormat(string format, params object[] args)
