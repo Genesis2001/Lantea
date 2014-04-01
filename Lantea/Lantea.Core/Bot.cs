@@ -81,8 +81,8 @@ namespace Lantea.Core
 
 			LoadIRC();
 
-			var loc = Assembly.GetEntryAssembly().Location;
-			String path = Path.GetDirectoryName(loc);
+			var loc                = Assembly.GetEntryAssembly().Location;
+			String path            = Path.GetDirectoryName(loc);
 			String moduleDirectory = Path.Combine(path, "Extensions");
 
 			Block modules = Config.GetBlock("modules");
@@ -91,7 +91,7 @@ namespace Lantea.Core
 				moduleDirectory = modules.Get("directory", moduleDirectory);
 			}
 
-			// moduleDirectory = Path.Combine(path, moduleDirectory);
+			moduleDirectory = Path.Combine(path, moduleDirectory);
 			String logPath  = Path.Combine(path, "logs");
 
 			if (!Directory.Exists(logPath))

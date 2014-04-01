@@ -58,10 +58,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Lantea.conf">
+    <None Include="config\Lantea.conf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="modules.conf">
+    <None Include="config\modules.conf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -6,10 +6,8 @@
 
 namespace Lantea.Common.Extensibility
 {
-	using System.ComponentModel.Composition;
 	using IO;
 
-	[InheritedExport(typeof (IModule))]
 	public interface IModule : IModuleAttribute
 	{
 		IBotCore Bot { get; }

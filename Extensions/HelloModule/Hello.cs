@@ -10,7 +10,7 @@ namespace HelloModule
 	using Lantea.Common.Extensibility;
 	using Lantea.Common.IO;
 
-	[Module(Author = "Zack Loveless", Name = "Lantea Hello Module", Type = ModuleType.VENDOR, Version = "1.0")]
+	[Export(typeof(IModule)), Module(Author = "Zack Loveless", Name = "Lantea Hello Module", Type = ModuleType.VENDOR, Version = "1.0")]
 	public class Hello : ModuleCore
 	{
 		[ImportingConstructor]
