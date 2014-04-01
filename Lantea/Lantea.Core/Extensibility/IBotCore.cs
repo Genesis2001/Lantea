@@ -7,7 +7,6 @@
 namespace Lantea.Core.Extensibility
 {
 	using System;
-	using System.Collections.Generic;
 	using System.ComponentModel.Composition;
 	using Atlantis.Net.Irc;
 	using IO;
@@ -19,10 +18,10 @@ namespace Lantea.Core.Extensibility
 
 		Configuration Config { get; }
 
-		IEnumerable<IModule> Modules { get; }
+		IModuleLoader ModuleLoader { get; }
 
-		void Initialize();
+		void Initialize(String configFile);
 
-		void Load(String path, String module = null);
+		void Load(String moduleName);
 	}
 }

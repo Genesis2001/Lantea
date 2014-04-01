@@ -4,128 +4,21 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace LanteaBot
+namespace Lantea
 {
 	using System;
 	using System.Collections.Generic;
-	using System.ComponentModel.Composition;
 	using System.ComponentModel.Composition.Hosting;
 	using System.IO;
-	using System.Linq;
 	using System.Reflection;
 	using Atlantis.Net.Irc;
-	using Lantea.Core.Extensibility;
-	using Lantea.Core.IO;
+	using Core.Extensibility;
+	using Core.IO;
 
-	public class Bot : IBotCore
+	// TODO: Migrate this class to it's own subassembly that can be swapped out for a user's own custom IBotCore.
+	// TODO: Migrate this class to "Lantea.Core." Migrate "Lantea.Core" to "Lantea.Common" instead.
+	public class Bot : IBotCore, IModuleLoader
 	{
-		[ImportMany] private IEnumerable<Lazy<IModule, IModuleAttribute>> modules;
-		
-		private void Compose()
-		{
-			var container = GetCompositionContainer();
-			container.ComposeExportedValue<IBotCore>(this);
-
-			modules = container.GetExports<IModule, IModuleAttribute>();
-		}
-
-		private static CompositionContainer GetCompositionContainer()
-		{
-			// ReSharper disable AssignNullToNotNullAttribute
-			Assembly asm     = Assembly.GetAssembly(typeof(Bot));
-			string bLocation = Path.GetDirectoryName(asm.Location);
-			string mLocation = Path.Combine(bLocation, "Extensions");
-			// ReSharper restore AssignNullToNotNullAttribute
-
-			if (!Directory.Exists(mLocation))
-			{
-				Directory.CreateDirectory(mLocation);
-			}
-
-			var catalog = new AggregateCatalog(new DirectoryCatalog(mLocation));
-
-			return new CompositionContainer(catalog);
-		}
-
-		// ReSharper disable once InconsistentNaming
-		private void LoadIRC()
-		{
-			Block connection = Config.GetBlock("connection");
-
-			if (connection == null)
-			{
-				throw new Exception("No connection block found in config.");
-			}
-
-			String nick = connection.Get<String>("nick");
-
-			Client = new IrcClient(nick)
-			         {
-				         Host     = connection.Get<String>("server"),
-				         Port     = connection.Get<Int32>("port"),
-				         RealName = connection.Get<String>("name"),
-			         };
-		}
-
-		#region Implementation of IBotCore
-
-		public IrcClient Client { get; private set; }
-		
-		public Configuration Config { get; private set; }
-
-		public IEnumerable<IModule> Modules
-		{
-			get { return modules != null ? modules.Select(x => x.Value) : Enumerable.Empty<IModule>(); }
-		}
-		
-		public void Initialize()
-		{
-			if (Config == null)
-			{
-				throw new InvalidOperationException("Unable to initialize core. Configuration not loaded.");
-			}
-
-			Compose();
-			LoadIRC();
-
-			if (Client != null)
-			{
-				Client.ConnectionEstablishedEvent += OnClientConnect;
-				Client.Start();
-
-				foreach (IModule m in Modules)
-				{
-					// 
-				}
-			}
-		}
-
-	    private void OnClientConnect(object sender, EventArgs args)
-	    {
-            Console.WriteLine("Connection established to IRC server.");
-		}
-
-		public void Load(string path, string module = null)
-		{
-			Config = new Configuration();
-
-			Config.ConfigurationLoadEvent += OnRehash;
-			Config.Load(path);
-		}
-
-		private void OnRehash(Object sender, ConfigurationLoadEventArgs args)
-		{
-			if (args.Success)
-			{
-				foreach (IModule m in Modules)
-				{
-					// 
-				}
-			}
-		}
-
-		#endregion
-
 		#region Implementation of IDisposable
 
 		/// <summary>
@@ -137,11 +30,85 @@ namespace LanteaBot
 			GC.SuppressFinalize(this);
 		}
 
-		protected virtual void Dispose(bool disposing)
+		protected virtual void Dispose(Boolean disposing)
 		{
 			if (!disposing) return;
 
-			Client.Disconnect("Exiting.");
+			if (Client != null) Client.Dispose();
+		}
+
+		#endregion
+
+		#region Implementation of IBotCore
+
+		public IrcClient Client { get; private set; }
+
+		public Configuration Config { get; private set; }
+
+		public IModuleLoader ModuleLoader
+		{
+			get { return this; }
+		}
+
+		public void Initialize(String configFile)
+		{
+			Config = new Configuration();
+			Config.Load(configFile);
+
+			Block connection = Config.GetBlock("connection");
+			if (connection == null)
+			{
+				throw new Exception("No connection block found.");
+			}
+
+			String clientNick = connection.Get("nick", "Lantea");
+
+			Client = new IrcClient(clientNick)
+			         {
+				         Host = connection.Get("host", "127.0.0.1"),
+				         Port = connection.Get("port", 6667),
+				         RealName = connection.Get("name", clientNick),
+			         };
+
+			var loc = Assembly.GetEntryAssembly().Location;
+			var path = Path.GetDirectoryName(loc);
+			// ReSharper disable once AssignNullToNotNullAttribute
+			String moduleDirectory = Path.Combine(path, "Extensions");
+
+			Block modules = Config.GetBlock("modules");
+			if (modules != null)
+			{
+				moduleDirectory = modules.Get("directory", moduleDirectory);
+			}
+
+			ModuleLoader.LoadModules(moduleDirectory);
+
+			Client.Start();
+		}
+
+		public void Load(String moduleName)
+		{
+		}
+
+		#endregion
+
+		#region Implementation of IModuleLoader
+
+		public IEnumerable<IModule> Modules { get; private set; }
+
+		public void LoadModules(String directory)
+		{
+			if (File.Exists(directory))
+			{
+				throw new DirectoryNotFoundException(String.Format("Unable to load modules from the specified path: {0}\nA file was given.", directory));
+			}
+
+			if (!Directory.Exists(directory))
+			{
+				throw new DirectoryNotFoundException(String.Format("Unable to load modules from the specified path: {0}\nThe directory does not exist.", directory));
+			}
+
+			var catalog = new DirectoryCatalog(directory);
 		}
 
 		#endregion

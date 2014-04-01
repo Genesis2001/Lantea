@@ -4,7 +4,7 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace LanteaBot
+namespace Lantea
 {
 	using System;
 	using System.ComponentModel.Composition;
@@ -13,7 +13,6 @@ namespace LanteaBot
 	using System.Reflection;
 	using System.Threading;
 	using Lantea.Core.Extensibility;
-	using Lantea.Core.IO;
 	using NDesk.Options;
 
 	public class Program : IDisposable
@@ -22,11 +21,6 @@ namespace LanteaBot
 		{
 			Console.Title = "Lantea Bot";
 			Console.SetWindowSize(125, 30);
-
-			Configuration configuration = new Configuration();
-
-			configuration.Load("example.conf.txt");
-
 
 			using (Program p = new Program())
 			{
@@ -77,7 +71,7 @@ namespace LanteaBot
 			config = Path.Combine(root, config);
 
 			bot.Load(config);
-			bot.Initialize();
+			//bot.Initialize();
 
 			Console.WriteLine("Press <CTRL+C> to terminate the bot.");
 

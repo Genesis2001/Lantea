@@ -42,10 +42,12 @@
     <Compile Include="Extensibility\IBotCore.cs" />
     <Compile Include="Extensibility\IModule.cs" />
     <Compile Include="Extensibility\IModuleAttribute.cs" />
+    <Compile Include="Extensibility\IModuleLoader.cs" />
     <Compile Include="Extensibility\ModuleAttributeAttribute.cs" />
     <Compile Include="Extensibility\ModuleCore.cs" />
     <Compile Include="Extensibility\ModuleType.cs" />
     <Compile Include="IObservableClass.cs" />
+    <Compile Include="IoCContainer.cs" />
     <Compile Include="IO\Block.cs" />
     <Compile Include="IO\Configuration.cs" />
     <Compile Include="IO\ConfigurationLoadEventArgs.cs" />
@@ -54,6 +56,7 @@
     <Compile Include="IO\LogStream.cs" />
     <Compile Include="IO\LogWriter.cs" />
     <Compile Include="IO\MalformedConfigException.cs" />
+    <Compile Include="Linq\BlockExtensions.cs" />
     <Compile Include="Modules\ModuleLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -12,6 +12,10 @@ namespace Lantea.Core.IO
 	using System.Text;
 	using Atlantis.Linq;
 
+	using Pair = System.Tuple<System.String, Block>;
+
+	// ReSharper disable InconsistentNaming
+
 	public class Configuration : Block
 	{
 		private readonly Stack<Block> block_stack;
@@ -19,7 +23,7 @@ namespace Lantea.Core.IO
 		private string currentFileName;
 		private string itemname;
 		private int currentLine;
-
+		
 		private bool in_word;
 		private bool in_quote;
 		private bool in_comment;
@@ -37,24 +41,28 @@ namespace Lantea.Core.IO
 			throw new NotImplementedException();
 		}
 
-		public void Load(string path)
+		/// <summary>
+		/// Loads the specified config file into memory according to the Anope configuration standard.
+		/// </summary>
+		/// <param name="path">The path of the file to be loaded.</param>
+		/// <exception cref="T:System.IO.FileNotFoundException" />
+		/// <exception cref="T:Lantea.Core.IO.MalformedConfigException" />
+		public void Load(String path)
 		{
 			try
 			{
 				currentFileName = Path.GetFileName(path);
-				string root = Path.GetDirectoryName(path);
+				String root     = Path.GetDirectoryName(path);
 
 				Load(new FileStream(path, FileMode.Open, FileAccess.Read));
 
 				for (int i = 0; i < CountBlock("include"); ++i)
 				{
 					Block include = GetBlock("include", i);
-					
+
 					string file = include.Get<String>("name");
 					Load(new FileStream(Path.Combine(root, file), FileMode.Open, FileAccess.Read));
 				}
-
-				ConfigurationLoadEvent.Raise(this, new ConfigurationLoadEventArgs(true));
 			}
 			catch (FileNotFoundException e)
 			{
@@ -68,9 +76,14 @@ namespace Lantea.Core.IO
 #endif
 		}
 
+		/// <summary>
+		/// Loads the specified stream into memory according to the Anope configuration standard.
+		/// </summary>
+		/// <param name="stream"></param>
+		/// <exception cref="T:Lantea.Core.IO.MalformedConfigException" />
 		public void Load(Stream stream)
 		{
-			if (string.IsNullOrEmpty(currentFileName))
+			if (String.IsNullOrEmpty(currentFileName))
 			{
 				currentFileName = "(memory)";
 			}
@@ -111,6 +124,8 @@ namespace Lantea.Core.IO
 					currentFileName,
 					block_stack.Peek().lineNumber));
 			}
+
+			ConfigurationLoadEvent.Raise(this, new ConfigurationLoadEventArgs(true));
 		}
 
 		private void ProcessLine(string line)
@@ -295,4 +310,6 @@ namespace Lantea.Core.IO
 			}
 		}
 	}
+
+	// ReSharper restore InconsistentNaming
 }
