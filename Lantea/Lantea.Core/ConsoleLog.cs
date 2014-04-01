@@ -35,6 +35,46 @@ namespace Lantea.Core
 		}
 
 		#region Overrides of LogBaseClass
+		
+		public override void Error(String message)
+		{
+			ConsoleColor c          = Console.ForegroundColor;
+			Console.ForegroundColor = ConsoleColor.Red;
+
+			Write(LogThreshold.Error, message);
+
+			Console.ForegroundColor = c;
+		}
+
+		public override void ErrorFormat(String format, params object[] args)
+		{
+			ConsoleColor c          = Console.ForegroundColor;
+			Console.ForegroundColor = ConsoleColor.Red;
+
+			Write(LogThreshold.Error, format, args);
+
+			Console.ForegroundColor = c;
+		}
+
+		public override void Warn(String message)
+		{
+			ConsoleColor c          = Console.ForegroundColor;
+			Console.ForegroundColor = ConsoleColor.Yellow;
+
+			Write(LogThreshold.Error, message);
+
+			Console.ForegroundColor = c;
+		}
+
+		public override void WarnFormat(String format, params object[] args)
+		{
+			ConsoleColor c          = Console.ForegroundColor;
+			Console.ForegroundColor = ConsoleColor.Yellow;
+
+			Write(LogThreshold.Error, format, args);
+
+			Console.ForegroundColor = c;
+		}
 
 		protected override void Dispose(Boolean disposing)
 		{
@@ -47,7 +87,7 @@ namespace Lantea.Core
 			{
 				BuildLogMessage(threshold, format, args);
 
-				Write(message.ToString());
+				Write(messageBuilder.ToString());
 			}
 		}
 

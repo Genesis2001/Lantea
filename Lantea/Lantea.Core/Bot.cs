@@ -25,20 +25,24 @@ namespace Lantea.Core
 	{
 		private void LoadIRC()
 		{
+			Log.Info("Loading Lantea IRC configuration.");
 			Block connection = Config.GetBlock("connection");
 			if (connection == null)
 			{
-				throw new Exception("No connection block found.");
+				Log.Error("No connection block found in configuration.");
+				return;
 			}
 
 			String clientNick = connection.Get("nick", "Lantea");
 
 			Client = new IrcClient(clientNick)
 			{
-				Host = connection.Get("server", "127.0.0.1"),
-				Port = connection.Get("port", 6667),
+				Host     = connection.Get("server", "127.0.0.1"),
+				Port     = connection.Get("port", 6667),
 				RealName = connection.Get("name", clientNick),
 			};
+
+			Log.InfoFormat("IRC configuration loaded: {0}:{1} as {2}", Client.Host, Client.Port, Client.Nick);
 		}
 
 		#region Implementation of IDisposable
@@ -56,7 +60,11 @@ namespace Lantea.Core
 		{
 			if (!disposing) return;
 
-			if (Client != null) Client.Dispose();
+			if (Client != null)
+			{
+				Client.Disconnect("Disconnecting.");
+				Client.Dispose();
+			}
 		}
 
 		#endregion
@@ -79,6 +87,15 @@ namespace Lantea.Core
 		{
 			Config = new Configuration();
 			Config.Load(configFile);
+
+			var loc     = Assembly.GetEntryAssembly().Location;
+			String path = Path.GetDirectoryName(loc);
+
+			String logPath = Path.Combine(path, "logs");
+			if (!Directory.Exists(logPath))
+			{
+				Directory.CreateDirectory(logPath);
+			}
 
 			List<ILog> logs = new List<ILog>();
 			for (Int32 i = 0; i <= Config.CountBlock("log"); ++i)
@@ -106,12 +123,11 @@ namespace Lantea.Core
 				}
 			}
 
-			Log = new MultiLog(logs.ToArray());
+			Log = new MultiLog(logs);
 
+			Log.Info("Starting Lantea bot.");
 			LoadIRC();
 
-			var loc                = Assembly.GetEntryAssembly().Location;
-			String path            = Path.GetDirectoryName(loc);
 			String moduleDirectory = Path.Combine(path, "Extensions");
 
 			Block modules = Config.GetBlock("modules");
@@ -121,15 +137,7 @@ namespace Lantea.Core
 			}
 
 			moduleDirectory = Path.Combine(path, moduleDirectory);
-			String logPath  = Path.Combine(path, "logs");
-
-			if (!Directory.Exists(logPath))
-			{
-				Directory.CreateDirectory(logPath);
-			}
-
-
-
+			
 			Client.Start();
 
 			ModuleLoader.ModulesLoadedEvent += OnModulesLoaded;

@@ -26,7 +26,6 @@ namespace Atlantis.Net.Irc
 
 		private Task queueRunner;
 
-		private CancellationTokenSource queueTokenSource;
 		private CancellationTokenSource tokenSource;
 		private CancellationToken token;
 		private bool enableFakeLag;
@@ -88,11 +87,10 @@ namespace Atlantis.Net.Irc
 			{
 				enableFakeLag = value;
 
-				if (!value)
+				if (value)
 				{
-					if (queueTokenSource != null) queueTokenSource.Cancel();
+					StartQueue();
 				}
-				else StartQueue();
 			}
 		}
 
@@ -378,7 +376,6 @@ namespace Atlantis.Net.Irc
 		{
 			if (!disposing) return;
 
-			if (queueTokenSource != null && !queueTokenSource.IsCancellationRequested) queueTokenSource.Cancel();
 			if (tokenSource != null && !tokenSource.IsCancellationRequested) tokenSource.Cancel();
 		}
 

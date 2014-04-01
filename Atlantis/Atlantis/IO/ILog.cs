@@ -18,22 +18,22 @@ namespace Atlantis.IO
 
 		void Debug(String message);
 
-		void DebugFormat(String format, params Object[] args);
+		void DebugFormat(String format, params object[] args);
 
 		void Error(String message);
 
-		void ErrorFormat(String format, params Object[] args);
+		void ErrorFormat(String format, params object[] args);
 
 		void Fatal(String message);
 
-		void FatalFormat(String format, params Object[] args);
+		void FatalFormat(String format, params object[] args);
 
 		void Info(String message);
 
-		void InfoFormat(String format, params Object[] args);
+		void InfoFormat(String format, params object[] args);
 
 		void Warn(String message);
 
-		void WarnFormat(String format, params Object[] args);
+		void WarnFormat(String format, params object[] args);
 	}
 }

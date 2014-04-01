@@ -35,6 +35,8 @@ namespace Lantea
 					}
 				} while (!exit);
 
+				b.Bot.Dispose();
+
 #if DEBUG
 				Console.Write("Bot running in debug mode. Press <ENTER> to exit completely.");
 				Console.ReadLine();

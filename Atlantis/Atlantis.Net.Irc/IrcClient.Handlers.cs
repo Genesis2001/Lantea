@@ -653,12 +653,11 @@ namespace Atlantis.Net.Irc
 				TimeoutEvent.Raise(this, args);
 
                 tokenSource.Dispose();
-                if (queueTokenSource != null) queueTokenSource.Dispose();
 
 				if (!args.Handled)
 				{
-					tokenSource      = new CancellationTokenSource();
-					queueTokenSource = new CancellationTokenSource();
+					tokenSource = new CancellationTokenSource();
+					token       = tokenSource.Token;
 
 					if (RetryInterval > 0)
 					{

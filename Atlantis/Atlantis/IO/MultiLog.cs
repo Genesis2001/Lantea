@@ -8,6 +8,7 @@ namespace Atlantis.IO
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 
 	public class MultiLog : ILog
 	{
@@ -16,6 +17,11 @@ namespace Atlantis.IO
 		public MultiLog(params ILog[] logs)
 		{
 			this.logs = logs;
+		}
+
+		public MultiLog(IEnumerable<ILog> logs)
+		{
+			this.logs = logs.ToArray();
 		}
 
 		#region Implementation of IDisposable

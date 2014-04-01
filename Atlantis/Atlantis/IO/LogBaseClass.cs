@@ -13,29 +13,29 @@ namespace Atlantis.IO
 	public abstract class LogBaseClass : ILog
 	{
 		protected Stream stream;
-		protected StringBuilder message;
+		protected StringBuilder messageBuilder;
 
 		#region Methods
 
 		protected virtual void BuildLogMessage(LogThreshold threshold, String format, params object[] args)
 		{
-			message = new StringBuilder();
+			messageBuilder = new StringBuilder();
 
 			if (PrefixLog)
 			{
-				message.Append(threshold);
+				messageBuilder.Append(threshold);
 
 				if (!String.IsNullOrEmpty(Prefix))
 				{
-					message.Append(" ");
-					message.Append(Prefix);
+					messageBuilder.Append(" ");
+					messageBuilder.Append(Prefix);
 				}
 
-				message.Append(" ");
+				messageBuilder.Append(" ");
 			}
 
-			message.AppendFormat(format, args);
-			message.Append('\n');
+			messageBuilder.AppendFormat(format, args);
+			messageBuilder.Append('\n');
 		}
 
 		protected virtual void Write(LogThreshold threshold, String format, params object[] args)
@@ -44,7 +44,7 @@ namespace Atlantis.IO
 			{
 				BuildLogMessage(threshold, format, args);
 
-				var buf = Encoding.Default.GetBytes(message.ToString());
+				var buf = Encoding.Default.GetBytes(messageBuilder.ToString());
 				stream.Write(buf, 0, buf.Length);
 				stream.Flush();
 			}

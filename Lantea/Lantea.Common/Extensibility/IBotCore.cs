@@ -22,6 +22,9 @@ namespace Lantea.Common.Extensibility
 		/// </summary>
 		Configuration Config { get; }
 
+		/// <summary>
+		/// Gets an instance of a logger.
+		/// </summary>
 		ILog Log { get; }
 
 		/// <summary>
