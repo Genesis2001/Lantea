@@ -49,7 +49,7 @@ namespace Atlantis.Net.Irc
 
 			FillListsOnJoin         = false;
 			FillListsDelay          = TimeSpan.FromSeconds(30.0).TotalMilliseconds;
-			RequestDelay         = TimeSpan.FromSeconds(3.0).TotalMilliseconds;
+			RequestDelay            = TimeSpan.FromSeconds(3.0).TotalMilliseconds;
 
 			RawMessageReceivedEvent += RegistrationHandler;
 			RawMessageReceivedEvent += PingHandler;
@@ -336,7 +336,7 @@ namespace Atlantis.Net.Irc
 
 		private void StartQueue()
 		{
-			queueRunner = Task.Run(new Action(QueueProcessor), queueTokenSource.Token);
+			queueRunner = Task.Run(new Action(QueueProcessor), token);
 		}
 		
 		private void Send(string data)

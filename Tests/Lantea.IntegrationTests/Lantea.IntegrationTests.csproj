@@ -36,11 +36,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ModuleLoaderFixture.cs" />
@@ -50,9 +45,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Lantea\Lantea.Core\Lantea.Core.csproj">
+    <ProjectReference Include="..\..\Lantea\Lantea.Common\Lantea.Common.csproj">
       <Project>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</Project>
-      <Name>Lantea.Core</Name>
+      <Name>Lantea.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

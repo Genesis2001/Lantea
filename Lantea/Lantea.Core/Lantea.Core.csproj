@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</ProjectGuid>
+    <ProjectGuid>{5CB52E16-46BE-41B2-A041-A112C0A5225F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Lantea.Core</RootNamespace>
@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\build\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,7 +24,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\build\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -33,31 +33,14 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Extensibility\IBotCore.cs" />
-    <Compile Include="Extensibility\IModule.cs" />
-    <Compile Include="Extensibility\IModuleAttribute.cs" />
-    <Compile Include="Extensibility\IModuleLoader.cs" />
-    <Compile Include="Extensibility\ModuleAttributeAttribute.cs" />
-    <Compile Include="Extensibility\ModuleCore.cs" />
-    <Compile Include="Extensibility\ModuleType.cs" />
-    <Compile Include="IObservableClass.cs" />
-    <Compile Include="IoCContainer.cs" />
-    <Compile Include="IO\Block.cs" />
-    <Compile Include="IO\Configuration.cs" />
-    <Compile Include="IO\ConfigurationLoadEventArgs.cs" />
-    <Compile Include="IO\DualLog.cs" />
-    <Compile Include="IO\Log.cs" />
-    <Compile Include="IO\LogStream.cs" />
-    <Compile Include="IO\LogWriter.cs" />
-    <Compile Include="IO\MalformedConfigException.cs" />
-    <Compile Include="Linq\BlockExtensions.cs" />
-    <Compile Include="Modules\ModuleLoader.cs" />
+    <Compile Include="AutoFileLog.cs" />
+    <Compile Include="Bot.cs" />
+    <Compile Include="ConsoleLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -69,8 +52,19 @@
       <Project>{3464FCF7-A68E-40CC-A354-32B80E698890}</Project>
       <Name>Atlantis</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Lantea.Common\Lantea.Common.csproj">
+      <Project>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</Project>
+      <Name>Lantea.Common</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Lantea.conf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="modules.conf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

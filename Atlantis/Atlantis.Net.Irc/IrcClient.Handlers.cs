@@ -623,7 +623,7 @@ namespace Atlantis.Net.Irc
 						Send(messageQueue.Pop());
 					}
 
-					Task.Delay(QueueInteval, queueTokenSource.Token).Wait(queueTokenSource.Token);
+					Task.Delay(QueueInteval, token).Wait(token);
 				}
 			}
 			catch (TaskCanceledException)

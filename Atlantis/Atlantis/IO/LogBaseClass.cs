@@ -13,32 +13,38 @@ namespace Atlantis.IO
 	public abstract class LogBaseClass : ILog
 	{
 		protected Stream stream;
+		protected StringBuilder message;
 
 		#region Methods
 
-		protected virtual void Write(LogThreshold threshold, String format, params Object[] args)
+		protected virtual void BuildLogMessage(LogThreshold threshold, String format, params object[] args)
+		{
+			message = new StringBuilder();
+
+			if (PrefixLog)
+			{
+				message.Append(threshold);
+
+				if (!String.IsNullOrEmpty(Prefix))
+				{
+					message.Append(" ");
+					message.Append(Prefix);
+				}
+
+				message.Append(" ");
+			}
+
+			message.AppendFormat(format, args);
+			message.Append('\n');
+		}
+
+		protected virtual void Write(LogThreshold threshold, String format, params object[] args)
 		{
 			if ((Threshold & threshold) == threshold)
 			{
-				var builder = new StringBuilder();
+				BuildLogMessage(threshold, format, args);
 
-				if (PrefixLog)
-				{
-					builder.Append(threshold);
-
-					if (!String.IsNullOrEmpty(Prefix))
-					{
-						builder.Append(" ");
-						builder.Append(Prefix);
-					}
-
-					builder.Append(" ");
-				}
-
-				builder.AppendFormat(format, args);
-				builder.Append('\n');
-
-				var buf = Encoding.Default.GetBytes(builder.ToString());
+				var buf = Encoding.Default.GetBytes(message.ToString());
 				stream.Write(buf, 0, buf.Length);
 				stream.Flush();
 			}
@@ -57,7 +63,7 @@ namespace Atlantis.IO
 			GC.SuppressFinalize(this);
 		}
 
-		protected virtual void Dispose(bool disposing)
+		protected virtual void Dispose(Boolean disposing)
 		{
 			if (!disposing) return;
 

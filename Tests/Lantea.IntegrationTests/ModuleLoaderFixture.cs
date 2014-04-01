@@ -6,7 +6,7 @@
 
 namespace Lantea.IntegrationTests
 {
-	using Core.Modules;
+	using Common.Modules;
 	using NUnit.Framework;
 
 	[TestFixture]

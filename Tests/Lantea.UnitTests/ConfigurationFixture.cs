@@ -9,7 +9,7 @@ namespace Lantea.UnitTests
 	using System;
 	using System.Collections.Generic;
 	using System.IO;
-	using Core.IO;
+	using Common.IO;
 	using NUnit.Framework;
 	using TestHelpers;
 

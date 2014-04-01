@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CB160C49-C9F6-4623-A93A-3144D78EB729}</ProjectGuid>
+    <ProjectGuid>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lantea.UnitTests</RootNamespace>
-    <AssemblyName>Lantea.UnitTests</AssemblyName>
+    <RootNamespace>Lantea.Common</RootNamespace>
+    <AssemblyName>Lantea.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,46 +30,46 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigurationFixture.cs" />
-    <Compile Include="ConfigurationStrings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ConfigurationStrings.resx</DependentUpon>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="ExtensionsFixture.cs" />
+    <Compile Include="Extensibility\IBotCore.cs" />
+    <Compile Include="Extensibility\IModule.cs" />
+    <Compile Include="Extensibility\IModuleAttribute.cs" />
+    <Compile Include="Extensibility\IModuleLoader.cs" />
+    <Compile Include="Extensibility\ModuleAttribute.cs" />
+    <Compile Include="Extensibility\ModuleCore.cs" />
+    <Compile Include="Extensibility\ModulesLoadedEventArgs.cs" />
+    <Compile Include="Extensibility\ModuleType.cs" />
+    <Compile Include="IObservableClass.cs" />
+    <Compile Include="IO\Block.cs" />
+    <Compile Include="IO\Configuration.cs" />
+    <Compile Include="IO\ConfigurationLoadEventArgs.cs" />
+    <Compile Include="IO\Log.cs" />
+    <Compile Include="IO\LogStream.cs" />
+    <Compile Include="IO\LogWriter.cs" />
+    <Compile Include="IO\MalformedConfigException.cs" />
+    <Compile Include="Linq\BlockExtensions.cs" />
+    <Compile Include="Modules\ModuleLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StubObject.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\..\Atlantis\Atlantis.Net.Irc\Atlantis.Net.Irc.csproj">
+      <Project>{07410E3A-D2CF-4A81-BA52-864C8D206664}</Project>
+      <Name>Atlantis.Net.Irc</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Atlantis\Atlantis\Atlantis.csproj">
       <Project>{3464FCF7-A68E-40CC-A354-32B80E698890}</Project>
       <Name>Atlantis</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Lantea\Lantea.Common\Lantea.Common.csproj">
-      <Project>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</Project>
-      <Name>Lantea.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TestHelpers\TestHelpers.csproj">
-      <Project>{DAD11188-590D-4544-BAC0-6334D403A094}</Project>
-      <Name>TestHelpers</Name>
-    </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="ConfigurationStrings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ConfigurationStrings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -25,9 +25,5 @@ namespace Atlantis.IO
 			this.encoding = encoding;
 			stream = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write);
 		}
-
-		#region Implementation of IDisposable
-
-		#endregion
 	}
 }

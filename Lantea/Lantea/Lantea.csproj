@@ -4,71 +4,69 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CB160C49-C9F6-4623-A93A-3144D78EB729}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{AE6B2EAC-6D88-4E70-87F6-415EDED3A022}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lantea.UnitTests</RootNamespace>
-    <AssemblyName>Lantea.UnitTests</AssemblyName>
+    <RootNamespace>Lantea</RootNamespace>
+    <AssemblyName>Lantea</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\build\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\build\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Lantea.Bootstrap</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="NDesk.Options, Version=0.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+      <HintPath>..\..\lib\NDesk.Options.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigurationFixture.cs" />
-    <Compile Include="ConfigurationStrings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ConfigurationStrings.resx</DependentUpon>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="ExtensionsFixture.cs" />
+    <Compile Include="Bootstrap.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StubObject.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\..\Atlantis\Atlantis.Net.Irc\Atlantis.Net.Irc.csproj">
+      <Project>{07410E3A-D2CF-4A81-BA52-864C8D206664}</Project>
+      <Name>Atlantis.Net.Irc</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Atlantis\Atlantis\Atlantis.csproj">
       <Project>{3464FCF7-A68E-40CC-A354-32B80E698890}</Project>
       <Name>Atlantis</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Lantea\Lantea.Common\Lantea.Common.csproj">
+    <ProjectReference Include="..\Lantea.Common\Lantea.Common.csproj">
       <Project>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</Project>
       <Name>Lantea.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TestHelpers\TestHelpers.csproj">
-      <Project>{DAD11188-590D-4544-BAC0-6334D403A094}</Project>
-      <Name>TestHelpers</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="ConfigurationStrings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ConfigurationStrings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
