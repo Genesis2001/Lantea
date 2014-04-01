@@ -51,9 +51,6 @@
     <Compile Include="IO\Block.cs" />
     <Compile Include="IO\Configuration.cs" />
     <Compile Include="IO\ConfigurationLoadEventArgs.cs" />
-    <Compile Include="IO\Log.cs" />
-    <Compile Include="IO\LogStream.cs" />
-    <Compile Include="IO\LogWriter.cs" />
     <Compile Include="IO\MalformedConfigException.cs" />
     <Compile Include="Linq\BlockExtensions.cs" />
     <Compile Include="Modules\ModuleLoader.cs" />

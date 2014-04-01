@@ -43,11 +43,11 @@ namespace Lantea.Core
 		
 		protected override void Write(LogThreshold threshold, String format, params object[] args)
 		{
-			if ((Threshold & threshold) == threshold)
+			if (Threshold.HasFlag(threshold))
 			{
 				BuildLogMessage(threshold, format, args);
 
-				WriteLine(message.ToString());
+				Write(message.ToString());
 			}
 		}
 

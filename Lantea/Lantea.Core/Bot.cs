@@ -18,6 +18,7 @@ namespace Lantea.Core
 	using Atlantis.Net.Irc;
 	using Common.Extensibility;
 	using Common.IO;
+	using Common.Linq;
 
 	// ReSharper disable InconsistentNaming
 	public class Bot : IBotCore, IModuleLoader
@@ -79,6 +80,34 @@ namespace Lantea.Core
 			Config = new Configuration();
 			Config.Load(configFile);
 
+			List<ILog> logs = new List<ILog>();
+			for (Int32 i = 0; i <= Config.CountBlock("log"); ++i)
+			{
+				Block entry = Config.GetBlock("log", i);
+
+				if (entry != null)
+				{
+					String target = entry.GetString("target");
+					Int32 threshold = entry.GetInt32("threshold");
+
+					ILog log;
+					if (target.Equals("System.Console", StringComparison.OrdinalIgnoreCase))
+					{
+						log = new ConsoleLog(Console.Write) { Threshold = (LogThreshold)threshold };
+
+						logs.Add(log);
+					}
+					else
+					{
+						log = new FileLog(Path.Combine(logPath, target)) { Threshold = (LogThreshold)threshold };
+
+						logs.Add(log);
+					}
+				}
+			}
+
+			Log = new MultiLog(logs.ToArray());
+
 			LoadIRC();
 
 			var loc                = Assembly.GetEntryAssembly().Location;
@@ -99,7 +128,7 @@ namespace Lantea.Core
 				Directory.CreateDirectory(logPath);
 			}
 
-			Log = new MultiLog(new ConsoleLog(Console.Write), new AutoFileLog(logPath));
+
 
 			Client.Start();
 
