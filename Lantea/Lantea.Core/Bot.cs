@@ -13,6 +13,7 @@ namespace Lantea.Core
 	using System.IO;
 	using System.Linq;
 	using System.Reflection;
+	using System.Threading.Tasks;
 	using Atlantis.IO;
 	using Atlantis.Linq;
 	using Atlantis.Net.Irc;
@@ -21,7 +22,7 @@ namespace Lantea.Core
 	using Common.Linq;
 
 	// ReSharper disable InconsistentNaming
-	public class Bot : IBotCore, IModuleLoader
+	public class Bot : IBotCore, IModuleLoader, ICommandManager
 	{
 		private void LoadIRC()
 		{
@@ -36,11 +37,11 @@ namespace Lantea.Core
 			String clientNick = connection.Get("nick", "Lantea");
 
 			Client = new IrcClient(clientNick)
-			{
-				Host     = connection.Get("server", "127.0.0.1"),
-				Port     = connection.Get("port", 6667),
-				RealName = connection.Get("name", clientNick),
-			};
+			         {
+				         Host     = connection.Get("server", "127.0.0.1"),
+				         Port     = connection.Get("port", 6667),
+				         RealName = connection.Get("name", clientNick),
+			         };
 
 			Log.InfoFormat("IRC configuration loaded: {0}:{1} as {2}", Client.Host, Client.Port, Client.Nick);
 		}
@@ -72,6 +73,14 @@ namespace Lantea.Core
 		#region Implementation of IBotCore
 
 		public IrcClient Client { get; private set; }
+
+		/// <summary>
+		/// Gets an <see cref="T:ICommandManager" /> instance for the current bot.
+		/// </summary>
+		public ICommandManager CommandManager
+		{
+			get { return this; }
+		}
 
 		public Configuration Config { get; private set; }
 
@@ -107,16 +116,11 @@ namespace Lantea.Core
 					String target   = entry.GetString("target");
 					Int32 threshold = entry.GetInt32("threshold");
 
-					ILog log;
-					if (target.Equals("System.Console", StringComparison.OrdinalIgnoreCase))
-						log = new ConsoleLog(Console.Write) {Threshold = (LogThreshold)threshold};
-					else
-						log = new FileLog(Path.Combine(logPath, target)) {Threshold = (LogThreshold)threshold};
-
-					logs.Add(log);
+					logs.Add(new FileLog(Path.Combine(logPath, target)) {Threshold = (LogThreshold)threshold});
 				}
 			}
 
+			logs.Add(new ConsoleLog(Console.Write) {Threshold = LogThreshold.Verbose});
 			Log = new MultiLog(logs) {PrefixLog = true};
 
 			Log.Info("Starting Lantea bot.");
@@ -133,6 +137,8 @@ namespace Lantea.Core
 			moduleDirectory = Path.Combine(path, moduleDirectory);
 			
 			Client.Start();
+
+			CommandManager.Initialize();
 
 			ModuleLoader.ModulesLoadedEvent += OnModulesLoaded;
 			ModuleLoader.LoadModules(moduleDirectory);
@@ -155,7 +161,7 @@ namespace Lantea.Core
 
 		public IEnumerable<IModule> Modules { get; private set; }
 
-		public void LoadModules(String directory)
+		void IModuleLoader.LoadModules(String directory)
 		{
 			if (File.Exists(directory))
 			{
@@ -189,6 +195,58 @@ namespace Lantea.Core
 
 			Modules = modules;
 			ModulesLoadedEvent.Raise(this, new ModulesLoadedEventArgs(Modules));
+		}
+
+		#endregion
+
+		#region Implementation of ICommandManager
+
+		public IList<ICommand> Commands { get; private set; }
+
+		void ICommandManager.Initialize()
+		{
+			Commands = new List<ICommand>();
+
+			Client.MessageReceivedEvent += OnChannelMessageReceived;
+		}
+
+		private void OnChannelMessageReceived(object sender, MessageReceivedEventArgs args)
+		{
+			if (!args.Target.StartsWith("#")) return;
+
+			String[] toks = args.Message.Split(' ');
+			if (toks.Length > 0)
+			{
+				Channel c = Client.GetChannel(args.Target);
+				PrefixList list;
+				if (!c.Users.TryGetValue(args.Source, out list))
+				{
+					return;
+				}
+
+				foreach (ICommand cmd in Commands)
+				{
+					// TODO: (Idea) Add an out string errorMessage that could be displayed to the user?
+					if (cmd.Triggers.Any(x => x.Equals(toks[0], StringComparison.OrdinalIgnoreCase)))
+					{
+						// TODO: Logic bug in "IsHigherOrEqualToPrefix" that prevents a '&' command from being accessed by a '~'/etc.
+						if (cmd.CanExecute(toks.Length - 1) &&
+						    Client.IsHigherOrEqualToPrefix(list.HighestPrefix, cmd.Access))
+						{
+							cmd.Execute(Client, args.Source, args.Target, toks.Skip(1).ToArray());
+						}
+						else if (!Client.IsHigherOrEqualToPrefix(list.HighestPrefix, cmd.Access))
+						{
+							Client.Notice(args.Source, "You need '{0}' to access this command. You currently have: {1}", cmd.Access, list);
+						}
+					}
+				}
+			}
+		}
+
+		void ICommandManager.Register(ICommand command)
+		{
+			Commands.Add(command);
 		}
 
 		#endregion

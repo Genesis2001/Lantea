@@ -6,13 +6,17 @@
 
 namespace HelloModule
 {
+	using System;
 	using System.ComponentModel.Composition;
 	using Lantea.Common.Extensibility;
 	using Lantea.Common.IO;
 
-	[Export(typeof(IModule)), Module(Author = "Zack Loveless", Name = "Lantea Hello Module", Type = ModuleType.VENDOR, Version = "1.0")]
+	[Export(typeof(IModule)), Module(Author = "Zack Loveless", Name = HelloName, Type = ModuleType.VENDOR, Version = HelloVersion)]
 	public class Hello : ModuleCore
 	{
+		public const String HelloVersion = "1.0.1";
+		public const String HelloName    = "Lantea Hello Module";
+
 		[ImportingConstructor]
 		public Hello([Import] IBotCore bot, [Import] Configuration config) : base(bot, config)
 		{
@@ -27,12 +31,12 @@ namespace HelloModule
 
 		public override string Name
 		{
-			get { return "Lantea Hello Module"; }
+			get { return HelloName; }
 		}
 
 		public override string Version
 		{
-			get { return "1.0"; }
+			get { return HelloVersion; }
 		}
 
 		public override ModuleType Type
@@ -43,6 +47,8 @@ namespace HelloModule
 		public override void Load()
 		{
 			Bot.Log.Info("Hello world!");
+
+			base.Load();
 		}
 
 		#endregion

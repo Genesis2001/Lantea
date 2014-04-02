@@ -28,7 +28,7 @@ namespace Lantea.Common.IO
 
 		public Configuration() : base("")
 		{
-			buffer     = new StringBuilder();
+			buffer      = new StringBuilder();
 			block_stack = new Stack<Block>();
 		}
 

@@ -6,6 +6,7 @@
 
 namespace Lantea.Common.Extensibility
 {
+	using System.ComponentModel.Composition.Hosting;
 	using IO;
 
 	public abstract class ModuleCore : IModule
@@ -34,7 +35,16 @@ namespace Lantea.Common.Extensibility
 
 		public Configuration Config { get; private set; }
 
-		public abstract void Load();
+		public virtual void Load()
+		{
+			var container = new CompositionContainer(new AssemblyCatalog(GetType().Assembly));
+			
+			var commands  = container.GetExportedValues<ICommand>();
+			foreach (ICommand item in commands)
+			{
+				Bot.CommandManager.Register(item);
+			}
+		}
 
 		#endregion
 	}

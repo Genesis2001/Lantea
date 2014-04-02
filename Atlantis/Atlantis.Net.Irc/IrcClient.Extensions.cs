@@ -10,8 +10,10 @@ namespace Atlantis.Net.Irc
 
 	public partial class IrcClient
 	{
-		public bool Compare(char prefixA, char prefixB)
+		public bool IsHigherOrEqualToPrefix(char prefixA, char prefixB)
 		{
+			if (prefixA == prefixB) return true;
+
 			return accessPrefixes.IndexOf(prefixA) > accessPrefixes.IndexOf(prefixB);
 		}
 	}

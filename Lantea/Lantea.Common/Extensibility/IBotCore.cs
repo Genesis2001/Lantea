@@ -18,6 +18,11 @@ namespace Lantea.Common.Extensibility
 		IrcClient Client { get; }
 
 		/// <summary>
+		/// Gets a <see cref="T:ICommandManager" /> instance for the current bot.
+		/// </summary>
+		ICommandManager CommandManager { get; }
+
+		/// <summary>
 		/// Gets a <see cref="T:Lantea.Common.IO.Configuration" /> instance of the configuration.
 		/// </summary>
 		Configuration Config { get; }
