@@ -14,7 +14,7 @@ namespace Atlantis.Net.Irc
 		{
 			if (prefixA == prefixB) return true;
 
-			return accessPrefixes.IndexOf(prefixA) > accessPrefixes.IndexOf(prefixB);
+			return AccessPrefixes.IndexOf(prefixA) >= AccessPrefixes.IndexOf(prefixB);
 		}
 	}
 }

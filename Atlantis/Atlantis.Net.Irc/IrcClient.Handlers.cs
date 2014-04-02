@@ -19,7 +19,6 @@ namespace Atlantis.Net.Irc
 	{
 		#region Fields
 
-		internal string accessPrefixes;
 		internal string accessModes;
 		internal string accessRegex;
 		internal string[] channelModes;
@@ -38,6 +37,13 @@ namespace Atlantis.Net.Irc
 		private const string IRC_CHANEX = @":?(?<target>\#?[^\W]+)";
 
 		#endregion
+
+		#region Properties
+
+		public string AccessPrefixes { get; private set; }
+
+		#endregion
+
 
 		// TODO: Handle disconnection events.
 		// TODO: DEBUG RECV: ERROR :Closing link: (lantea@1.2.3.4) [Killed (Genesis2001 (foo))]
@@ -82,7 +88,7 @@ namespace Atlantis.Net.Irc
 				if (message.TryMatch(@"PREFIX=\((\S+)\)(\S+)", out m))
 				{
 					accessModes    = m.Groups[1].Value;
-					accessPrefixes = m.Groups[2].Value;
+					AccessPrefixes = m.Groups[2].Value;
 				}
 				
 				if (message.TryMatch(@"CHANMODES=(\S+)", out m))
@@ -123,7 +129,7 @@ namespace Atlantis.Net.Irc
 				MatchCollection collection;
 				if (string.IsNullOrEmpty(accessRegex))
 				{
-					accessRegex = string.Format(@"(?<prefix>[{0}]*)(?<nick>\S+)", accessPrefixes);
+					accessRegex = string.Format(@"(?<prefix>[{0}]*)(?<nick>\S+)", AccessPrefixes);
 				}
 
 				if (names.TryMatches(accessRegex, out collection))
@@ -506,7 +512,7 @@ namespace Atlantis.Net.Irc
 								}
 
 								int pi      = accessModes.IndexOf(modes[i]);
-								char prefix = accessPrefixes[pi];
+								char prefix = AccessPrefixes[pi];
 
 								if (set) list.AddPrefix(prefix);
 								else list.RemovePrefix(prefix);
