@@ -104,26 +104,20 @@ namespace Lantea.Core
 
 				if (entry != null)
 				{
-					String target = entry.GetString("target");
+					String target   = entry.GetString("target");
 					Int32 threshold = entry.GetInt32("threshold");
 
 					ILog log;
 					if (target.Equals("System.Console", StringComparison.OrdinalIgnoreCase))
-					{
-						log = new ConsoleLog(Console.Write) { Threshold = (LogThreshold)threshold };
-
-						logs.Add(log);
-					}
+						log = new ConsoleLog(Console.Write) {Threshold = (LogThreshold)threshold};
 					else
-					{
-						log = new FileLog(Path.Combine(logPath, target)) { Threshold = (LogThreshold)threshold };
+						log = new FileLog(Path.Combine(logPath, target)) {Threshold = (LogThreshold)threshold};
 
-						logs.Add(log);
-					}
+					logs.Add(log);
 				}
 			}
 
-			Log = new MultiLog(logs);
+			Log = new MultiLog(logs) {PrefixLog = true};
 
 			Log.Info("Starting Lantea bot.");
 			LoadIRC();

@@ -7,10 +7,10 @@ using System.Reflection;
 [assembly: AssemblyConfiguration("Release")]
 #endif
 
-[assembly: AssemblyTitle("Hello")]
-[assembly: AssemblyDescription("A hello world module for Lantea introducing the module system.")]
+[assembly: AssemblyTitle("Autojoin")]
+[assembly: AssemblyDescription("An autojoin module for Lantea to join channels upon connecting to the server.")]
 [assembly: AssemblyCompany("Zack Loveless")]
-[assembly: AssemblyProduct("Hello Module")]
+[assembly: AssemblyProduct("Autojoin Module")]
 [assembly: AssemblyCopyright("Copyright © Zack Loveless. All Rights Reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

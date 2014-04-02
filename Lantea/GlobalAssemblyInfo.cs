@@ -8,14 +8,13 @@ using System;
 using System.Reflection;
 
 #if DEBUG
-
 [assembly: AssemblyConfiguration("Debug")]
 #else
 [assembly: AssemblyConfiguration("Release")]
 #endif
 
 [assembly: AssemblyCompany("Zack Loveless")]
-[assembly: AssemblyProduct("Lantea Program")]
+[assembly: AssemblyProduct("Lantea IRC Bot")]
 [assembly: AssemblyCopyright("Copyright © Zack Loveless. All Rights Reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
