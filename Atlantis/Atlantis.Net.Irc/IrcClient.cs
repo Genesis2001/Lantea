@@ -68,6 +68,24 @@ namespace Atlantis.Net.Irc
 			token.Register(CancellationNoticeHandler);
 		}
 
+		~IrcClient()
+		{
+			RawMessageReceivedEvent -= RegistrationHandler;
+			RawMessageReceivedEvent -= PingHandler;
+			RawMessageReceivedEvent -= RfcNumericHandler;
+			RawMessageReceivedEvent -= JoinPartHandler;
+			RawMessageReceivedEvent -= MessageNoticeHandler;
+			RawMessageReceivedEvent -= ModeHandler;
+			RawMessageReceivedEvent -= NickHandler;
+			RawMessageReceivedEvent -= QuitHandler;
+
+			RfcNumericEvent -= ConnectionHandler;
+			RfcNumericEvent -= RfcProtocolHandler;
+			RfcNumericEvent -= RfcNamesHandler;
+			RfcNumericEvent -= NickInUseHandler;
+			RfcNumericEvent -= ListModeHandler;
+		}
+
 		#region Properties
 
 		/// <summary>
@@ -375,6 +393,9 @@ namespace Atlantis.Net.Irc
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!disposing) return;
+
+			RawMessageReceivedEvent = null;
+			RfcNumericEvent         = null;
 
 			if (tokenSource != null && !tokenSource.IsCancellationRequested) tokenSource.Cancel();
 		}
