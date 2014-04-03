@@ -13,14 +13,6 @@ namespace Lantea.Common.IO
 
 	public class Block
 	{
-		/* 
-		 * template<typename T> class map : public std::map<string, T, ci::less> { };				// Dictionary<String, T>
-		 * template<typename T> class multimap : public std::multimap<string, T, ci::less> { };		// Dictionary<String, List<T>>
-		 * 
-		 * item_map items;
-		 * block_map blocks;
-		 */
-
 		internal readonly DictionaryList<Block> blocks;
 		internal readonly Dictionary<string, string> items;
 		internal int lineNumber;
@@ -49,7 +41,7 @@ namespace Lantea.Common.IO
 			if (items.ContainsKey(property))
 			{
 				string value = items[property];
-
+				
 				return (T)Convert.ChangeType(value, typeof (T));
 			}
 
