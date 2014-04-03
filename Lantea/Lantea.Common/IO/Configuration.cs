@@ -20,23 +20,33 @@ namespace Lantea.Common.IO
 	{
 		private readonly Stack<Block> block_stack = new Stack<Block>();
 		private readonly StringBuilder buffer     = new StringBuilder();
-		private string currentFileName;
-		private string itemname;
-		private int currentLine;
+		private String currentFileName;
+		private String itemname;
+		private Int32 currentLine;
 		
 		private bool in_word;
 		private bool in_quote;
 		private bool in_comment;
 
-		private Dictionary<String, Block> modules = new Dictionary<string, Block>(); 
+		private readonly Dictionary<String, Block> modules = new Dictionary<string, Block>();
+		private readonly String root;
 
 		public Configuration() : base("")
 		{
 			buffer      = new StringBuilder();
 			block_stack = new Stack<Block>();
+
+			var asm = Assembly.GetEntryAssembly();
+			root = Path.GetFullPath(Path.GetDirectoryName(asm.Location));
 		}
 
+		#region Events
+
 		public event EventHandler<ConfigurationLoadEventArgs> ConfigurationLoadEvent;
+
+		#endregion
+		
+		#region Methods
 
 		public Block GetModule(IModule module)
 		{
@@ -45,7 +55,9 @@ namespace Lantea.Common.IO
 
 		public Block GetModule(string name)
 		{
-			throw new NotSupportedException();
+			Block block;
+
+			return (modules.TryGetValue(name, out block) ? block : null);
 		}
 
 		/// <summary>
@@ -59,27 +71,20 @@ namespace Lantea.Common.IO
 			try
 			{
 				currentFileName = Path.GetFileName(path);
-				var asm         = Assembly.GetEntryAssembly();
-				String root     = Path.GetFullPath(Path.GetDirectoryName(asm.Location));
 
 				Load(new FileStream(path, FileMode.Open, FileAccess.Read));
 
 				for (Int32 i = 0; i < CountBlock("include"); ++i)
 				{
 					Block include = GetBlock("include", i);
-
 					String file = include.Get<String>("name");
-					Load(new FileStream(Path.Combine(root, file), FileMode.Open, FileAccess.Read));
-				}
 
-				for (Int32 i = 0; i < CountBlock("module"); ++i)
-				{
-					Block module   = GetBlock("module", i);
-					String modname = module.Get<String>("name");
+					ValidateNotEmpty("include", "name", file);
+					ValidateFilePath("include", "name", file);
 
+					file = Path.GetFullPath(Path.Combine(root, file));
 
-
-					modules.Add(modname, module);
+					Load(new FileStream(file, FileMode.Open, FileAccess.Read));
 				}
 			}
 			catch (FileNotFoundException e)
@@ -92,6 +97,22 @@ namespace Lantea.Common.IO
 				ConfigurationLoadEvent.Raise(this, new ConfigurationLoadEventArgs(false, e));
 			}
 #endif
+			finally
+			{
+				for (Int32 i = 0; i < CountBlock("module"); ++i)
+				{
+					Block module = GetBlock("module", i);
+					if (module != null)
+					{
+						String name = module.Get<String>("name");
+
+						ValidateNotEmpty("module", "name", name);
+						ValidateNoSpaces("module", "name", name);
+
+						modules.Add(name, module);
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -122,7 +143,8 @@ namespace Lantea.Common.IO
 
 			if (in_comment)
 			{
-				throw new MalformedConfigException(string.Format("Unterminated multiline comment at end of file: {0}", currentFileName));
+				throw new MalformedConfigException(string.Format("Unterminated multiline comment at end of file: {0}",
+					currentFileName));
 			}
 
 			if (in_quote)
@@ -219,7 +241,9 @@ namespace Lantea.Common.IO
 				{
 					if (block_stack.Count == 0)
 					{
-						throw new MalformedConfigException(string.Format("Unexpected config item outside of section: {0}:{1}", currentFileName, currentLine));
+						throw new MalformedConfigException(string.Format("Unexpected config item outside of section: {0}:{1}",
+							currentFileName,
+							currentLine));
 					}
 
 					if (!String.IsNullOrEmpty(itemname) || buffer.Length == 0)
@@ -227,7 +251,7 @@ namespace Lantea.Common.IO
 						throw new MalformedConfigException("Stray '=' or item without value", currentFileName, currentLine);
 					}
 
-					in_word  = false;
+					in_word = false;
 					itemname = buffer.ToString().Trim();
 					buffer.Clear();
 				}
@@ -250,12 +274,12 @@ namespace Lantea.Common.IO
 					}
 
 					String blockName = buffer.ToString();
-					Block b          = block_stack.Count == 0 ? this : block_stack.Peek();
+					Block b = block_stack.Count == 0 ? this : block_stack.Peek();
 
 					Tuple<String, Block> pair = new Tuple<string, Block>(blockName, new Block(blockName));
 					b.blocks.Add(pair.Item1, pair.Item2);
 
-					b            = pair.Item2;
+					b = pair.Item2;
 					b.lineNumber = currentLine;
 					block_stack.Push(b);
 
@@ -305,7 +329,7 @@ namespace Lantea.Common.IO
 						}
 
 						Block b = block_stack.Peek();
-						
+
 						if (b != null)
 						{
 							b.items[itemname] = buffer.ToString().Trim();
@@ -336,9 +360,39 @@ namespace Lantea.Common.IO
 			}
 		}
 
-		private void ValidateNotZero<T>(String block, String name, T value)
+		private void ValidateNotZero(String block, String name, Int32 value)
 		{
+			if (value == 0)
+			{
+				throw new MalformedConfigException(String.Format("The value for <{0}:{1}> cannot be zero.", block, name));
+			}
 		}
+
+		private void ValidateNoSpaces(String block, String name, String value)
+		{
+			if (value.Contains(" "))
+			{
+				throw new MalformedConfigException(String.Format("The value for <{0}:{1}> cannot contain spaces.", block, name));
+			}
+		}
+
+		private void ValidateDirectory(String block, String name, String value)
+		{
+			if (!Directory.Exists(value))
+			{
+				throw new MalformedConfigException(String.Format("The value for <{0}:{1}> is not a valid directory.", block, name));
+			}
+		}
+
+		private void ValidateFilePath(String block, String name, String value)
+		{
+			if (!File.Exists(value))
+			{
+				throw new MalformedConfigException(String.Format("The value for <{0}:{1}> is not a valid file path.", block, name));
+			}
+		}
+
+		#endregion
 	}
 
 	// ReSharper restore InconsistentNaming

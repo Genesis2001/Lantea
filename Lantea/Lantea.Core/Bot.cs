@@ -188,7 +188,11 @@ namespace Lantea.Core
 				IModule value = item.Value;
 				value.Load();
 
-				Log.InfoFormat("Loaded: {0} (v{1}) by {2}", item.Metadata.Name, item.Metadata.Version, item.Metadata.Author);
+				String description = String.IsNullOrEmpty(item.Metadata.Description)
+					? item.Metadata.Name
+					: item.Metadata.Description;
+
+				Log.InfoFormat("Loaded: {0} (v{1}) by {2}", description, item.Metadata.Version, item.Metadata.Author);
 
 				modules.Add(value);
 			}

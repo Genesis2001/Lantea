@@ -28,5 +28,29 @@ namespace Atlantis.Linq
 		{
 			return Double.Parse(source);
 		}
+
+		public static bool IsNumeric(this Type source)
+		{
+			if (source == null)
+			{
+				throw new ArgumentNullException("source");
+			}
+
+			return (source == typeof (int)
+			        || source == typeof (double)
+			        || source == typeof (long)
+			        || source == typeof (short)
+			        || source == typeof (float)
+			        || source == typeof (Int16)
+			        || source == typeof (Int32)
+			        || source == typeof (Int64)
+			        || source == typeof (uint)
+			        || source == typeof (UInt16)
+			        || source == typeof (UInt32)
+			        || source == typeof (UInt64)
+			        || source == typeof (sbyte)
+			        || source == typeof (Single)
+				);
+		}
 	}
 }
