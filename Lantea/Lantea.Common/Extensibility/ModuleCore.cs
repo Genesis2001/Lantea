@@ -21,6 +21,8 @@ namespace Lantea.Common.Extensibility
 
 		public abstract string Author { get; }
 
+		public abstract string Description { get; }
+
 		public abstract string Name { get; }
 
 		public abstract string Version { get; }

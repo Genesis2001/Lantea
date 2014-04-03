@@ -50,7 +50,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lantea.IntegrationTests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lantea.Core", "Lantea\Lantea.Core\Lantea.Core.csproj", "{5CB52E16-46BE-41B2-A041-A112C0A5225F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloModule", "Extensions\HelloModule\HelloModule.csproj", "{AFE4A5A7-4A81-429E-9C60-E756E0C29650}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hello", "Extensions\HelloModule\Hello.csproj", "{AFE4A5A7-4A81-429E-9C60-E756E0C29650}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autojoin", "Extensions\Autojoin\Autojoin.csproj", "{E5AD298D-2DFD-4BAB-B360-85221A0D604A}"
 EndProject

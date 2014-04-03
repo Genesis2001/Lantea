@@ -12,6 +12,8 @@ namespace Lantea.Common.Extensibility
 	{
 		String Author { get; }
 
+		String Description { get; }
+
 		String Name { get; }
 
 		String Version { get; }

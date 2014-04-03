@@ -9,13 +9,17 @@ namespace Autojoin
 	using System;
 	using System.Collections.Generic;
 	using System.ComponentModel.Composition;
-	using System.Threading.Tasks;
 	using Lantea.Common.Extensibility;
 	using Lantea.Common.IO;
 
-	[Export(typeof(IModule)), Module(Author = "Zack Loveless", Name = "Autojoin Channels", Type = ModuleType.VENDOR, Version = "1.0")]
+	[Export(typeof(IModule))]
+	[Module(Author = "Zack Loveless", Description = ModuleDesc, Name = ModuleName, Type = ModuleType.VENDOR, Version = ModuleVersion)]
 	public class Autojoin : ModuleCore
 	{
+		private const String ModuleName    = "Autojoin";
+		private const String ModuleVersion = "1.0";
+		private const String ModuleDesc    = "";
+
 		[ImportingConstructor]
 		public Autojoin([Import] IBotCore bot, [Import] Configuration config) : base(bot, config)
 		{
@@ -30,14 +34,19 @@ namespace Autojoin
 			get { return "Zack Loveless"; }
 		}
 
+		public override string Description
+		{
+			get { return ModuleDesc; }
+		}
+
 		public override string Name
 		{
-			get { return "Autojoin Channels"; }
+			get { return ModuleName; }
 		}
 
 		public override string Version
 		{
-			get { return "1.0"; }
+			get { return ModuleVersion; }
 		}
 
 		public override ModuleType Type

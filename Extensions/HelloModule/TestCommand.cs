@@ -4,10 +4,9 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace HelloModule
+namespace Hello
 {
 	using System;
-	using System.Linq;
 	using Atlantis.Net.Irc;
 	using Lantea.Common.Extensibility;
 

@@ -4,18 +4,19 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace HelloModule
+namespace Hello
 {
 	using System;
 	using System.ComponentModel.Composition;
 	using Lantea.Common.Extensibility;
 	using Lantea.Common.IO;
 
-	[Export(typeof(IModule)), Module(Author = "Zack Loveless", Name = HelloName, Type = ModuleType.VENDOR, Version = HelloVersion)]
+	[Export(typeof(IModule)), Module(Author = "Zack Loveless", Name = ModuleName, Type = ModuleType.VENDOR, Version = ModuleVersion)]
 	public class Hello : ModuleCore
 	{
-		public const String HelloVersion = "1.0.1";
-		public const String HelloName    = "Lantea Hello Module";
+		private const String ModuleVersion = "1.0.1";
+		private const String ModuleName    = "Hello";
+		private const String ModuleDesc    = "";
 
 		[ImportingConstructor]
 		public Hello([Import] IBotCore bot, [Import] Configuration config) : base(bot, config)
@@ -29,14 +30,19 @@ namespace HelloModule
 			get { return "Zack Loveless"; }
 		}
 
+		public override string Description
+		{
+			get { return ModuleDesc; }
+		}
+
 		public override string Name
 		{
-			get { return HelloName; }
+			get { return ModuleName; }
 		}
 
 		public override string Version
 		{
-			get { return HelloVersion; }
+			get { return ModuleVersion; }
 		}
 
 		public override ModuleType Type

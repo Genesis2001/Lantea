@@ -9,15 +9,17 @@ namespace Lantea.Common.IO
 	using System;
 	using System.Collections.Generic;
 	using System.IO;
+	using System.Reflection;
 	using System.Text;
 	using Atlantis.Linq;
+	using Extensibility;
 
 	// ReSharper disable InconsistentNaming
 
 	public class Configuration : Block
 	{
-		private readonly Stack<Block> block_stack;
-		private readonly StringBuilder buffer;
+		private readonly Stack<Block> block_stack = new Stack<Block>();
+		private readonly StringBuilder buffer     = new StringBuilder();
 		private string currentFileName;
 		private string itemname;
 		private int currentLine;
@@ -25,6 +27,8 @@ namespace Lantea.Common.IO
 		private bool in_word;
 		private bool in_quote;
 		private bool in_comment;
+
+		private Dictionary<String, Block> modules = new Dictionary<string, Block>(); 
 
 		public Configuration() : base("")
 		{
@@ -34,9 +38,14 @@ namespace Lantea.Common.IO
 
 		public event EventHandler<ConfigurationLoadEventArgs> ConfigurationLoadEvent;
 
+		public Block GetModule(IModule module)
+		{
+			return module == null ? null : GetModule(module.Name);
+		}
+
 		public Block GetModule(string name)
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException();
 		}
 
 		/// <summary>
@@ -50,16 +59,27 @@ namespace Lantea.Common.IO
 			try
 			{
 				currentFileName = Path.GetFileName(path);
-				String root     = Path.GetDirectoryName(path);
+				var asm         = Assembly.GetEntryAssembly();
+				String root     = Path.GetFullPath(Path.GetDirectoryName(asm.Location));
 
 				Load(new FileStream(path, FileMode.Open, FileAccess.Read));
 
-				for (int i = 0; i < CountBlock("include"); ++i)
+				for (Int32 i = 0; i < CountBlock("include"); ++i)
 				{
 					Block include = GetBlock("include", i);
 
-					string file = include.Get<String>("name");
+					String file = include.Get<String>("name");
 					Load(new FileStream(Path.Combine(root, file), FileMode.Open, FileAccess.Read));
+				}
+
+				for (Int32 i = 0; i < CountBlock("module"); ++i)
+				{
+					Block module   = GetBlock("module", i);
+					String modname = module.Get<String>("name");
+
+
+
+					modules.Add(modname, module);
 				}
 			}
 			catch (FileNotFoundException e)
@@ -306,6 +326,18 @@ namespace Lantea.Common.IO
 					}
 				}
 			}
+		}
+
+		private void ValidateNotEmpty(String block, String name, String value)
+		{
+			if (String.IsNullOrEmpty(value))
+			{
+				throw new MalformedConfigException(String.Format("The value for <{0}:{1}> cannot be empty.", block, name));
+			}
+		}
+
+		private void ValidateNotZero<T>(String block, String name, T value)
+		{
 		}
 	}
 

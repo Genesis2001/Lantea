@@ -14,7 +14,8 @@ namespace Uptime
 	[Module(Author = "Zack Loveless", Name = ModuleName, Type = ModuleType.VENDOR, Version = ModuleVersion)]
 	public class Uptime : ModuleCore
 	{
-		private const String ModuleName = "Service Uptime Module";
+		private const String ModuleName    = "Uptime";
+		private const String ModuleDesc    = "Service Uptime Module";
 		private const String ModuleVersion = "1.0";
 
 		[ImportingConstructor]
@@ -27,6 +28,11 @@ namespace Uptime
 		public override string Author
 		{
 			get { return "Zack Loveless"; }
+		}
+
+		public override string Description
+		{
+			get { return ModuleDesc; }
 		}
 
 		public override string Name
@@ -50,11 +56,12 @@ namespace Uptime
 
 		public override void Load()
 		{
-			Block uptimeBlock = Config.GetBlock("uptime");
+			Block uptime = Config.GetBlock("uptime");
+			//Block uptime = Config.GetModule(this);
 
-			if (uptimeBlock != null)
+			if (uptime != null)
 			{
-				for (Int32 i = 0; i < uptimeBlock.CountBlock("server"); ++i)
+				for (Int32 i = 0; i < uptime.CountBlock("server"); ++i)
 				{
 					// todo.
 				}

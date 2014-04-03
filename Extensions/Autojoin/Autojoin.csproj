@@ -42,14 +42,17 @@
     <ProjectReference Include="..\..\Atlantis\Atlantis.Net.Irc\Atlantis.Net.Irc.csproj">
       <Project>{07410E3A-D2CF-4A81-BA52-864C8D206664}</Project>
       <Name>Atlantis.Net.Irc</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\Atlantis\Atlantis\Atlantis.csproj">
       <Project>{3464FCF7-A68E-40CC-A354-32B80E698890}</Project>
       <Name>Atlantis</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\Lantea\Lantea.Common\Lantea.Common.csproj">
       <Project>{5F2809C1-A7B0-453A-9B8F-31BE9DCD2AA2}</Project>
       <Name>Lantea.Common</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

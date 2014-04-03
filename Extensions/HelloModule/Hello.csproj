@@ -7,8 +7,8 @@
     <ProjectGuid>{AFE4A5A7-4A81-429E-9C60-E756E0C29650}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HelloModule</RootNamespace>
-    <AssemblyName>HelloModule</AssemblyName>
+    <RootNamespace>Hello</RootNamespace>
+    <AssemblyName>Hello</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -44,6 +44,7 @@
     <ProjectReference Include="..\..\Atlantis\Atlantis.Net.Irc\Atlantis.Net.Irc.csproj">
       <Project>{07410E3A-D2CF-4A81-BA52-864C8D206664}</Project>
       <Name>Atlantis.Net.Irc</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\Atlantis\Atlantis\Atlantis.csproj">
       <Project>{3464FCF7-A68E-40CC-A354-32B80E698890}</Project>
