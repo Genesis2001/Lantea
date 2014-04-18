@@ -28,7 +28,7 @@ namespace Lantea.Common.IO
 		private bool in_quote;
 		private bool in_comment;
 
-		private readonly Dictionary<String, Block> modules = new Dictionary<string, Block>();
+		private readonly Dictionary<String, Block> modules = new Dictionary<String, Block>(StringComparer.OrdinalIgnoreCase);
 		private readonly String root;
 
 		public Configuration() : base("")
@@ -53,11 +53,11 @@ namespace Lantea.Common.IO
 			return module == null ? null : GetModule(module.Name);
 		}
 
-		public Block GetModule(string name)
+		public Block GetModule(String name)
 		{
 			Block block;
 
-			return (modules.TryGetValue(name, out block) ? block : null);
+			return modules.TryGetValue(name, out block) ? block : null;
 		}
 
 		/// <summary>

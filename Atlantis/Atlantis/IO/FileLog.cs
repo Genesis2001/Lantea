@@ -23,7 +23,7 @@ namespace Atlantis.IO
 		{
 			this.fileName = fileName;
 			this.encoding = encoding;
-			stream        = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write);
+			stream        = new FileStream(fileName, FileMode.Append, FileAccess.Write);
 		}
 	}
 }

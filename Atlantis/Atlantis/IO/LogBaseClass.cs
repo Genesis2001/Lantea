@@ -23,12 +23,17 @@ namespace Atlantis.IO
 
 			if (PrefixLog)
 			{
-				messageBuilder.Append(threshold);
+				messageBuilder.Append(threshold.ToString().ToUpper());
 
 				if (!String.IsNullOrEmpty(Prefix))
 				{
 					messageBuilder.Append(" ");
 					messageBuilder.Append(Prefix);
+				}
+				else
+				{
+					messageBuilder.Append(" ");
+					messageBuilder.Append(DateTime.Now.ToString("g"));
 				}
 
 				messageBuilder.Append(" ");

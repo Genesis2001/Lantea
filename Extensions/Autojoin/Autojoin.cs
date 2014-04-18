@@ -56,16 +56,17 @@ namespace Autojoin
 
 		public override void Load()
 		{
-			Block module = Config.GetModule(this);
-			if (module != null)
+			Block autojoin = Config.GetBlock("autojoin");
+			if (autojoin != null)
 			{
-				Block autojoin = module.GetBlock("autojoin");
-
 				for (Int32 i = 0; i < autojoin.CountBlock("channel"); ++i)
 				{
-					Block chan = autojoin.GetBlock("channel", i);
+					Block chan     = autojoin.GetBlock("channel", i);
+					String channel = chan.Get("name", String.Empty);
 
-					channels.Add(chan.Get("name", String.Empty));
+					if (String.IsNullOrEmpty(channel)) continue;
+
+					channels.Add(channel);
 				}
 			}
 

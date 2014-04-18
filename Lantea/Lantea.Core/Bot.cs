@@ -13,7 +13,6 @@ namespace Lantea.Core
 	using System.IO;
 	using System.Linq;
 	using System.Reflection;
-	using System.Threading.Tasks;
 	using Atlantis.IO;
 	using Atlantis.Linq;
 	using Atlantis.Net.Irc;
@@ -186,6 +185,13 @@ namespace Lantea.Core
 			foreach (var item in composedModules)
 			{
 				IModule value = item.Value;
+
+				if (Config.GetModule(value) == null)
+				{
+					// module is commented out and/or not enabled in the config.
+					continue;
+				}
+
 				value.Load();
 
 				String description = String.IsNullOrEmpty(item.Metadata.Description)
