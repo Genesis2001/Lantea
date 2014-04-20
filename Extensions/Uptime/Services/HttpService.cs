@@ -92,12 +92,12 @@ namespace Uptime.Services
 				String[] parts = HostName.Split(new[] {@"//"}, StringSplitOptions.None);
 
 				builder.Scheme = parts[0].TrimEnd(':');
-				builder.Host = parts[1];
+				builder.Host = parts[1].TrimEnd('/');
 			}
 			else
 			{
 				builder.Scheme = ssl ? "https" : "http";
-				builder.Host = HostName;
+				builder.Host = HostName.TrimEnd('/');
 			}
 			
 			builder.Port   = Port;
