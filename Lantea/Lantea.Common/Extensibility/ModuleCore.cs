@@ -27,7 +27,7 @@ namespace Lantea.Common.Extensibility
 
 		public abstract string Version { get; }
 
-		public abstract ModuleType Type { get; }
+		public abstract ModuleType ModuleType { get; }
 
 		#endregion
 

@@ -234,13 +234,18 @@ namespace Lantea.Core
 					return;
 				}
 
-				foreach (ICommand cmd in Commands)
+				foreach (ICommand cmd in Commands.Where(cmd => cmd.Triggers.Any(x => x.Equals(toks[0], StringComparison.OrdinalIgnoreCase))).ToArray())
 				{
-					// TODO: (Idea) Add an out string errorMessage that could be displayed to the user?
-					if (cmd.Triggers.Any(x => x.Equals(toks[0], StringComparison.OrdinalIgnoreCase)))
+					if (cmd.CanExecute(toks.Length - 1) && (Client.ComparePrefix(list.HighestPrefix, cmd.Access) >= 0 || cmd.Access == (char)0))
 					{
-						// TODO: Logic bug in "IsHigherOrEqualToPrefix" that prevents a '&' command from being accessed by a '~'/etc.
-						if (cmd.CanExecute(toks.Length - 1) &&
+						cmd.Execute(Client, args.Source, args.Target, toks.Skip(1).ToArray());
+					}
+					else if (Client.ComparePrefix(list.HighestPrefix, cmd.Access) < 0)
+					{
+						Client.Notice(args.Source, "Sorry, you don't have access to {0}", cmd.Triggers[0]);
+					}
+
+					/*if (cmd.CanExecute(toks.Length - 1) &&
 						    Client.IsHigherOrEqualToPrefix(list.HighestPrefix, cmd.Access))
 						{
 							cmd.Execute(Client, args.Source, args.Target, toks.Skip(1).ToArray());
@@ -248,8 +253,7 @@ namespace Lantea.Core
 						else if (!Client.IsHigherOrEqualToPrefix(list.HighestPrefix, cmd.Access))
 						{
 							Client.Notice(args.Source, "You need '{0}' to access this command. You currently have: {1}", cmd.Access, list);
-						}
-					}
+						}*/
 				}
 			}
 		}

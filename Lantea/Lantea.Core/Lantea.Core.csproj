@@ -57,14 +57,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="config\autojoin.conf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="config\autojoin.conf" />
     <None Include="config\Lantea.conf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="config\modules.conf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="config\uptime.conf" />
   </ItemGroup>

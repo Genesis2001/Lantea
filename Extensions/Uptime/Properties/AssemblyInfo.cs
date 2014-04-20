@@ -7,10 +7,10 @@ using System.Reflection;
 [assembly: AssemblyConfiguration("Release")]
 #endif
 
-[assembly: AssemblyTitle("Uptime")]
+[assembly: AssemblyTitle("Check")]
 [assembly: AssemblyDescription("A module to retrieve the uptime of a service or server.")]
 [assembly: AssemblyCompany("Zack Loveless")]
-[assembly: AssemblyProduct("Uptime Module")]
+[assembly: AssemblyProduct("Check Module")]
 [assembly: AssemblyCopyright("Copyright © Zack Loveless. All Rights Reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

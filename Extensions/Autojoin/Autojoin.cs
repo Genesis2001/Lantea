@@ -13,7 +13,7 @@ namespace Autojoin
 	using Lantea.Common.IO;
 
 	[Export(typeof(IModule))]
-	[Module(Author = "Zack Loveless", Description = ModuleDesc, Name = ModuleName, Type = ModuleType.VENDOR, Version = ModuleVersion)]
+	[Module(Author = "Zack Loveless", Description = ModuleDesc, Name = ModuleName, ModuleType = ModuleType.VENDOR, Version = ModuleVersion)]
 	public class Autojoin : ModuleCore
 	{
 		private const String ModuleName    = "Autojoin";
@@ -49,20 +49,21 @@ namespace Autojoin
 			get { return ModuleVersion; }
 		}
 
-		public override ModuleType Type
+		public override ModuleType ModuleType
 		{
 			get { return ModuleType.VENDOR; }
 		}
 
 		public override void Load()
 		{
-			Block autojoin = Config.GetBlock("autojoin");
+			//Block autojoin = Config.GetBlock("autojoin");
+			Block autojoin = Config.GetBlock(this);
 			if (autojoin != null)
 			{
 				for (Int32 i = 0; i < autojoin.CountBlock("channel"); ++i)
 				{
 					Block chan     = autojoin.GetBlock("channel", i);
-					String channel = chan.Get("name", String.Empty);
+					String channel = chan.Get("name", "");
 
 					if (String.IsNullOrEmpty(channel)) continue;
 

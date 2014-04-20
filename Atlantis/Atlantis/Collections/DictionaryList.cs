@@ -11,7 +11,17 @@ namespace Atlantis.Collections
 
 	public class DictionaryList<T>
 	{
-		private readonly Dictionary<String, List<T>> dict = new Dictionary<String, List<T>>();
+		private readonly Dictionary<String, List<T>> dict;
+
+		public DictionaryList()
+		{
+			dict = new Dictionary<string, List<T>>();
+		}
+
+		public DictionaryList(IEqualityComparer<String> comparer)
+		{
+			dict = new Dictionary<String, List<T>>(comparer);
+		}
 
 		public void Add(String key, T value)
 		{

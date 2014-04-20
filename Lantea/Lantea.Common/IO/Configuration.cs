@@ -48,6 +48,11 @@ namespace Lantea.Common.IO
 		
 		#region Methods
 
+		public Block GetBlock(IModule module)
+		{
+			return module == null ? null : GetBlock(module.Name);
+		}
+
 		public Block GetModule(IModule module)
 		{
 			return module == null ? null : GetModule(module.Name);

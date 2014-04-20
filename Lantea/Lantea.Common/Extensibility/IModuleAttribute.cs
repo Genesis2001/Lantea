@@ -18,6 +18,6 @@ namespace Lantea.Common.Extensibility
 
 		String Version { get; }
 
-		ModuleType Type { get; }
+		ModuleType ModuleType { get; }
 	}
 }

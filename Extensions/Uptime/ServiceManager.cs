@@ -6,34 +6,81 @@
 
 namespace Uptime
 {
-	using System.Collections.Concurrent;
+	using System;
+	using System.Collections;
 	using System.Collections.Generic;
 	using System.Linq;
 	using Services;
 
-	public class ServiceManager
+	public class ServiceManager : IEnumerable<Service>
 	{
-		private readonly ConcurrentBag<IService> services = new ConcurrentBag<IService>(); 
+		private static ServiceManager instance;
 
-		public IEnumerable<IService> Services
+		/// <summary>
+		/// Represents a singleton instance of the ServiceManager class.
+		/// </summary>
+		public static ServiceManager Instance
 		{
-			get { return services; }
+			get { return instance ?? (instance = new ServiceManager()); }
 		}
 
-		public void Register<T>(T service) where T : IService
+		private readonly Dictionary<String, String> map = new Dictionary<String, String>(StringComparer.OrdinalIgnoreCase);
+		private readonly HashSet<Service> services = new HashSet<Service>();
+
+		public Service CreateService(String key)
 		{
-			if (!services.Any(x => ReferenceEquals(x, service)))
+			String fullname;
+			if (!map.TryGetValue(key, out fullname)) return null;
+
+			// not going to worry about exceptions here
+			// because it's a private method and the obvious
+			// ones aren't likely to occur since they're not
+			// loaded by user-interaction.
+
+			Type type = Type.GetType(fullname);
+			return type != null ? (Service)Activator.CreateInstance(type) : null;
+		}
+
+		public void MapService<T>(String key) where T : Service
+		{
+			if (!map.ContainsKey(key))
+			{
+				map.Add(key, typeof (T).FullName);
+			}
+		}
+
+		public void Register<T>(T service) where T : Service
+		{
+			if (!services.Any(x => ReferenceEquals(service, x)))
 			{
 				services.Add(service);
 			}
 		}
 
-		public void Unregister<T>(T service) where T : IService
+		#region Implementation of IEnumerable
+
+		/// <summary>
+		/// Returns an enumerator that iterates through the collection.
+		/// </summary>
+		/// <returns>
+		/// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+		/// </returns>
+		public IEnumerator<Service> GetEnumerator()
 		{
-			if (services.Any(x => ReferenceEquals(x, service)))
-			{
-				
-			}
+			return services.GetEnumerator();
 		}
+
+		/// <summary>
+		/// Returns an enumerator that iterates through a collection.
+		/// </summary>
+		/// <returns>
+		/// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
+		/// </returns>
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return ((IEnumerable)services).GetEnumerator();
+		}
+
+		#endregion
 	}
 }

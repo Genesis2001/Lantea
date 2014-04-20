@@ -53,7 +53,9 @@
     <Compile Include="IO\Block.cs" />
     <Compile Include="IO\Configuration.cs" />
     <Compile Include="IO\ConfigurationLoadEventArgs.cs" />
+    <Compile Include="IO\StringExtensions.cs" />
     <Compile Include="IO\MalformedConfigException.cs" />
+    <Compile Include="IO\MissingRequiredPropertyException.cs" />
     <Compile Include="Linq\BlockExtensions.cs" />
     <Compile Include="Modules\ModuleLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

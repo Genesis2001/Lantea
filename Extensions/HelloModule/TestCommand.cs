@@ -33,8 +33,8 @@ namespace Hello
 		{
 			client.Message(target,
 				"Hello, {0}. I see you've called my test command. Here's the list of parameters you sent with it: {1}",
-				nick,
-				String.Join(" ", args));
+				nick.Color(10),
+				String.Join(" ", args).Color(4));
 		}
 
 		#endregion

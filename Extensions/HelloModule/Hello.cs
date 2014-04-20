@@ -11,7 +11,8 @@ namespace Hello
 	using Lantea.Common.Extensibility;
 	using Lantea.Common.IO;
 
-	[Export(typeof(IModule)), Module(Author = "Zack Loveless", Name = ModuleName, Type = ModuleType.VENDOR, Version = ModuleVersion)]
+	[Export(typeof(IModule))]
+	[Module(Author = "Zack Loveless", Name = ModuleName, ModuleType = ModuleType.VENDOR, Version = ModuleVersion)]
 	public class Hello : ModuleCore
 	{
 		private const String ModuleVersion = "1.0.1";
@@ -45,16 +46,9 @@ namespace Hello
 			get { return ModuleVersion; }
 		}
 
-		public override ModuleType Type
+		public override ModuleType ModuleType
 		{
 			get { return ModuleType.VENDOR; }
-		}
-
-		public override void Load()
-		{
-			Bot.Log.Info("Hello world!");
-
-			base.Load();
 		}
 
 		#endregion

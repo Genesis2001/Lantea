@@ -20,13 +20,13 @@ namespace Lantea.Common.Extensibility
 		/// <summary>
 		/// Initializes a new instance of the <see cref="T:System.Attribute"/> class.
 		/// </summary>
-		public ModuleAttribute(string author, string description, string name, string version, ModuleType type)
+		public ModuleAttribute(string author, string description, string name, string version, ModuleType moduleType)
 		{
 			Author      = author;
 			Description = description;
 			Name        = name;
 			Version     = version;
-			Type        = type;
+			ModuleType        = moduleType;
 		}
 
 		#region Implementation of IModuleAttribute
@@ -39,7 +39,7 @@ namespace Lantea.Common.Extensibility
 
 		public string Version { get; set; }
 
-		public ModuleType Type { get; set; }
+		public ModuleType ModuleType { get; set; }
 
 		#endregion
 	}
