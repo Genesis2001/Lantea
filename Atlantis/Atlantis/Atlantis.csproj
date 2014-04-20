@@ -55,7 +55,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Web\HttpHelper.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\lib\Humanizer\Humanizer.csproj">
+      <Project>{511a7984-f455-4a6e-adb9-9caac47ea079}</Project>
+      <Name>Humanizer</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

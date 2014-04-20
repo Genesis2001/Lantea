@@ -13,6 +13,8 @@ namespace Uptime.Services
 	{
 		#region Properties
 
+		public virtual String[] Channels { get; set; }
+
 		public virtual String DisplayName { get; set; }
 
 		public virtual String HostName { get; set; }

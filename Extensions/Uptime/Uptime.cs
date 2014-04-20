@@ -71,6 +71,7 @@ namespace Uptime
 				//ServiceManager.Instance.MapService<NullService>("none");
 				ServiceManager.Instance.MapService<SshService>("ssh");
 				ServiceManager.Instance.MapService<HttpService>("http");
+				ServiceManager.Instance.MapService<MySqlService>("mysql");
 				
 				defaultRetries = uptime.Get("max_retries", 3);
 				defaultTimeout = uptime.Get("timeout", 30);
@@ -95,6 +96,8 @@ namespace Uptime
 						s.DisplayName = b.Get<String>("display");
 						s.HostName    = b.Get<String>("hostname");
 						s.Port        = b.Get<Int32>("port");
+
+						s.Channels    = b.Get<String>("channels").Split(' ');
 
 						s.Initialize(b.Data);
 

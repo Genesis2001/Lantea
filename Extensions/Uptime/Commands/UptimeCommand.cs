@@ -36,7 +36,7 @@ namespace Uptime.Commands
 		{
 			Service[] services = args[0] == "*"
 				? ServiceManager.Instance.ToArray() // "*" is representative of *all* the services. No need to use a regex to find *all* when we have them all.
-				: ServiceManager.Instance.Where(x => Regex.IsMatch(x.DisplayName, args[0])).ToArray();
+				: ServiceManager.Instance.Where(x => Regex.IsMatch(x.DisplayName, args[0].Replace('*', '+'))).ToArray();
 
 			if (services.Length == 0)
 			{
@@ -44,6 +44,7 @@ namespace Uptime.Commands
 			}
 			else
 			{
+				services = services.Where(x => x.Channels.Any(z => z.Equals(target, StringComparison.OrdinalIgnoreCase))).ToArray();
 				foreach (var item in services)
 				{
 					client.Message(target, "{0}: {1}", item.DisplayName.Bold(), item.Check());
