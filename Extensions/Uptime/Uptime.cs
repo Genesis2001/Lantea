@@ -13,7 +13,7 @@ namespace Uptime
 	using Services;
 
 	[Export(typeof (IModule))]
-	[Module(Author = "Zack Loveless", Name = ModuleName, ModuleType = ModuleType.VENDOR, Version = ModuleVersion)]
+	[Module(Author = "Zack Loveless", Name = ModuleName, ModuleType = ModuleType.EXTRA, Version = ModuleVersion)]
 	public class Uptime : ModuleCore
 	{
 		private const String ModuleName    = "Uptime";
@@ -54,7 +54,7 @@ namespace Uptime
 
 		public override ModuleType ModuleType
 		{
-			get { return ModuleType.VENDOR; }
+			get { return ModuleType.EXTRA; }
 		}
 
 		#endregion
@@ -97,7 +97,8 @@ namespace Uptime
 						s.HostName    = b.Get<String>("hostname");
 						s.Port        = b.Get<Int32>("port");
 
-						s.Channels    = b.Get<String>("channels").Split(' ');
+						String channels = b.Get<String>("channels");
+						s.Channels = channels == null ? new String[0] : channels.Split(' ');
 
 						s.Initialize(b.Data);
 

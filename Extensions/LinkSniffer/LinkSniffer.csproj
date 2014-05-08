@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7998A044-E6EB-499D-A4E3-8F09EA942763}</ProjectGuid>
+    <ProjectGuid>{ADD4A147-38AB-4D55-8874-CD00EDE2ED90}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Uptime</RootNamespace>
-    <AssemblyName>Uptime</AssemblyName>
+    <RootNamespace>LinkSniffer</RootNamespace>
+    <AssemblyName>LinkSniffer</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,28 +30,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MySql.Data, Version=6.8.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\MySql.Data.6.8.3\lib\net45\MySql.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="Renci.SshNet">
-      <HintPath>..\..\packages\SSH.NET.2013.4.7\lib\net40\Renci.SshNet.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\UptimeCommand.cs" />
-    <Compile Include="PathHelper.cs" />
-    <Compile Include="ServiceManager.cs" />
-    <Compile Include="Services\HttpService.cs" />
-    <Compile Include="Services\MySqlService.cs" />
-    <Compile Include="Services\NullService.cs" />
-    <Compile Include="Services\Service.cs" />
-    <Compile Include="Services\SshService.cs" />
-    <Compile Include="Uptime.cs" />
+    <Compile Include="LinkService.cs" />
+    <Compile Include="LinkSniffer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -71,10 +56,6 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -35,8 +35,10 @@ namespace Uptime.Commands
 		public void Execute(IrcClient client, string nick, string target, params string[] args)
 		{
 			Service[] services = args[0] == "*"
-				? ServiceManager.Instance.ToArray() // "*" is representative of *all* the services. No need to use a regex to find *all* when we have them all.
-				: ServiceManager.Instance.Where(x => Regex.IsMatch(x.DisplayName, args[0].Replace('*', '+'))).ToArray();
+				? ServiceManager.Instance.ToArray()
+				// "*" is representative of *all* the services. No need to use a regex to find *all* when we have them all.
+				: ServiceManager.Instance.Where(x => Regex.IsMatch(x.DisplayName, Regex.Escape(args[0].Replace('*', '+')))).
+					ToArray();
 
 			if (services.Length == 0)
 			{

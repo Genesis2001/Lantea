@@ -25,11 +25,14 @@ namespace Uptime.Services
 			try
 			{
 				connection = new MySqlConnection(connectionStringBuilder.ConnectionString);
+//				connection.ConnectionTimeout = Timeout;
 				await connection.OpenAsync();
 
 				using (MySqlCommand cmd = connection.CreateCommand())
 				{
+					cmd.CommandTimeout = Timeout / 4;
 					cmd.CommandText = "SHOW GLOBAL STATUS LIKE 'Uptime'";
+
 					var reader = await cmd.ExecuteReaderAsync();
 
 					if (reader.HasRows && reader.Read())

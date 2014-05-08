@@ -7,7 +7,9 @@
 namespace Atlantis.Web
 {
 	using System;
+	using System.Linq;
 	using System.Net;
+	using System.Text.RegularExpressions;
 
 	public static class HttpHelper
 	{
@@ -48,6 +50,47 @@ namespace Atlantis.Web
 				case 505: return "HTTP version not supported";
 				default: return statusCode.ToString();
 			}
+		}
+
+		public static String GetHtmlTitle(String uri)
+		{
+			const String regex = @"(?<=<title.*>)([\s\S]*)(?=</title>)";
+
+			HttpWebRequest request = WebRequest.Create(uri) as HttpWebRequest;
+			if (request == null) return null;
+
+			HttpWebResponse response;
+			try
+			{
+				response = request.GetResponse() as HttpWebResponse;
+			}
+			catch (WebException)
+			{
+				return null;
+			}
+
+			if (response != null)
+			{
+				using (response)
+				{
+					if (response.Headers.AllKeys.Any(x => x.Equals("content-type", StringComparison.OrdinalIgnoreCase)))
+					{
+						if (response.Headers["Content-Type"].StartsWith("text/html"))
+						{
+							WebClient client = new WebClient();
+							String data = client.DownloadString(uri);
+
+							Match m;
+							if ((m = Regex.Match(data, regex)).Success)
+							{
+								return m.Value;
+							}
+						}
+					}
+				}
+			}
+
+			return null;
 		}
 	}
 }
