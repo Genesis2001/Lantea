@@ -39,7 +39,7 @@
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Bot.cs" />
-    <Compile Include="ConsoleLog.cs" />
+    <Compile Include="BotEx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

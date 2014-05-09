@@ -35,7 +35,7 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Lantea.Bootstrap</StartupObject>
+    <StartupObject>Lantea.BootLoader</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NDesk.Options, Version=0.2.1.0, Culture=neutral, processorArchitecture=MSIL">
@@ -51,8 +51,7 @@
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Bootstrap.cs" />
-    <Compile Include="BootstrapEx.cs" />
-    <Compile Include="ModuleLoader.cs" />
+    <Compile Include="BootLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

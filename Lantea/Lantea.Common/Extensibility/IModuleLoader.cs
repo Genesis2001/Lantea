@@ -31,7 +31,7 @@ namespace Lantea.Common.Extensibility
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		IEnumerable<T> Get<T>();
+		IEnumerable<T> GetExportedValues<T>();
 
 		/// <summary>
 		/// Returns a collection of T from the composition container that have the specified metadata
@@ -40,14 +40,14 @@ namespace Lantea.Common.Extensibility
 		/// <typeparam name="TMetadata"></typeparam>
 		/// <param name="condition"></param>
 		/// <returns></returns>
-		IEnumerable<T> Get<T, TMetadata>(Func<TMetadata, Boolean> condition = null);
+		IEnumerable<Lazy<T, TMetadata>> GetExportedValues<T, TMetadata>(Func<TMetadata, Boolean> condition = null);
 
 		/// <summary>
 		/// Returns a single item from the composition container.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		T GetSingle<T>();
+		T GetExportedValue<T>();
 
 		/// <summary>
 		/// Initializes the composition container and loads the bot.
@@ -58,5 +58,10 @@ namespace Lantea.Common.Extensibility
 		/// Loads discovered modules.
 		/// </summary>
 		void Load();
+		
+		/// <summary>
+		/// Unloads modules.
+		/// </summary>
+		void Unload();
 	}
 }

@@ -54,6 +54,7 @@
     <Compile Include="IO\Block.cs" />
     <Compile Include="IO\Configuration.cs" />
     <Compile Include="IO\ConfigurationLoadEventArgs.cs" />
+    <Compile Include="IO\ConsoleLog.cs" />
     <Compile Include="IO\StringExtensions.cs" />
     <Compile Include="IO\MalformedConfigException.cs" />
     <Compile Include="IO\MissingRequiredPropertyException.cs" />

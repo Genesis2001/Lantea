@@ -21,7 +21,7 @@ namespace Lantea.Core
 	using Common.Linq;
 
 	// ReSharper disable InconsistentNaming
-	public class Bot : IBotCore, IModuleLoader, ICommandManager
+	public class Bot : IBotCore, ICommandManager
 	{
 		private void LoadIRC()
 		{
@@ -87,7 +87,7 @@ namespace Lantea.Core
 
 		public IModuleLoader ModuleLoader
 		{
-			get { return this; }
+			get { return null; }
 		}
 
 		// ReSharper disable AssignNullToNotNullAttribute
@@ -140,7 +140,7 @@ namespace Lantea.Core
 			CommandManager.Initialize();
 
 			ModuleLoader.ModulesLoadedEvent += OnModulesLoaded;
-			ModuleLoader.LoadModules(moduleDirectory);
+//			ModuleLoader.LoadModules(moduleDirectory);
 		}
 
 		private void OnModulesLoaded(object sender, ModulesLoadedEventArgs args)
@@ -156,7 +156,7 @@ namespace Lantea.Core
 
 		#region Implementation of IModuleLoader
 
-		public event EventHandler<ModulesLoadedEventArgs> ModulesLoadedEvent;
+		/*public event EventHandler<ModulesLoadedEventArgs> ModulesLoadedEvent;
 
 		public IEnumerable<IModule> Modules { get; private set; }
 
@@ -205,7 +205,7 @@ namespace Lantea.Core
 
 			Modules = modules;
 			ModulesLoadedEvent.Raise(this, new ModulesLoadedEventArgs(Modules));
-		}
+		}*/
 
 		#endregion
 
