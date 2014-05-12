@@ -172,7 +172,7 @@ namespace Lantea
 		private Boolean disposed = false;
 		private CompositionContainer container;
 
-		private List<Lazy<IModule, IModuleAttribute>> modules = new List<Lazy<IModule, IModuleAttribute>>();
+		private readonly List<Lazy<IModule, IModuleAttribute>> modules = new List<Lazy<IModule, IModuleAttribute>>();
 
 		public event EventHandler<ModulesLoadedEventArgs> ModulesLoadedEvent;
 

@@ -85,9 +85,9 @@ namespace Lantea.Common.IO
 		{
 			if (Threshold.HasFlag(threshold))
 			{
-				BuildLogMessage(threshold, format, args);
+				var message = BuildLogMessage(threshold, format, args);
 
-				Write(messageBuilder.ToString());
+				Write(message.ToString());
 			}
 		}
 

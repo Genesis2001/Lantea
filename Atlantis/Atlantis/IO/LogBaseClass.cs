@@ -13,43 +13,44 @@ namespace Atlantis.IO
 	public abstract class LogBaseClass : ILog
 	{
 		protected Stream stream;
-		protected StringBuilder messageBuilder;
 
 		#region Methods
 
-		protected virtual void BuildLogMessage(LogThreshold threshold, String format, params object[] args)
+		protected virtual StringBuilder BuildLogMessage(LogThreshold threshold, String format, params object[] args)
 		{
-			messageBuilder = new StringBuilder();
+			var builder = new StringBuilder();
 
 			if (PrefixLog)
 			{
-				messageBuilder.Append(threshold.ToString().ToUpper());
+				builder.Append(threshold.ToString().ToUpper());
 
 				if (!String.IsNullOrEmpty(Prefix))
 				{
-					messageBuilder.Append(" ");
-					messageBuilder.Append(Prefix);
+					builder.Append(" ");
+					builder.Append(Prefix);
 				}
 				else
 				{
-					messageBuilder.Append(" ");
-					messageBuilder.Append(DateTime.Now.ToString("g"));
+					builder.Append(" ");
+					builder.Append(DateTime.Now.ToString("g"));
 				}
 
-				messageBuilder.Append(" ");
+				builder.Append(" ");
 			}
 
-			messageBuilder.AppendFormat(format, args);
-			messageBuilder.Append('\n');
+			builder.AppendFormat(format, args);
+			builder.Append('\n');
+
+			return builder;
 		}
 
 		protected virtual void Write(LogThreshold threshold, String format, params object[] args)
 		{
 			if (Threshold.HasFlag(threshold))
 			{
-				BuildLogMessage(threshold, format, args);
+				var message = BuildLogMessage(threshold, format, args);
 
-				var buf = Encoding.Default.GetBytes(messageBuilder.ToString());
+				var buf = Encoding.Default.GetBytes(message.ToString());
 				stream.Write(buf, 0, buf.Length);
 				stream.Flush();
 			}
