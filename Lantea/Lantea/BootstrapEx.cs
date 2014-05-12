@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------------
-//  <copyright file="BootLoader.cs" company="Zack Loveless">
+//  <copyright file="BootstrapEx.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------------
@@ -18,7 +18,7 @@ namespace Lantea
 	using Common.IO;
 	using NDesk.Options;
 
-	public class BootLoader : IModuleLoader, IDisposable
+	public class BootstrapEx : IModuleLoader, IDisposable
 	{
 		#region Entry point
 
@@ -27,7 +27,7 @@ namespace Lantea
 			Console.Title = "Lantea IRC Bot";
 			Console.SetWindowSize(125, 30);
 
-			using (BootLoader b = new BootLoader())
+			using (BootstrapEx b = new BootstrapEx())
 			{
 				b.Run(args);
 
@@ -69,7 +69,7 @@ namespace Lantea
 
 		#endregion
 
-		public BootLoader()
+		public BootstrapEx()
 		{
 			Log = new ConsoleLog(Console.Write);
 
@@ -206,14 +206,12 @@ namespace Lantea
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <typeparam name="TMetadata"></typeparam>
-		/// <param name="condition"></param>
 		/// <returns></returns>
-		public IEnumerable<Lazy<T, TMetadata>> GetExportedValues<T, TMetadata>(Func<TMetadata, Boolean> condition = null)
+		public IEnumerable<Lazy<T, TMetadata>> GetExportedValues<T, TMetadata>()
 		{
 			CheckContainer();
 
-			var exports      = container.GetExports<T, TMetadata>();
-			return condition == null ? exports : exports.Where(x => condition(x.Metadata));
+			return container.GetExports<T, TMetadata>();
 		}
 
 		/// <summary>

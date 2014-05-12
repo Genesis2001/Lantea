@@ -38,9 +38,8 @@ namespace Lantea.Common.Extensibility
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <typeparam name="TMetadata"></typeparam>
-		/// <param name="condition"></param>
 		/// <returns></returns>
-		IEnumerable<Lazy<T, TMetadata>> GetExportedValues<T, TMetadata>(Func<TMetadata, Boolean> condition = null);
+		IEnumerable<Lazy<T, TMetadata>> GetExportedValues<T, TMetadata>();
 
 		/// <summary>
 		/// Returns a single item from the composition container.
