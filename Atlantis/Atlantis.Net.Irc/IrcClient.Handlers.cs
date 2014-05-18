@@ -604,13 +604,16 @@ namespace Atlantis.Net.Irc
 
 		#region Callbacks
 
-		private void OnAsyncRead(Task<String> task)
+		private async void OnAsyncRead(Task<String> task, object state)
 		{
 			if (task.Exception == null && task.Result != null && !task.IsCanceled)
 			{
 				lastMessage = DateTime.Now;
 				RawMessageReceivedEvent.Raise(this, new RawMessageEventArgs(task.Result));
-				client.ReadLineAsync().ContinueWith(OnAsyncRead, token);
+
+				await
+					client.ReadLineAsync().
+						ContinueWith(OnAsyncRead, state, token, TaskContinuationOptions.LongRunning, TaskScheduler.Current);
 			}
 			else if (task.Result == null)
 			{
@@ -618,7 +621,7 @@ namespace Atlantis.Net.Irc
 			}
 		}
 		
-		protected void QueueProcessor()
+		protected async void QueueProcessor(object o)
 		{
 			try
 			{
@@ -629,7 +632,7 @@ namespace Atlantis.Net.Irc
 						Send(messageQueue.Pop());
 					}
 
-					Task.Delay(QueueInteval, token).Wait(token);
+					await Task.Delay(QueueInteval, token);
 				}
 			}
 			catch (TaskCanceledException)
@@ -651,7 +654,7 @@ namespace Atlantis.Net.Irc
 	        Send("PING :{0}", Host);
 	    }
 
-		private void OnTimeoutTimerElapsed(object sender, ElapsedEventArgs e)
+		private async void OnTimeoutTimerElapsed(object sender, ElapsedEventArgs e)
 		{
 			if ((e.SignalTime - lastMessage) > Timeout)
 			{
@@ -668,7 +671,7 @@ namespace Atlantis.Net.Irc
 					if (RetryInterval > 0)
 					{
 						// ReSharper disable MethodSupportsCancellation
-						Task.Delay((int)RetryInterval).Wait();
+						await Task.Delay((int)RetryInterval);
 						// ReSharper restore MethodSupportsCancellation
 					}
 

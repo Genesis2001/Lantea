@@ -312,7 +312,7 @@ namespace Atlantis.Net.Irc
 			Connect();
 		}
 
-		private void Connect()
+		private async void Connect()
 		{
 			try
 			{
@@ -344,7 +344,9 @@ namespace Atlantis.Net.Irc
 				tokenSource.Cancel();
 			}
 
-			client.ReadLineAsync().ContinueWith(OnAsyncRead, token);
+			await
+				client.ReadLineAsync().
+					ContinueWith(OnAsyncRead, this, token, TaskContinuationOptions.LongRunning, TaskScheduler.Current);
 
 			StartQueue();
 			TickTimeout();
@@ -352,7 +354,7 @@ namespace Atlantis.Net.Irc
 
 		private void StartQueue()
 		{
-			queueRunner = Task.Run(new Action(QueueProcessor), token);
+			queueRunner = Task.Factory.StartNew(QueueProcessor, token, TaskCreationOptions.LongRunning);
 		}
 		
 		private void Send(string data)
