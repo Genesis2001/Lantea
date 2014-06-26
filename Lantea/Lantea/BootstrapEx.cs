@@ -18,7 +18,7 @@ namespace Lantea
 	using Common.IO;
 	using NDesk.Options;
 
-	public class BootstrapEx : IModuleLoader, IDisposable
+    public class BootstrapEx : IModuleLoader, IDisposable
 	{
 		#region Entry point
 
@@ -29,8 +29,10 @@ namespace Lantea
 
 			using (BootstrapEx b = new BootstrapEx())
 			{
-				b.Run(args);
+			    b.Log.Info("Lantea starting up.");
+                b.Run(args);
 
+			    b.Log.Info("Started. Press <CTRL+C> to terminate the application.");
 				Boolean exit = false;
 				do
 				{
@@ -94,19 +96,26 @@ namespace Lantea
 
 		public void Run(String[] args)
 		{
-			Boolean help = false;
-			String configFile = null;
+            Boolean help           = false;
+			String configFile      = null;
 			String pluginsLocation = DefaultLocation;
 
-			OptionSet options = new OptionSet
-			                    {
-				                    {"config=", "Sets the path for the configuration file to be used by Lantea.", x => configFile = x},
-				                    {"p:|plugins-dir:", "Sets the plugin directory for Lantea's module system.",x => pluginsLocation = x},
-				                    {"?|h|help", "Shows this help system.", (bool x) => help = x},
-			                    };
+		    OptionSet options = new OptionSet
+		                        {
+		                            {
+		                                "config=", "Sets the path for the configuration file to be used by Lantea.",
+		                                x => configFile = x
+		                            },
+		                            {
+		                                "p:|plugins-dir:", "Sets the plugin directory for Lantea's module system.",
+		                                x => pluginsLocation = x
+		                            },
+		                            {"?|h|help", "Shows this help system.", (bool x) => help = x},
+		                        };
+
 			try
 			{
-				options.Parse(args);
+                options.Parse(args);
 
 				if (help)
 				{
@@ -121,7 +130,6 @@ namespace Lantea
 			}
 
 			Location = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, pluginsLocation);
-
 			if (!Directory.Exists(Location))
 			{
 				Directory.CreateDirectory(Location);
@@ -130,7 +138,7 @@ namespace Lantea
 			configFile = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, configFile);
 			if (!File.Exists(configFile))
 			{
-				Log.ErrorFormat("");
+			    Log.ErrorFormat("The file '{0}' does not exist.", configFile);
 			}
 
 			// Initialize the loader.
