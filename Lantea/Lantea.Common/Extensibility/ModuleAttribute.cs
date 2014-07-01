@@ -6,41 +6,30 @@
 
 namespace Lantea.Common.Extensibility
 {
-	using System;
-	using System.ComponentModel.Composition;
+    using System;
+    using System.ComponentModel.Composition;
 
-	[MetadataAttribute, AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
-	public class ModuleAttribute : Attribute, IModuleAttribute
-	{
-		public ModuleAttribute()
-		{
-			
-		}
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false), MetadataAttribute]
+    public class ModuleAttribute : ExportAttribute, IModuleAttribute
+    {
+        public ModuleAttribute() : base(typeof(IModule))
+        {
+        }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="T:System.Attribute"/> class.
-		/// </summary>
-		public ModuleAttribute(string author, string description, string name, string version, ModuleType moduleType)
-		{
-			Author      = author;
-			Description = description;
-			Name        = name;
-			Version     = version;
-			ModuleType        = moduleType;
-		}
+        #region Implementation of IModuleAttribute
 
-		#region Implementation of IModuleAttribute
+        /// <summary>
+        ///     <para>Gets or sets a <see cref="T:System.Boolean" /> value indicating whether the bot will instantiate a new IrcClient for the module.</para>
+        ///     <para>If not set, will reuse the same IrcClient that the bot instantiates for itself. Defaults to false.</para>
+        /// </summary>
+        public bool CreateNewClient { get; set; }
 
-		public string Author { get; set; }
+        /// <summary>
+        ///     <para>Gets or sets a <see cref="T:System.String" /> value representing the name of the configuration block for the module.</para>
+        ///     <para>If not set, will use the name of the module.</para>
+        /// </summary>
+        public string ConfigBlock { get; set; }
 
-		public string Description { get; set; }
-
-		public string Name { get; set; }
-
-		public string Version { get; set; }
-
-		public ModuleType ModuleType { get; set; }
-
-		#endregion
-	}
+        #endregion
+    }
 }

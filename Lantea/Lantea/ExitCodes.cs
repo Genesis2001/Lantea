@@ -1,15 +1,13 @@
 ﻿// -----------------------------------------------------------------------------
-//  <copyright file="ModuleType.cs" company="Zack Loveless">
+//  <copyright file="ExitCodes.cs" company="Zack Loveless">
 //      Copyright (c) Zack Loveless.  All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------------
 
-namespace Lantea.Common.Extensibility
+namespace Lantea
 {
-	public enum ModuleType
-	{
-		THIRD  = 0,
-		VENDOR = 1,
-		EXTRA  = 2,
-	}
+    public static class ExitCodes
+    {
+         
+    }
 }

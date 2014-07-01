@@ -4,6 +4,8 @@
 //  </copyright>
 // -----------------------------------------------------------------------------
 
+#pragma warning disable 642
+
 namespace Lantea.Common.IO
 {
 	using System;
@@ -48,11 +50,6 @@ namespace Lantea.Common.IO
 		
 		#region Methods
 
-		public Block GetBlock(IModule module)
-		{
-			return module == null ? null : GetBlock(module.Name);
-		}
-
 		public Block GetModule(IModule module)
 		{
 			return module == null ? null : GetModule(module.Name);
@@ -84,10 +81,11 @@ namespace Lantea.Common.IO
 					Block include = GetBlock("include", i);
 					String file = include.Get<String>("name");
 
-					ValidateNotEmpty("include", "name", file);
-					ValidateFilePath("include", "name", file);
+                    ValidateNotEmpty("include", "name", file);
 
-					file = Path.GetFullPath(Path.Combine(root, file));
+                    file = Path.GetFullPath(Path.Combine(root, "config", file));
+
+                    ValidateFilePath("include", "name", file);
 
 					Load(new FileStream(file, FileMode.Open, FileAccess.Read));
 				}
@@ -357,45 +355,59 @@ namespace Lantea.Common.IO
 			}
 		}
 
-		private void ValidateNotEmpty(String block, String name, String value)
-		{
-			if (String.IsNullOrEmpty(value))
-			{
-				throw new MalformedConfigException(String.Format("The value for <{0}:{1}> cannot be empty.", block, name));
-			}
-		}
 
-		private void ValidateNotZero(String block, String name, Int32 value)
-		{
-			if (value == 0)
-			{
-				throw new MalformedConfigException(String.Format("The value for <{0}:{1}> cannot be zero.", block, name));
-			}
-		}
+	    #region TODO
 
-		private void ValidateNoSpaces(String block, String name, String value)
-		{
-			if (value.Contains(" "))
-			{
-				throw new MalformedConfigException(String.Format("The value for <{0}:{1}> cannot contain spaces.", block, name));
-			}
-		}
+        // TODO: Refactor these into extension methods possibly to fit more of a C# style of programming.
 
-		private void ValidateDirectory(String block, String name, String value)
-		{
-			if (!Directory.Exists(value))
-			{
-				throw new MalformedConfigException(String.Format("The value for <{0}:{1}> is not a valid directory.", block, name));
-			}
-		}
+	    public static void ValidateNotEmpty(String block, String name, String value)
+	    {
+	        if (String.IsNullOrEmpty(value))
+	        {
+	            throw new MalformedConfigException(String.Format("The value for <{0}:{1}> cannot be empty.", block, name));
+	        }
+	    }
 
-		private void ValidateFilePath(String block, String name, String value)
-		{
-			if (!File.Exists(value))
-			{
-				throw new MalformedConfigException(String.Format("The value for <{0}:{1}> is not a valid file path.", block, name));
-			}
-		}
+	    public static void ValidateNotZero(String block, String name, Int32 value)
+	    {
+	        if (value == 0)
+	        {
+	            throw new MalformedConfigException(String.Format("The value for <{0}:{1}> cannot be zero.", block, name));
+	        }
+	    }
+
+	    public static void ValidateNoSpaces(String block, String name, String value)
+	    {
+	        if (value.Contains(" "))
+	        {
+	            throw new MalformedConfigException(String.Format("The value for <{0}:{1}> cannot contain spaces.",
+	                block,
+	                name));
+	        }
+	    }
+
+	    public static void ValidateDirectory(String block, String name, String value)
+	    {
+	        if (!Directory.Exists(value))
+	        {
+	            throw new MalformedConfigException(String.Format("The value for <{0}:{1}> is not a valid directory.",
+	                block,
+	                name));
+	        }
+	    }
+
+	    public static void ValidateFilePath(String block, String name, String value)
+	    {
+	        if (!File.Exists(value))
+	        {
+	            throw new MalformedConfigException(String.Format("The value for <{0}:{1}> is not a valid file path.",
+	                block,
+	                name));
+	        }
+	    }
+
+	    #endregion
+
 
 		#endregion
 	}

@@ -6,14 +6,22 @@
 
 namespace Lantea.Common.Extensibility
 {
-	using IO;
+    using System.ComponentModel.Composition;
+    using Atlantis.Net.Irc;
+    using IO;
 
-	public interface IModule : IModuleAttribute
-	{
-		IBotCore Bot { get; }
+    public interface IModule
+    {
+        string Author { get; }
+        
+        string Description { get; }
+        
+        string Name { get; }
+        
+        string Version { get; }
 
-		Configuration Config { get; }
+        void Dispose();
 
-		void Load();
-	}
+        void Initialize(Block config, IrcClient client);
+    }
 }

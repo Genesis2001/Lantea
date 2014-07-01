@@ -42,6 +42,7 @@
     <Compile Include="IrcClient.cs" />
     <Compile Include="IrcClient.Handlers.cs" />
     <Compile Include="IrcClient.Extensions.cs" />
+    <Compile Include="IrcConfiguration.cs" />
     <Compile Include="IrcEncoding.cs" />
     <Compile Include="IrcHeaders.cs" />
     <Compile Include="JoinPartEventArgs.cs" />

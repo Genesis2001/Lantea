@@ -31,14 +31,13 @@ namespace Atlantis.Net.Irc
 		private bool enableFakeLag;
 		// ReSharper restore FieldCanBeMadeReadOnly.Local
 
-		public IrcClient(string nick)
+		public IrcClient()
 		{
 			tokenSource             = new CancellationTokenSource();
 			token                   = tokenSource.Token;
 
 			Channels                = new HashSet<Channel>();
 			messageQueue            = new ConcurrentQueueAdapter<string>();
-			Nick                    = nick;
 			Options                 = ConnectOptions.Default;
 			QueueInteval            = 1000;
 			EnableFakeLag           = true;
@@ -46,9 +45,9 @@ namespace Atlantis.Net.Irc
 			Timeout                 = TimeSpan.FromMinutes(10.0);
 			Modes                   = new List<char>();
 
-			FillListsOnJoin         = false;
-			FillListsDelay          = TimeSpan.FromSeconds(30.0).TotalMilliseconds;
-			RequestDelay            = TimeSpan.FromSeconds(3.0).TotalMilliseconds;
+		    FillListsOnJoin = false;
+		    FillListsDelay = new TimeSpan(0, 0, 30, 0).TotalMilliseconds;
+            RequestDelay = new TimeSpan(0, 0, 3, 0).TotalMilliseconds;
 
 			RawMessageReceivedEvent += RegistrationHandler;
 			RawMessageReceivedEvent += PingHandler;
@@ -68,22 +67,20 @@ namespace Atlantis.Net.Irc
 			token.Register(CancellationNoticeHandler);
 		}
 
+	    public IrcClient(IrcConfiguration config) : this()
+	    {
+	        Host = config.Host;
+	        Port = config.Port;
+	        Nick = config.Nick;
+	        Ident = config.Ident;
+	        RealName = config.RealName;
+	        Password = config.Password;
+	    }
+
 		~IrcClient()
 		{
-			RawMessageReceivedEvent -= RegistrationHandler;
-			RawMessageReceivedEvent -= PingHandler;
-			RawMessageReceivedEvent -= RfcNumericHandler;
-			RawMessageReceivedEvent -= JoinPartHandler;
-			RawMessageReceivedEvent -= MessageNoticeHandler;
-			RawMessageReceivedEvent -= ModeHandler;
-			RawMessageReceivedEvent -= NickHandler;
-			RawMessageReceivedEvent -= QuitHandler;
-
-			RfcNumericEvent -= ConnectionHandler;
-			RfcNumericEvent -= RfcProtocolHandler;
-			RfcNumericEvent -= RfcNamesHandler;
-			RfcNumericEvent -= NickInUseHandler;
-			RfcNumericEvent -= ListModeHandler;
+		    RawMessageReceivedEvent = null;
+            RfcNumericEvent = null;
 		}
 
 		#region Properties
@@ -245,14 +242,9 @@ namespace Atlantis.Net.Irc
 		{
 			Send("QUIT {0}", string.IsNullOrEmpty(message) ? "" : ":" + message);
 
-			// ReSharper disable MethodSupportsCancellation
-			Task.Factory.StartNew(() =>
-			                      {
-				                      Task.Delay(250).Wait();
-
-									  Dispose();
-			                      });
-			// ReSharper restore MethodSupportsCancellation
+            // ReSharper disable MethodSupportsCancellation
+		    Task.Factory.StartNew(async () => await Task.Delay(250)).Wait();
+		    // ReSharper restore MethodSupportsCancellation
 		}
 
 		public Channel GetChannel(string channelName)

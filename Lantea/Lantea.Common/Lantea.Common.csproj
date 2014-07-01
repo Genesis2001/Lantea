@@ -39,17 +39,10 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Extensibility\IBotCore.cs" />
-    <Compile Include="Extensibility\ICommand.cs" />
-    <Compile Include="Extensibility\ICommandManager.cs" />
-    <Compile Include="IIoCContainer.cs" />
     <Compile Include="Extensibility\IModule.cs" />
     <Compile Include="Extensibility\IModuleAttribute.cs" />
-    <Compile Include="Extensibility\IModuleLoader.cs" />
     <Compile Include="Extensibility\ModuleAttribute.cs" />
-    <Compile Include="Extensibility\ModuleCore.cs" />
-    <Compile Include="Extensibility\ModulesLoadedEventArgs.cs" />
-    <Compile Include="Extensibility\ModuleType.cs" />
+    <Compile Include="IIoCContainer.cs" />
     <Compile Include="IObservableClass.cs" />
     <Compile Include="IO\Block.cs" />
     <Compile Include="IO\Configuration.cs" />
@@ -59,6 +52,7 @@
     <Compile Include="IO\MalformedConfigException.cs" />
     <Compile Include="IO\MissingRequiredPropertyException.cs" />
     <Compile Include="Linq\BlockExtensions.cs" />
+    <Compile Include="Linq\PathExtensions.cs" />
     <Compile Include="Modules\ModuleLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

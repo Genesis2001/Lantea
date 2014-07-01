@@ -6,93 +6,107 @@
 
 namespace Lantea
 {
-	using System;
-	using System.ComponentModel.Composition;
-	using System.ComponentModel.Composition.Hosting;
-	using Common.Extensibility;
-	using NDesk.Options;
+    using System;
+    using System.IO;
+    using Atlantis.Net.Irc;
+    using Common;
+    using Common.IO;
+    using Common.Linq;
+    using NDesk.Options;
 
-	public class Bootstrap : IDisposable
-	{
-		public static void Main(string[] args)
-		{
-			Console.Title = "Lantea IRC Bot";
-			Console.SetWindowSize(125, 30);
+    public class Bootstrap
+    {
+        private static readonly TimeSpan interval       = new TimeSpan(0, 0, 0, 0, 100);
+        private static readonly IIoCContainer container = new IoCContainer();
+        private static readonly OptionSet options = new OptionSet
+                                                    {
+                                                         {"config=","", x => configFile = x}
+                                                    };
 
-			using (Bootstrap b = new Bootstrap())
-			{
-				b.Initialize();
-				
-				Boolean exit = false;
-				do
-				{
-					System.Threading.Thread.Sleep(100);
+        private static IrcClient client;
+        private static string configFile;
 
-					ConsoleKeyInfo key = Console.ReadKey(true);
-					if (key.Modifiers == ConsoleModifiers.Control && key.Key == ConsoleKey.C)
-					{
-						exit = true;
-					}
-				} while (!exit);
+        public static void Main(string[] args)
+        {
+            options.Parse(Environment.GetCommandLineArgs());
 
-				b.Bot.Dispose();
+            if (String.IsNullOrEmpty(configFile))
+            {
+                // defaulting to a standard config.
+                configFile = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, "Lantea.conf");
+            }
+
+            if (!File.Exists(configFile))
+            {
+                Console.Write("Unable to find the specified configuration file: {0} (Located: {1})",
+                    Path.GetFileName(configFile),
+                    Path.GetPathRoot(configFile));
+
+                Console.ReadLine();
+                Environment.Exit(3);
+            }
+
+            Configuration config = new Configuration();
+//            config.ConfigurationLoadEvent += OnConfigLoaded;
+            config.Load(configFile);
+
+            Block uplink = config.GetBlock("uplink");
+            if (uplink == null)
+            {
+                Console.Write("Unable to load IRC uplink information. Be sure to include an <uplink> block inside your configuration file and re-launch the application.");
+                Console.ReadLine();
+                Environment.Exit(2);
+            }
+
+            var ircinfo = uplink.AsIrcConfig();
+            client = new IrcClient(ircinfo);
+
+            ModuleManager manager = new ModuleManager(container);
+
+            container.RegisterContract(config);
+            container.RegisterContract(client);
+            container.RegisterContract(manager);
+
+            Block modules = config.GetBlock("modules");
+            string modulesDirectory = @".\Extensions";
+
+            if (modules != null)
+            {
+                modulesDirectory = modules.GetString("directory", modulesDirectory);
+            }
+
+            modulesDirectory = modulesDirectory.GetAbsolutePath();
+            
+            manager.LoadDirectory(modulesDirectory);
+
+            client.Start();
+
+            Console.Write("Press <CTRL+C> to terminate.");
+            bool exit = false;
+            do
+            {
+                System.Threading.Thread.Sleep(interval);
+
+                ConsoleKeyInfo key = Console.ReadKey(true);
+                if (key.Modifiers == ConsoleModifiers.Control && key.Key == ConsoleKey.C)
+                {
+                    exit = true;
+                    client.Disconnect("Received console termination request.");
+                }
+            } while (!exit);
 
 #if DEBUG
-				Console.Write("Bot running in debug mode. Press <ENTER> to exit completely.");
-				Console.ReadLine();
+            Console.Write("Debug build detected. Press <ENTER> to continue control-breaking the app.");
+            Console.ReadLine();
 #endif
-			}
-		}
-
-		public IBotCore Bot { get; private set; }
-		
-		public void Initialize()
-		{
-			var container = new CompositionContainer(new DirectoryCatalog("."));
-			
-			try
-			{
-				Bot = container.GetExportedValue<IBotCore>();
-			}
-			catch (ImportCardinalityMismatchException e)
-			{
-				throw new InvalidOperationException("Unable to load a bot core. Either no bot core was found, or multiple were detected.", e);
-			}
-			finally
-			{
-				if (Bot != null)
-				{
-					String configFile = null;
-					OptionSet options = new OptionSet
-				                    {
-					                    {"config=", "Sets the configuration file the bot will use for it's configuration.", x => configFile = x},
-				                    };
-
-					options.Parse(Environment.GetCommandLineArgs());
-
-					if (String.IsNullOrEmpty(configFile))
-					{
-						Console.Write("No config file detected in command line.");
-						Console.ReadKey(true);
-
-						Environment.Exit(1);
-					}
-
-					Bot.Initialize(configFile);
-				}
-			}
-		}
-
-		#region Implementation of IDisposable
-
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		public void Dispose()
-		{
-			GC.SuppressFinalize(this);
-		}
-
-		#endregion
-	}
+        }
+        
+        private static void OnConfigLoaded(object sender, ConfigurationLoadEventArgs args)
+        {
+            if (args.Success && args.Exception == null)
+            {
+                // I forget...
+            }
+        }
+    }
 }

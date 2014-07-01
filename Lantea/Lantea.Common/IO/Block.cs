@@ -57,9 +57,8 @@ namespace Lantea.Common.IO
 		public Block GetBlock(String blockName, Int32 num = 0)
 		{
 			if (blockName == null) throw new ArgumentNullException("blockName");
-			if (!blocks.ContainsKey(blockName)) throw new KeyNotFoundException("The specified block name was not found.");
 
-			return blocks[blockName].Where((t, i) => i == num).FirstOrDefault();
+		    return !blocks.ContainsKey(blockName) ? null : blocks[blockName].Where((t, i) => i == num).FirstOrDefault();
 		}
 
 		public void Set<T>(String property, T value) where T : class
