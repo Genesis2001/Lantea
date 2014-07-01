@@ -84,7 +84,7 @@ namespace Lantea.Common.IO
 
                     ValidateNotEmpty("include", "name", file);
 
-                    file = Path.GetFullPath(Path.Combine(root, "config", file));
+                    file = Path.GetFullPath(Path.Combine(root, file));
 
                     ValidateFilePath("include", "name", file);
 
