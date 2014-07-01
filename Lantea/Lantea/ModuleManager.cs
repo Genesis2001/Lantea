@@ -34,11 +34,19 @@ namespace Lantea
         {
             IModule module        = lazy.Value;
             IModuleAttribute attr = lazy.Metadata;
+            
+            Configuration config  = iocc.RetrieveContract<Configuration>();
+            Block mBlock          = config.GetModule(module);
+
+            if (mBlock == null)
+            {
+                // Module disabled.
+                // Do not continue and call it's initialize method at the end of this method.
+                return;
+            }
 
             // TODO: Replace these console writes with the logging system.
             Console.WriteLine("Loading module: {0} v{1} by {2}", module.Name, module.Version, module.Author);
-
-            Configuration config = iocc.RetrieveContract<Configuration>();
 
             Block block = config.GetBlock(module.Name);
             if (!String.IsNullOrEmpty(attr.ConfigBlock))
@@ -120,8 +128,7 @@ namespace Lantea
                 }
 
                 container = new CompositionContainer(catalog);
-                
-                Modules = container.GetExports<IModule, IModuleAttribute>().ToList();
+                Modules   = container.GetExports<IModule, IModuleAttribute>().ToList();
 
                 Modules.ForEach(ProcessModule);
                 temp = true;
@@ -150,10 +157,10 @@ namespace Lantea
             // TODO: Load "SslEnabled"... (ircclient doesnt even support ssl atm)
             return new IrcConfiguration
                    {
-                       Host = source.GetString("host", "irc.cncfps.com"),
-                       Port = source.GetInt32("port", 6667),
-                       Nick = source.GetString("nick", "Lantea"),
-                       Ident = source.GetString("username", "lantea"),
+                       Host     = source.GetString("host", "irc.cncfps.com"),
+                       Port     = source.GetInt32("port", 6667),
+                       Nick     = source.GetString("nick", "Lantea"),
+                       Ident    = source.GetString("username", "lantea"),
                        RealName = source.GetString("name", "Lantea IRC Bot"),
                        Password = source.GetString("password", ""),
                    };
