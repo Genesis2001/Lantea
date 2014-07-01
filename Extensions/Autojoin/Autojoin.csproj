@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\build\Debug\modules\</OutputPath>
+    <OutputPath>..\..\Build\Debug\Extensions\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,7 +24,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\build\Release\modules\</OutputPath>
+    <OutputPath>..\..\Build\Release\Extensions\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -42,11 +42,6 @@
     <ProjectReference Include="..\..\Atlantis\Atlantis.Net.Irc\Atlantis.Net.Irc.csproj">
       <Project>{07410E3A-D2CF-4A81-BA52-864C8D206664}</Project>
       <Name>Atlantis.Net.Irc</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Atlantis\Atlantis\Atlantis.csproj">
-      <Project>{3464FCF7-A68E-40CC-A354-32B80E698890}</Project>
-      <Name>Atlantis</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\Lantea\Lantea.Common\Lantea.Common.csproj">

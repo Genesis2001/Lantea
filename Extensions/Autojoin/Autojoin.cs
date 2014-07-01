@@ -8,43 +8,17 @@ namespace Autojoin
 {
 	using System;
 	using System.Collections.Generic;
-	using System.ComponentModel.Composition;
+	using System.Threading.Tasks;
 	using Atlantis.Net.Irc;
 	using Lantea.Common.Extensibility;
 	using Lantea.Common.IO;
+	using Lantea.Common.Linq;
 
+    [Module(ConfigBlock = "autojoin")]
 	public class Autojoin : IModule
 	{
 		private readonly List<String> channels = new List<String>();
-
-//		public void Load()
-//		{
-//			//Block autojoin = Config.GetBlock("autojoin");
-////			Block autojoin = Config.GetBlock(this);
-//			if (autojoin != null)
-//			{
-//				for (Int32 i = 0; i < autojoin.CountBlock("channel"); ++i)
-//				{
-//					Block chan     = autojoin.GetBlock("channel", i);
-//					String channel = chan.Get("name", "");
-//
-//					if (String.IsNullOrEmpty(channel)) continue;
-//
-//					channels.Add(channel);
-//				}
-//			}
-//
-//			Bot.Client.ConnectionEstablishedEvent += OnClientConnect;
-//		}
-//
-//		private void OnClientConnect(object sender, EventArgs e)
-//		{
-//			channels.ForEach(x =>
-//			                 {
-//				                 Bot.Client.Send("JOIN {0}", x);
-//				                 Bot.Log.DebugFormat("Autojoin: {0}", x);
-//			                 });
-//		}
+        private readonly TimeSpan wait = new TimeSpan(0, 0, 0, 2);
 
 	    #region Implementation of IModule
 
@@ -70,14 +44,35 @@ namespace Autojoin
 
 	    public void Dispose()
 	    {
-	        throw new NotImplementedException();
 	    }
 
 	    public void Initialize(Block config, IrcClient client)
 	    {
-	        throw new NotImplementedException();
+	        client.ConnectionEstablishedEvent += OnClientConnect;
+	        for (int i = 0; i < config.CountBlock("channel"); ++i)
+	        {
+	            Block c = config.GetBlock("channel", i);
+                string channel = c.GetString("name");
+
+	            if (string.IsNullOrEmpty(channel))
+	                continue;
+
+	            channels.Add(channel);
+	        }
 	    }
 
-	    #endregion
+        private async void OnClientConnect(object sender, EventArgs e)
+        {
+            await Task.Delay(wait);
+
+            IrcClient client = sender as IrcClient;
+            foreach (string channel in channels)
+            {
+                // ReSharper disable once PossibleNullReferenceException
+                client.Send("JOIN {0}", channel);
+            }
+        }
+
+        #endregion
 	}
 }
