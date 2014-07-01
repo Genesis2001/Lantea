@@ -39,15 +39,15 @@ namespace Atlantis.Net.Irc
 			Channels                = new HashSet<Channel>();
 			messageQueue            = new ConcurrentQueueAdapter<string>();
 			Options                 = ConnectOptions.Default;
-			QueueInteval            = 1000;
+		    QueueInteval            = (int)new TimeSpan(0, 0, 0, 0, 500).TotalMilliseconds;
 			EnableFakeLag           = true;
-			RetryInterval           = TimeSpan.FromMinutes(1.0).TotalMilliseconds;
-			Timeout                 = TimeSpan.FromMinutes(10.0);
+		    RetryInterval           = new TimeSpan(0, 0, 0, 1).TotalMilliseconds;
+		    Timeout                 = new TimeSpan(0, 0, 10, 0);
 			Modes                   = new List<char>();
 
-		    FillListsOnJoin = false;
-		    FillListsDelay = new TimeSpan(0, 0, 30, 0).TotalMilliseconds;
-            RequestDelay = new TimeSpan(0, 0, 3, 0).TotalMilliseconds;
+		    FillListsOnJoin         = false;
+		    FillListsDelay          = new TimeSpan(0, 0, 30, 0).TotalMilliseconds;
+            RequestDelay            = new TimeSpan(0, 0, 3, 0).TotalMilliseconds;
 
 			RawMessageReceivedEvent += RegistrationHandler;
 			RawMessageReceivedEvent += PingHandler;
