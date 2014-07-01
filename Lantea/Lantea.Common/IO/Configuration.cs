@@ -15,8 +15,9 @@ namespace Lantea.Common.IO
 	using System.Text;
 	using Atlantis.Linq;
 	using Extensibility;
+	using Linq;
 
-	// ReSharper disable InconsistentNaming
+    // ReSharper disable InconsistentNaming
 
 	public class Configuration : Block
 	{
@@ -31,15 +32,12 @@ namespace Lantea.Common.IO
 		private bool in_comment;
 
 		private readonly Dictionary<String, Block> modules = new Dictionary<String, Block>(StringComparer.OrdinalIgnoreCase);
-		private readonly String root;
+		private String root;
 
 		public Configuration() : base("")
 		{
 			buffer      = new StringBuilder();
 			block_stack = new Stack<Block>();
-
-			var asm = Assembly.GetEntryAssembly();
-			root = Path.GetFullPath(Path.GetDirectoryName(asm.Location));
 		}
 
 		#region Events
@@ -70,9 +68,12 @@ namespace Lantea.Common.IO
 		/// <exception cref="T:Lantea.Common.IO.MalformedConfigException" />
 		public void Load(String path)
 		{
-			try
+		    if (path == null) throw new ArgumentNullException("path");
+
+		    try
 			{
 				currentFileName = Path.GetFileName(path);
+                root            = Path.GetDirectoryName(path.GetAbsolutePath());
 
 				Load(new FileStream(path, FileMode.Open, FileAccess.Read));
 
@@ -118,7 +119,7 @@ namespace Lantea.Common.IO
 			}
 		}
 
-		/// <summary>
+	    /// <summary>
 		/// Loads the specified stream into memory according to the Anope configuration standard.
 		/// </summary>
 		/// <param name="stream"></param>

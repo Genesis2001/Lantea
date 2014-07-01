@@ -114,8 +114,13 @@ namespace Lantea.UnitTests
 
 		[Test, Category("Configuration Tests")]
 		[ExpectedException(typeof (KeyNotFoundException))]
+        [Obsolete]
 		public void GetBlock_WithNonExistantBlockName_ShouldThrowKeyNotFoundException()
 		{
+            // We no longer throw an exception for no block found.
+
+            Assert.Ignore();
+
 			SUT.GetBlock("none"); // exception
 		}
 
