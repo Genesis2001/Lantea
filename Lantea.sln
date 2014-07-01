@@ -59,6 +59,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Humanizer", "lib\Humanizer\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linkviewer", "Extensions\Linkviewer\Linkviewer.csproj", "{7F13A69A-DBE3-4F00-9459-C972361EEB64}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Execraws", "Extensions\Execraws\Execraws.csproj", "{836FD69A-81C6-45A9-8852-D4C79B3828FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -144,6 +146,12 @@ Global
 		{7F13A69A-DBE3-4F00-9459-C972361EEB64}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7F13A69A-DBE3-4F00-9459-C972361EEB64}.Verify|Any CPU.ActiveCfg = Release|Any CPU
 		{7F13A69A-DBE3-4F00-9459-C972361EEB64}.Verify|Any CPU.Build.0 = Release|Any CPU
+		{836FD69A-81C6-45A9-8852-D4C79B3828FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{836FD69A-81C6-45A9-8852-D4C79B3828FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{836FD69A-81C6-45A9-8852-D4C79B3828FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{836FD69A-81C6-45A9-8852-D4C79B3828FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{836FD69A-81C6-45A9-8852-D4C79B3828FD}.Verify|Any CPU.ActiveCfg = Release|Any CPU
+		{836FD69A-81C6-45A9-8852-D4C79B3828FD}.Verify|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -163,5 +171,6 @@ Global
 		{E5AD298D-2DFD-4BAB-B360-85221A0D604A} = {C12C37ED-8216-40CA-88BD-01E522A759D4}
 		{511A7984-F455-4A6E-ADB9-9CAAC47EA079} = {F5165F2E-06DB-45A6-9B7F-0FD23BF07ED3}
 		{7F13A69A-DBE3-4F00-9459-C972361EEB64} = {C12C37ED-8216-40CA-88BD-01E522A759D4}
+		{836FD69A-81C6-45A9-8852-D4C79B3828FD} = {C12C37ED-8216-40CA-88BD-01E522A759D4}
 	EndGlobalSection
 EndGlobal

@@ -35,11 +35,12 @@ namespace Lantea
             IModule module        = lazy.Value;
             IModuleAttribute attr = lazy.Metadata;
 
+            // TODO: Replace these console writes with the logging system.
             Console.WriteLine("Loading module: {0} v{1} by {2}", module.Name, module.Version, module.Author);
 
             Configuration config = iocc.RetrieveContract<Configuration>();
-            
-            Block block = config.GetModule(module);
+
+            Block block = config.GetBlock(module.Name);
             if (!String.IsNullOrEmpty(attr.ConfigBlock))
             {
                 block = config.GetBlock(attr.ConfigBlock);
