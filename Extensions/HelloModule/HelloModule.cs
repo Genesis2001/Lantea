@@ -33,7 +33,7 @@ namespace Hello
 
         public string Version
         {
-            get { return "1.0"; }
+            get { return "1.2"; }
         }
 
         public void Dispose()
