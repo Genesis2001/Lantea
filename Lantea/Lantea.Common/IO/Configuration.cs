@@ -354,8 +354,7 @@ namespace Lantea.Common.IO
 				}
 			}
 		}
-
-
+        
 	    #region TODO
 
         // TODO: Refactor these into extension methods possibly to fit more of a C# style of programming.
@@ -407,8 +406,7 @@ namespace Lantea.Common.IO
 	    }
 
 	    #endregion
-
-
+        
 		#endregion
 	}
 
