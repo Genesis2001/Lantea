@@ -7,13 +7,23 @@
 namespace Hello
 {
     using System;
+    using System.ComponentModel.Composition;
     using Atlantis.Net.Irc;
+    using Lantea.Common;
     using Lantea.Common.Extensibility;
     using Lantea.Common.IO;
 
     [Module(ConfigBlock = "hello")]
 	public class HelloModule : IModule
     {
+        private readonly IIoCContainer iocc;
+
+        [ImportingConstructor]
+        public HelloModule([Import] IIoCContainer iocc)
+        {
+            this.iocc = iocc;
+        }
+
         #region Implementation of IModule
 
         public string Author

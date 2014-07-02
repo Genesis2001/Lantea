@@ -113,10 +113,6 @@ namespace Lantea
                 {
                     item = new DirectoryCatalog(directory, "*.dll");
                     catalog.Catalogs.Add(item);
-                    
-                    // todo...this might be bad.
-//                    container.ComposeParts(this);
-//                    modules.ForEach(ProcessModule);
                 }
             }
             else
@@ -128,6 +124,8 @@ namespace Lantea
                 }
 
                 container = new CompositionContainer(catalog);
+                container.ComposeExportedValue(iocc);
+
                 Modules   = container.GetExports<IModule, IModuleAttribute>().ToList();
 
                 Modules.ForEach(ProcessModule);
