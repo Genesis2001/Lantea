@@ -22,6 +22,7 @@ namespace Lantea
         private readonly IIoCContainer iocc;
         private CompositionContainer container;
         private AggregateCatalog catalog;
+        private Configuration config;
 
         private bool temp;
 
@@ -30,12 +31,23 @@ namespace Lantea
             this.iocc = iocc;
         }
 
+        private Block GetModule(IModule module, IModuleAttribute attr = null)
+        {
+            Block block = config.GetBlock(module.Name);
+
+            if (attr != null && !String.IsNullOrEmpty(attr.ConfigBlock))
+            {
+                block = config.GetBlock(attr.ConfigBlock);
+            }
+
+            return block;
+        }
+
         private void ProcessModule(Lazy<IModule, IModuleAttribute> lazy)
         {
             IModule module        = lazy.Value;
             IModuleAttribute attr = lazy.Metadata;
             
-            Configuration config  = iocc.RetrieveContract<Configuration>();
             Block mBlock          = config.GetModule(module);
 
             if (mBlock == null)
@@ -48,13 +60,9 @@ namespace Lantea
             // TODO: Replace these console writes with the logging system.
             Console.WriteLine("Loading module: {0} v{1} by {2}", module.Name, module.Version, module.Author);
 
-            Block block = config.GetBlock(module.Name);
-            if (!String.IsNullOrEmpty(attr.ConfigBlock))
-            {
-                block = config.GetBlock(attr.ConfigBlock);
-            }
-
+            Block block      = GetModule(module, attr);
             IrcClient client = null;
+
             if (attr.CreateNewClient)
             {
                 if (block != null)
@@ -63,7 +71,7 @@ namespace Lantea
                     if (uplink != null)
                     {
                         var ircinfo = uplink.AsIrcConfig(); // possible null ref, but acceptable.
-                        client = new IrcClient(ircinfo);
+                        client      = new IrcClient(ircinfo);
                     }
                 }
 
@@ -99,6 +107,12 @@ namespace Lantea
                 throw new NotImplementedException();
             }
 
+            if (config == null)
+            {
+                config = iocc.RetrieveContract<Configuration>();
+                config.ConfigurationLoadEvent += OnConfigLoaded;
+            }
+
             if (container != null)
             {
                 var item =
@@ -131,6 +145,25 @@ namespace Lantea
                 Modules.ForEach(ProcessModule);
                 temp = true;
             }
+        }
+
+        private void OnConfigLoaded(object sender, ConfigurationLoadEventArgs e)
+        {
+            // ReSharper disable RedundantThisQualifier
+
+            if (e.Success && e.Exception == null && Modules.Count > 0)
+            {
+                foreach (var item in Modules)
+                {
+                    IModule module = item.Value;
+                    Block b        = this.GetModule(module, item.Metadata);
+                    
+
+                    module.Rehash(b);
+                }
+            }
+
+            // ReSharper restore RedundantThisQualifier
         }
 
         public void Unload(IModule module)

@@ -55,6 +55,10 @@ namespace Hello
             Console.WriteLine("Hello World");
         }
 
+        public void Rehash(Block config)
+        {
+        }
+
         #endregion
 	}
 }

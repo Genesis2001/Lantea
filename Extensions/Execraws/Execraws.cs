@@ -62,6 +62,10 @@ namespace Execraws
             }
         }
 
+        public void Rehash(Block config)
+        {
+        }
+
         private async void OnClientConnect(object sender, EventArgs e)
         {
             await Task.Delay(interval);

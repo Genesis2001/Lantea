@@ -23,5 +23,7 @@ namespace Lantea.Common.Extensibility
         void Dispose();
 
         void Initialize(Block config, IrcClient client);
+
+        void Rehash(Block config);
     }
 }
