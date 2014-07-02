@@ -463,36 +463,36 @@ namespace Atlantis.Net.Irc
 						// TODO: Add error checking to parameter list.
 						for (int i = 0; i < modes.Length; ++i)
 						{
-							if (modes[i] == '+') set = true;
+							if (modes[i]      == '+') set = true;
 							else if (modes[i] == '-') set = false;
-							else if (channel == null)
+							else if (channel  == null)
 							{
 								Modes.Add(modes[i]);
 							}
 							else if (channelModes[0].Contains(modes[i]))
 							{
-								if (!channel.ListModes.Any(x => x.Mask.Equals(data[i])) && set)
+								if (!channel.ListModes.Any(x => x.Mask.Equals(data[i - 1])) && set)
 								{
-									channel.ListModes.Add(new ListMode(modes[i], DateTime.Now, data[i], source));
+								    channel.ListModes.Add(new ListMode(modes[i], DateTime.Now, data[i - 1], source));
 								}
-								else if (channel.ListModes.Any(x => x.Mask.Equals(data[i])) && !set)
+								else if (channel.ListModes.Any(x => x.Mask.Equals(data[i - 1])) && !set)
 								{
-									ListMode tmp = channel.ListModes.SingleOrDefault(x => x.Mask.Equals(data[i]));
+								    ListMode tmp = channel.ListModes.SingleOrDefault(x => x.Mask.Equals(data[i - 1]));
 
-									if (tmp != null)
-									{
-										channel.ListModes.Remove(tmp);
-									}
+								    if (tmp != null)
+								    {
+								        channel.ListModes.Remove(tmp);
+								    }
 								}
 							}
 							else if (channelModes[1].Contains(modes[i]))
 							{
 								// mode that always has a parameter
-								if (channel.Modes.Any(x => x.Key.Equals(modes[i]) && x.Value.Equals(data[i])))
-								{
-									channel.Modes.Remove(modes[i]);
-									channel.Modes.Add(modes[i], data[i]);
-								}
+							    if (channel.Modes.Any(x => x.Key.Equals(modes[i]) && x.Value.Equals(data[i - 1])))
+							    {
+							        channel.Modes.Remove(modes[i]);
+							        channel.Modes.Add(modes[i], data[i - 1]);
+							    }
 							}
 							else if (channelModes[2].Contains(modes[i]))
 							{

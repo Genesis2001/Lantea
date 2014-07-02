@@ -28,19 +28,21 @@ namespace Lantea
 
         public static void Main(string[] args)
         {
+            Console.Title = "Lantea IRC Bot";
+
             options.Parse(Environment.GetCommandLineArgs());
 
             if (String.IsNullOrEmpty(configFile))
             {
                 // defaulting to a standard config.
-                configFile = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, "Lantea.conf");
+                configFile = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, "config", "Lantea.conf");
             }
 
             if (!File.Exists(configFile))
             {
                 Console.Write("Unable to find the specified configuration file: {0} (Located: {1})",
                     Path.GetFileName(configFile),
-                    Path.GetPathRoot(configFile));
+                    Path.GetDirectoryName(configFile));
 
                 Console.ReadLine();
                 Environment.Exit(3);
@@ -67,7 +69,7 @@ namespace Lantea
             container.RegisterContract(client);
             container.RegisterContract(manager);
 
-            Block modules = config.GetBlock("modules");
+            Block modules           = config.GetBlock("modules");
             string modulesDirectory = @".\Extensions";
 
             if (modules != null)
