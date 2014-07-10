@@ -615,6 +615,11 @@ namespace Atlantis.Net.Irc
 					client.ReadLineAsync().
 						ContinueWith(OnAsyncRead, state, token, TaskContinuationOptions.LongRunning, TaskScheduler.Current);
 			}
+            else if (task.Exception != null)
+            {
+                // TODO: Alert user.
+                client.Close();
+            }
 			else if (task.Result == null)
 			{
 				client.Close();
