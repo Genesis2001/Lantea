@@ -18,7 +18,7 @@ namespace Autojoin
 	public class Autojoin : IModule
 	{
 		private readonly List<String> channels = new List<String>();
-        private readonly TimeSpan wait = new TimeSpan(0, 0, 0, 2);
+        private readonly TimeSpan wait = new TimeSpan(0, 0, 0, 3);
 
 	    #region Implementation of IModule
 
@@ -44,6 +44,7 @@ namespace Autojoin
 
 	    public void Dispose()
 	    {
+
 	    }
 
 	    public void Initialize(Block config, IrcClient client)
@@ -60,6 +61,10 @@ namespace Autojoin
 	            channels.Add(channel);
 	        }
 	    }
+
+        public void Rehash(Block config)
+        {
+        }
 
         private async void OnClientConnect(object sender, EventArgs e)
         {
