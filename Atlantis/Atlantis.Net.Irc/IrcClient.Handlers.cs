@@ -33,8 +33,9 @@ namespace Atlantis.Net.Irc
 
 		// PRIVMSG|NOTICE|JOIN|PART|QUIT|MODE|NICK|INVITE|KICK
 		// private const string IRC_PROTOSTR = @"^:?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+)) (?<command>[A-Z]) :?(?<target>\#?[^\W]+)\W?:?(?<params>.+)?$";
-		private const string IRC_USERSTR = @":?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+))";
-		private const string IRC_CHANEX = @":?(?<target>\#?[^\W]+)";
+
+		private const string IRC_USERSTR     = @":?(?<source>[^!]+)\!((?<ident>[^@]+)@(?<host>\S+))";
+		private const string IRC_CHANEX      = @":?(?<target>\#?[^\W]+)";
 
 		#endregion
 
@@ -447,7 +448,7 @@ namespace Atlantis.Net.Irc
 
 					if (target != null)
 					{
-						string modes  = toks[3].TrimStart(':');
+						string modeList  = toks[3].TrimStart(':');
 						string[] data = toks.Skip(4).ToArray();
 
 						bool set = false;
@@ -461,19 +462,19 @@ namespace Atlantis.Net.Irc
 						bool accessList = false;
 
 						// TODO: Add error checking to parameter list.
-						for (int i = 0; i < modes.Length; ++i)
+						for (int i = 0; i < modeList.Length; ++i)
 						{
-							if (modes[i]      == '+') set = true;
-							else if (modes[i] == '-') set = false;
+							if (modeList[i]      == '+') set = true;
+							else if (modeList[i] == '-') set = false;
 							else if (channel  == null)
 							{
-								Modes.Add(modes[i]);
+								modes.Add(modeList[i]);
 							}
-							else if (channelModes[0].Contains(modes[i]))
+							else if (channelModes[0].Contains(modeList[i]))
 							{
 								if (!channel.ListModes.Any(x => x.Mask.Equals(data[i - 1])) && set)
 								{
-								    channel.ListModes.Add(new ListMode(modes[i], DateTime.Now, data[i - 1], source));
+								    channel.ListModes.Add(new ListMode(modeList[i], DateTime.Now, data[i - 1], source));
 								}
 								else if (channel.ListModes.Any(x => x.Mask.Equals(data[i - 1])) && !set)
 								{
@@ -485,24 +486,24 @@ namespace Atlantis.Net.Irc
 								    }
 								}
 							}
-							else if (channelModes[1].Contains(modes[i]))
+							else if (channelModes[1].Contains(modeList[i]))
 							{
 								// mode that always has a parameter
-							    if (channel.Modes.Any(x => x.Key.Equals(modes[i]) && x.Value.Equals(data[i - 1])))
+							    if (channel.Modes.Any(x => x.Key.Equals(modeList[i]) && x.Value.Equals(data[i - 1])))
 							    {
-							        channel.Modes.Remove(modes[i]);
-							        channel.Modes.Add(modes[i], data[i - 1]);
+							        channel.Modes.Remove(modeList[i]);
+							        channel.Modes.Add(modeList[i], data[i - 1]);
 							    }
 							}
-							else if (channelModes[2].Contains(modes[i]))
+							else if (channelModes[2].Contains(modeList[i]))
 							{
 								// mode that only has a parameter when being set
 							}
-							else if (channelModes[3].Contains(modes[i]))
+							else if (channelModes[3].Contains(modeList[i]))
 							{
-								channel.Modes.Add(modes[i], string.Empty);
+								channel.Modes.Add(modeList[i], string.Empty);
 							}
-							else if (accessModes.Contains(modes[i]))
+							else if (accessModes.Contains(modeList[i]))
 							{
 								PrefixList list;
 								if (!channel.Users.TryGetValue(data[i - 1], out list))
@@ -511,7 +512,7 @@ namespace Atlantis.Net.Irc
 									channel.Users.Add(source, list);
 								}
 
-								int pi      = accessModes.IndexOf(modes[i]);
+								int pi      = accessModes.IndexOf(modeList[i]);
 								char prefix = AccessPrefixes[pi];
 
 								if (set) list.AddPrefix(prefix);

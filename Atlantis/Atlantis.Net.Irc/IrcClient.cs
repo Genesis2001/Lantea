@@ -8,6 +8,7 @@ namespace Atlantis.Net.Irc
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
 	using System.Linq;
 	using System.Net;
 	using System.Net.Sockets;
@@ -29,7 +30,8 @@ namespace Atlantis.Net.Irc
 		private CancellationTokenSource tokenSource;
 		private CancellationToken token;
 		private bool enableFakeLag;
-		// ReSharper restore FieldCanBeMadeReadOnly.Local
+	    private List<char> modes;
+	    // ReSharper restore FieldCanBeMadeReadOnly.Local
 
 		public IrcClient()
 		{
@@ -43,7 +45,7 @@ namespace Atlantis.Net.Irc
 			EnableFakeLag           = true;
 		    RetryInterval           = new TimeSpan(0, 0, 0, 1).TotalMilliseconds;
 		    Timeout                 = new TimeSpan(0, 0, 10, 0);
-			Modes                   = new List<char>();
+			modes                   = new List<char>();
 
 		    FillListsOnJoin         = false;
 		    FillListsDelay          = new TimeSpan(0, 0, 30, 0).TotalMilliseconds;
@@ -58,21 +60,21 @@ namespace Atlantis.Net.Irc
 			RawMessageReceivedEvent += NickHandler;
 			RawMessageReceivedEvent += QuitHandler;
 
-			RfcNumericEvent += ConnectionHandler;
-			RfcNumericEvent += RfcProtocolHandler;
-			RfcNumericEvent += RfcNamesHandler;
-			RfcNumericEvent += NickInUseHandler;
-			RfcNumericEvent += ListModeHandler;
+			RfcNumericEvent         += ConnectionHandler;
+			RfcNumericEvent         += RfcProtocolHandler;
+			RfcNumericEvent         += RfcNamesHandler;
+			RfcNumericEvent         += NickInUseHandler;
+			RfcNumericEvent         += ListModeHandler;
 
 			token.Register(CancellationNoticeHandler);
 		}
 
 	    public IrcClient(IrcConfiguration config) : this()
 	    {
-	        Host = config.Host;
-	        Port = config.Port;
-	        Nick = config.Nick;
-	        Ident = config.Ident;
+	        Host     = config.Host;
+	        Port     = config.Port;
+	        Nick     = config.Nick;
+	        Ident    = config.Ident;
 	        RealName = config.RealName;
 	        Password = config.Password;
 	    }
@@ -144,16 +146,19 @@ namespace Atlantis.Net.Irc
 				return val;
 			}
 		}
+        
+	    /// <summary>
+	    /// Gets a list of modes that are currently set on the client.
+	    /// </summary>
+	    public ReadOnlyCollection<char> Modes
+	    {
+	        get { return modes.AsReadOnly(); }
+	    }
 
-		/// <summary>
-		/// Gets a list of modes that are currently set on the client.
-		/// </summary>
-		public List<char> Modes { get; private set; }
-
-		/// <summary>
-		/// Gets or sets a <see cref="T:System.String" /> value representing the nickname for the <see cref="T:IrcClient" /> 
-		/// </summary>
-		public string Nick { get; set; }
+	    /// <summary>
+	    /// Gets or sets a <see cref="T:System.String" /> value representing the nickname for the <see cref="T:IrcClient" /> 
+	    /// </summary>
+	    public string Nick { get; set; }
 
 		/// <summary>
 		/// Gets or sets a bit-mask value representing the options for connecting to the Host.
