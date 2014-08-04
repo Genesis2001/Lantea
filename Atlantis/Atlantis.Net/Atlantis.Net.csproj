@@ -40,15 +40,8 @@
     <Compile Include="ITcpClient.cs" />
     <Compile Include="ITcpClientAsync.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Query\TS3Client.cs" />
     <Compile Include="TcpClientAdapter.cs" />
     <Compile Include="TcpClientAsyncAdapter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Atlantis\Atlantis.csproj">
-      <Project>{3464FCF7-A68E-40CC-A354-32B80E698890}</Project>
-      <Name>Atlantis</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

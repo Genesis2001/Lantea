@@ -501,7 +501,27 @@ namespace Atlantis.Net.Irc
 							}
 							else if (channelModes[3].Contains(modeList[i]))
 							{
-								channel.Modes.Add(modeList[i], string.Empty);
+                                if (set && !channel.Modes.ContainsKey(modeList[i]))
+                                {
+                                    channel.Modes.Add(modeList[i], String.Empty);
+                                }
+                                else if (!set && channel.Modes.ContainsKey(modeList[i]))
+                                {
+                                    channel.Modes.Remove(modeList[i]);
+                                }
+                                else
+                                {
+                                    ConsoleColor c          = Console.ForegroundColor;
+                                    Console.ForegroundColor = ConsoleColor.Yellow;
+
+                                    Console.WriteLine("DEBUG: {0} was {1}set on channel {2} at {3}",
+                                        modeList[i],
+                                        !set ? "un" : "",
+                                        channel,
+                                        DateTime.Now);
+
+                                    Console.ForegroundColor = c;
+                                }
 							}
 							else if (accessModes.Contains(modeList[i]))
 							{
