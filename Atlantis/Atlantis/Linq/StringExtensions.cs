@@ -7,9 +7,8 @@
 namespace Atlantis.Linq
 {
 	using System;
-	using Humanizer;
 
-	public static partial class Extensions
+    public static partial class Extensions
 	{
 		public static bool EqualsIgnoreCase(this string source, string value)
 		{
@@ -31,6 +30,7 @@ namespace Atlantis.Linq
 			return source != null ? source.Trim(trimChars) : String.Empty;
 		}
 
+        [Obsolete("Removing shortly.")]
 		public static String Prettify(this TimeSpan source)
 		{
 			if (source == null)
@@ -38,10 +38,10 @@ namespace Atlantis.Linq
 				throw new ArgumentNullException("source", "The specified System.TimeSpan was null. :(");
 			}
 
-			return source.Humanize(6);
+            return source.ToString();
 
-			// TODO: Internationalization this method.
-			/*StringBuilder builder = new StringBuilder();
+            // TODO: Internationalization this method.
+            /*StringBuilder builder = new StringBuilder();
 
 			if (source.Days > 0) builder.AppendFormat("{0} days", source.Days);
 			if (source.Hours > 0) builder.AppendFormat(", {0} hours", source.Hours);
