@@ -8,9 +8,8 @@
     <owners>$author$</owners>
     <projectUrl>https://github.com/Genesis2001/Lantea</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>description</description>
-    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
-    <copyright>Copyright 2014</copyright>
+    <description>Common library for building plugins for Lantea IRC bot.</description>
+    <copyright>Copyright (c) 2014 Zack Loveless. All rights reserved.</copyright>
     <tags></tags>
   </metadata>
 </package>
