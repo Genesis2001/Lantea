@@ -2,4 +2,4 @@
 
 [assembly: AssemblyTitle("Atlantis.Net")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyFileVersion("4.0.0")]
+[assembly: AssemblyFileVersion("4.0.1")]
