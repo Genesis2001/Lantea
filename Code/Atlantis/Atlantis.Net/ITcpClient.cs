@@ -6,13 +6,17 @@
 
 namespace Atlantis.Net
 {
-	public interface ITcpClient
+    using System.IO;
+
+    public interface ITcpClient
 	{
 		bool Connected { get; }
 
 		bool DataAvailable { get; }
 
 		bool EndOfStream { get; }
+
+        Stream BaseStream { get; }
 
 		void Connect(string host, int port);
 

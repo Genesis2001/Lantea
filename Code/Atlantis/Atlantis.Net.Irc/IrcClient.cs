@@ -31,6 +31,8 @@ namespace Atlantis.Net.Irc
 		private CancellationToken token;
 		private bool enableFakeLag;
 	    private List<char> modes;
+	    private bool quitSent;
+	    private Encoding encoding;
 	    // ReSharper restore FieldCanBeMadeReadOnly.Local
 
 		public IrcClient()
@@ -245,11 +247,22 @@ namespace Atlantis.Net.Irc
 
 		public void Disconnect(string message = null)
 		{
-			Send("QUIT {0}", string.IsNullOrEmpty(message) ? "" : ":" + message);
+		    if (quitSent)
+		    {
+		        return;
+		    }
 
-            // ReSharper disable MethodSupportsCancellation
-		    Task.Factory.StartNew(async () => await Task.Delay(250)).Wait();
-		    // ReSharper restore MethodSupportsCancellation
+            // Send QUIT directly to the IRC server, bypassing the queue system.
+            string quit = String.Format("QUIT{0}", string.IsNullOrEmpty(message) ? "" : " :" + message);
+		    byte[] data = encoding.GetBytes(quit);
+
+		    client.BaseStream.Write(data, 0, data.Length);
+		    client.BaseStream.Flush();
+
+            quitSent = true;
+
+		    //Send("QUIT {0}", string.IsNullOrEmpty(message) ? "" : ":" + message);
+		    //Task.Factory.StartNew(async () => await Task.Delay(250)).Wait();
 		}
 
 		public Channel GetChannel(string channelName)
@@ -313,7 +326,6 @@ namespace Atlantis.Net.Irc
 		{
 			try
 			{
-                Encoding encoding;
                 switch (Encoding)
                 {
                     default:

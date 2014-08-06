@@ -69,7 +69,12 @@ namespace Atlantis.Net
 			get { return clientReader.EndOfStream; }
 		}
 
-		public void Connect(string host, int port)
+	    public Stream BaseStream
+	    {
+	        get { return client.GetStream(); }
+	    }
+
+	    public void Connect(string host, int port)
 		{
 			var entry = Dns.GetHostEntry(host);
 			if (entry == null)
