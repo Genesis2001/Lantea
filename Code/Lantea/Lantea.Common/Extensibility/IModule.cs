@@ -6,7 +6,6 @@
 
 namespace Lantea.Common.Extensibility
 {
-    using System.ComponentModel.Composition;
     using Atlantis.Net.Irc;
     using IO;
 
@@ -19,6 +18,8 @@ namespace Lantea.Common.Extensibility
         string Name { get; }
         
         string Version { get; }
+
+        ModuleType ModType { get; }
 
         void Dispose();
 

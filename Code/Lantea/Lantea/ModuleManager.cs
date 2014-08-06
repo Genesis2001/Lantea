@@ -24,7 +24,7 @@ namespace Lantea
         private AggregateCatalog catalog;
         private Configuration config;
 
-        private bool temp;
+        private bool tmpStopLoadingAfterFirstLoad;
 
         public ModuleManager(IIoCContainer iocc)
         {
@@ -48,7 +48,8 @@ namespace Lantea
             IModule module        = lazy.Value;
             IModuleAttribute attr = lazy.Metadata;
             
-            Block mBlock          = config.GetModule(module);
+            // TODO: Move "Configuration.GetModule" to private member/method in this class as it has no standing in 'Configuration' (referencing IModule directory!)
+            Block mBlock = config.GetModule(module);
 
             if (mBlock == null)
             {
@@ -58,7 +59,7 @@ namespace Lantea
             }
 
             // TODO: Replace these console writes with the logging system.
-            Console.WriteLine("Loading module: {0} v{1} by {2}", module.Name, module.Version, module.Author);
+            Console.WriteLine("Loading module: {0} v{1} by {2} [{3}]", module.Name, module.Version, module.Author, module.ModType);
 
             Block block      = GetModule(module, attr);
             IrcClient client = null;
@@ -102,8 +103,10 @@ namespace Lantea
 
         public void LoadDirectory(string directory)
         {
-            if (temp)
+            if (tmpStopLoadingAfterFirstLoad)
             {
+                // Renamed variable for reddit.
+
                 throw new NotImplementedException();
             }
 
@@ -143,7 +146,7 @@ namespace Lantea
                 Modules   = container.GetExports<IModule, IModuleAttribute>().ToList();
 
                 Modules.ForEach(ProcessModule);
-                temp = true;
+                tmpStopLoadingAfterFirstLoad = true;
             }
         }
 

@@ -43,7 +43,12 @@ namespace Hello
 
         public string Version
         {
-            get { return "1.2"; }
+            get { return "1.3"; }
+        }
+
+        public ModuleType ModType
+        {
+            get { return ModuleType.VENDOR; }
         }
 
         public void Dispose()

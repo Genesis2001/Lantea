@@ -42,6 +42,7 @@
     <Compile Include="Extensibility\IModule.cs" />
     <Compile Include="Extensibility\IModuleAttribute.cs" />
     <Compile Include="Extensibility\ModuleAttribute.cs" />
+    <Compile Include="Extensibility\ModuleType.cs" />
     <Compile Include="IIoCContainer.cs" />
     <Compile Include="IObservableClass.cs" />
     <Compile Include="IO\Block.cs" />
