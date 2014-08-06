@@ -9,8 +9,10 @@ namespace Atlantis.Net.Irc
 	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
+	using System.IO;
 	using System.Linq;
 	using System.Net;
+	using System.Net.Security;
 	using System.Net.Sockets;
 	using System.Text;
 	using System.Threading;
@@ -23,7 +25,10 @@ namespace Atlantis.Net.Irc
 	{
 		// ReSharper disable FieldCanBeMadeReadOnly.Local
 		private readonly IQueue<string> messageQueue;
-		private ITcpClientAsync client;
+
+        private TcpClient client;
+	    private NetworkStream stream;
+	    private StreamReader reader;
 
 		private Task queueRunner;
 
@@ -256,9 +261,6 @@ namespace Atlantis.Net.Irc
             string quit = String.Format("QUIT{0}", string.IsNullOrEmpty(message) ? "" : " :" + message);
 		    byte[] data = encoding.GetBytes(quit);
 
-		    client.BaseStream.Write(data, 0, data.Length);
-		    client.BaseStream.Flush();
-
             quitSent = true;
 
 		    //Send("QUIT {0}", string.IsNullOrEmpty(message) ? "" : ":" + message);
@@ -315,8 +317,6 @@ namespace Atlantis.Net.Irc
 						GetType().Name));
 			}
 
-			
-
 			SetDefaults();
 
 			Connect();
@@ -324,37 +324,55 @@ namespace Atlantis.Net.Irc
 
 		private async void Connect()
 		{
-			try
-			{
-                switch (Encoding)
-                {
-                    default:
-                        encoding = new ASCIIEncoding();
-                        break;
+		    try
+		    {
+		        switch (Encoding)
+		        {
+		            default:
+		                encoding = new ASCIIEncoding();
+		                break;
 
-                    case IrcEncoding.UTF8:
-                        encoding = new UTF8Encoding(false);
-                        break;
-                }
+		            case IrcEncoding.UTF8:
+		                encoding = new UTF8Encoding(false);
+		                break;
+		        }
 
-                client = new TcpClientAsyncAdapter(new TcpClient(), encoding);
-				if (Options.HasFlag(ConnectOptions.Secure))
-				{
-					// TODO: Call client.ConnectSecurely(string host, int port, [something] certificate);
-					client.Connect(Host, Port);
-				}
-				else
-				{
-					client.Connect(Host, Port);
-				}
-			}
-			catch (ArgumentNullException)
-			{
-				tokenSource.Cancel();
-			}
+		        //client = new TcpClientAsyncAdapter(new TcpClient(), encoding);
+		        client = new TcpClient();
+
+		        IPHostEntry he = await Dns.GetHostEntryAsync(Host);
+
+		        if (he.AddressList.Length == 0)
+		        {
+                    throw new SocketException();
+		        }
+
+		        var connectionEndpoint = new IPEndPoint(he.AddressList[0], Port);
+		        if (Options.HasFlag(ConnectOptions.Secure))
+		        {
+                    // TODO: Actually open a secure connection (using SSL).
+		            client.Connect(connectionEndpoint);
+                    stream = client.GetStream();
+                    reader = new StreamReader(stream, encoding);
+		        }
+		        else
+		        {
+                    client.Connect(connectionEndpoint);
+                    stream = client.GetStream();
+                    reader = new StreamReader(stream, encoding);
+		        }
+		    }
+		    catch (ArgumentNullException)
+		    {
+		        tokenSource.Cancel();
+		    }
+		    catch (SocketException)
+		    {
+		        // poo
+		    }
 
 			await
-				client.ReadLineAsync().
+				reader.ReadLineAsync().
 					ContinueWith(OnAsyncRead, this, token, TaskContinuationOptions.LongRunning, TaskScheduler.Current);
 
 			StartQueue();
@@ -366,9 +384,15 @@ namespace Atlantis.Net.Irc
 			queueRunner = Task.Factory.StartNew(QueueProcessor, token, TaskCreationOptions.LongRunning);
 		}
 		
-		private void Send(string data)
+		private async void Send(string data)
 		{
-			client.WriteLine(data);
+		    var sb = new StringBuilder(data);
+		    sb.AppendLine();
+
+		    byte[] buf = encoding.GetBytes(sb.ToString());
+
+		    await stream.WriteAsync(buf, 0, buf.Length, token);
+		    await stream.FlushAsync(token);
 		}
 
 		/// <summary>

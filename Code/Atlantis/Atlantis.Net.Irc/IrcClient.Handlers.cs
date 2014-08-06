@@ -633,7 +633,7 @@ namespace Atlantis.Net.Irc
 				RawMessageReceivedEvent.Raise(this, new RawMessageEventArgs(task.Result));
 
 				await
-					client.ReadLineAsync().
+					reader.ReadLineAsync().
 						ContinueWith(OnAsyncRead, state, token, TaskContinuationOptions.LongRunning, TaskScheduler.Current);
 			}
             else if (task.Exception != null)
